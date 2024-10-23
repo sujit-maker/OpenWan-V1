@@ -65,7 +65,6 @@ const DeviceTable: React.FC = () => {
   };
 
   const handleConnect = (device: Device) => {
-    // Use router.push for navigation
     router.push(`/devices/${device.deviceId}`);
   };
 
