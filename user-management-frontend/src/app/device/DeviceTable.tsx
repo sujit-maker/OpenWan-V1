@@ -1,20 +1,20 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrash, FaSearch, FaLink } from 'react-icons/fa';
-import CreateDeviceModal from './CreateDeviceModal';
-import EditDeviceModal from './EditDeviceModal';
-import Header from '../components/Header';
-import { Device } from './types'; 
-import { useRouter } from 'next/navigation'; 
+"use client";
+import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaSearch, FaLink } from "react-icons/fa";
+import CreateDeviceModal from "./CreateDeviceModal";
+import EditDeviceModal from "./EditDeviceModal";
+import Header from "../components/Header";
+import { Device } from "./types";
+import { useRouter } from "next/navigation";
 
 const DeviceTable: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<Device[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const router = useRouter(); 
+  const router = useRouter();
 
   useEffect(() => {
     fetchDevices();
@@ -22,24 +22,25 @@ const DeviceTable: React.FC = () => {
 
   useEffect(() => {
     setFilteredDevices(
-      devices.filter(device =>
-        device.deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        device.deviceId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        device.deviceType.toLowerCase().includes(searchQuery.toLowerCase())
+      devices.filter(
+        (device) =>
+          device.deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.deviceId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.deviceType.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
   }, [searchQuery, devices]);
 
   const fetchDevices = async () => {
     try {
-      const response = await fetch('http://localhost:8000/devices');
+      const response = await fetch("http://localhost:8000/devices");
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       const data: Device[] = await response.json();
       setDevices(data);
     } catch (error) {
-      console.error('Failed to fetch devices:', error);
+      console.error("Failed to fetch devices:", error);
     }
   };
 
@@ -47,14 +48,14 @@ const DeviceTable: React.FC = () => {
     if (window.confirm("Are you sure you want to delete this device?")) {
       try {
         const response = await fetch(`http://localhost:8000/devices/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
-        fetchDevices(); 
+        fetchDevices();
       } catch (error) {
-        console.error('Failed to delete device:', error);
+        console.error("Failed to delete device:", error);
       }
     }
   };
@@ -69,19 +70,24 @@ const DeviceTable: React.FC = () => {
   };
 
   const handleDeviceCreated = () => {
-    fetchDevices(); 
+    fetchDevices();
   };
 
   const handleDeviceUpdated = (updatedDevice: Device) => {
-    setDevices(prev =>
-      prev.map(device => (device.id === updatedDevice.id ? updatedDevice : device))
+    setDevices((prev) =>
+      prev.map((device) =>
+        device.id === updatedDevice.id ? updatedDevice : device
+      )
     );
   };
 
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-6 lg:pl-72" style={{ marginTop: 80 }}>
+      <div
+        className="container mx-auto px-4 py-6 lg:pl-72"
+        style={{ marginTop: 80 }}
+      >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -97,7 +103,10 @@ const DeviceTable: React.FC = () => {
               placeholder="Search devices..."
               className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
             />
-            <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+            <FaSearch
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+              size={20}
+            />
           </div>
         </div>
         <div className="overflow-x-auto ml-8">
@@ -125,13 +134,23 @@ const DeviceTable: React.FC = () => {
                   <td className="border p-1">{device.deviceUsername}</td>
                   <td className="border p-1">{device.devicePassword}</td>
                   <td className="border p-1 text-center">
-                    <button onClick={() => handleConnect(device)} className="text-yellow-500 hover:text-yellow-700 mr-2" title="Connect">
+                    <button
+                      onClick={() => handleConnect(device)}
+                      className="text-yellow-500 hover:text-yellow-700 mr-2"
+                      title="Connect"
+                    >
                       <FaLink />
                     </button>
-                    <button onClick={() => handleEdit(device)} className="text-blue-500 hover:text-blue-700 mr-2">
+                    <button
+                      onClick={() => handleEdit(device)}
+                      className="text-blue-500 hover:text-blue-700 mr-2"
+                    >
                       <FaEdit />
                     </button>
-                    <button onClick={() => handleDelete(device.id)} className="text-red-500 hover:text-red-700">
+                    <button
+                      onClick={() => handleDelete(device.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
                       <FaTrash />
                     </button>
                   </td>
