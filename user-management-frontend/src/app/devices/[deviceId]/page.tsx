@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Header from "@/app/components/Header";
+import Sidebar from "@/app/components/Sidebar";
+import router from "next/router";
 
 interface DeviceData {
   date: string;
@@ -9,64 +12,87 @@ interface DeviceData {
   cpuLoad: string;
   freeMemory: string;
   totalMemory: string;
+  name: string;
+
   wan1: {
     address: string;
     status: string;
     internet: string;
-    running: string; // Keep as string to directly show the value
+    running: string;
   };
+
   wan2: {
     address: string;
     status: string;
     internet: string;
-    running: string; // Keep as string to directly show the value
+    running: string;
   };
 }
 
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
   const { deviceId } = useParams();
+  const router = useRouter();
+
 
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/devices/${deviceId}/data`);
+        const response = await fetch(
+          `http://localhost:8000/devices/${deviceId}/data`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch device data");
         }
         const data = await response.json();
 
         const filteredData: DeviceData = {
-          date: `${data["system/clock"].date} ${data["system/clock"].time}` || "N/A",
+          date:
+            `${data["system/clock"].date} ${data["system/clock"].time}` ||
+            "N/A",
           uptime: `${data["system/resource"].uptime}` || "N/A",
           osVersion: `${data["system/resource"].version}` || "N/A",
           cpuLoad: `${data["system/resource"]["cpu-load"]}` || "N/A",
-          freeMemory: `${(data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
-          totalMemory: `${(data["system/resource"]["total-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
+          freeMemory:
+            `${(data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(
+              2
+            )} MB` || "N/A",
+          totalMemory:
+            `${(
+              data["system/resource"]["total-memory"] /
+              (1024 * 1024)
+            ).toFixed(2)} MB` || "N/A",
+          name: data["system/identity"]["name"] || "N/A",
+
           wan1: {
             address: "N/A",
             status: "Disconnected",
             internet: "Disconnected",
-            running: "N/A" // Initialize as "N/A"
+            running: "N/A",
           },
           wan2: {
             address: "N/A",
             status: "Disconnected",
             internet: "Disconnected",
-            running: "N/A" // Initialize as "N/A"
-          }
+            running: "N/A",
+          },
         };
 
         // Fetch WAN IP details directly for WAN1
         try {
-          const wan1IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN1`);
+          const wan1IpResponse = await fetch(
+            `http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN1`
+          );
           if (wan1IpResponse.ok) {
             const wan1IpData = await wan1IpResponse.json();
             if (Array.isArray(wan1IpData) && wan1IpData.length > 0) {
               filteredData.wan1.address = wan1IpData[0].address || "N/A";
               filteredData.wan1.status = "Connected";
             } else {
-              console.warn("WAN1 IP data is not in expected format or is empty:", wan1IpData);
+              console.warn(
+                "WAN1 IP data is not in expected format or is empty:",
+                wan1IpData
+              );
             }
           } else {
             console.error("Error fetching WAN1 IP:", wan1IpResponse.statusText);
@@ -77,14 +103,19 @@ const DeviceDetails: React.FC = () => {
 
         // Fetch WAN IP details directly for WAN2
         try {
-          const wan2IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN2`);
+          const wan2IpResponse = await fetch(
+            `http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN2`
+          );
           if (wan2IpResponse.ok) {
             const wan2IpData = await wan2IpResponse.json();
             if (Array.isArray(wan2IpData) && wan2IpData.length > 0) {
               filteredData.wan2.address = wan2IpData[0].address || "N/A";
               filteredData.wan2.status = "Connected";
             } else {
-              console.warn("WAN2 IP data is not in expected format or is empty:", wan2IpData);
+              console.warn(
+                "WAN2 IP data is not in expected format or is empty:",
+                wan2IpData
+              );
             }
           } else {
             console.error("Error fetching WAN2 IP:", wan2IpResponse.statusText);
@@ -95,13 +126,17 @@ const DeviceDetails: React.FC = () => {
 
         // Fetch Netwatch status for both WANs
         try {
-          const netwatchResponse = await fetch(`http://localhost:8000/devices/${deviceId}/tool/netwatch`);
+          const netwatchResponse = await fetch(
+            `http://localhost:8000/devices/${deviceId}/tool/netwatch`
+          );
           if (netwatchResponse.ok) {
             const netwatchData = await netwatchResponse.json();
-            console.log("Netwatch Data:", netwatchData);
-
-            const wan1Status = netwatchData.find((entry: any) => entry.comment === 'WAN1');
-            const wan2Status = netwatchData.find((entry: any) => entry.comment === 'WAN2');
+            const wan1Status = netwatchData.find(
+              (entry: any) => entry.comment === "WAN1"
+            );
+            const wan2Status = netwatchData.find(
+              (entry: any) => entry.comment === "WAN2"
+            );
 
             if (wan1Status) {
               filteredData.wan1.internet = wan1Status.status || "N/A";
@@ -110,7 +145,10 @@ const DeviceDetails: React.FC = () => {
               filteredData.wan2.internet = wan2Status.status || "N/A";
             }
           } else {
-            console.error("Error fetching netwatch data:", netwatchResponse.statusText);
+            console.error(
+              "Error fetching netwatch data:",
+              netwatchResponse.statusText
+            );
           }
         } catch (error) {
           console.error("Error fetching netwatch details:", error);
@@ -118,29 +156,42 @@ const DeviceDetails: React.FC = () => {
 
         // Fetch interface data to get the running status
         try {
-          const interfaceResponse = await fetch(`http://localhost:8000/devices/${deviceId}/interface`);
+          const interfaceResponse = await fetch(
+            `http://localhost:8000/devices/${deviceId}/interface`
+          );
           if (interfaceResponse.ok) {
             const interfaceData = await interfaceResponse.json();
 
             // Assuming interfaceData is an array and includes WAN1 and WAN2
-            const wan1Interface = interfaceData.find((entry: any) => entry.name === 'WAN1');
-            const wan2Interface = interfaceData.find((entry: any) => entry.name === 'WAN2');
+            const wan1Interface = interfaceData.find(
+              (entry: any) => entry.name === "WAN1"
+            );
+            const wan2Interface = interfaceData.find(
+              (entry: any) => entry.name === "WAN2"
+            );
 
             // Check the running status for WAN1
             if (wan1Interface) {
-              filteredData.wan1.running = wan1Interface.running ? "Running" : "Not Running"; // Update running status directly
+              filteredData.wan1.running = wan1Interface.running
+                ? "Running"
+                : "Not Running";
             } else {
               console.warn("WAN1 interface data not found");
             }
 
             // Check the running status for WAN2
             if (wan2Interface) {
-              filteredData.wan2.running = wan2Interface.running ? "Running" : "Not Running"; // Update running status directly
+              filteredData.wan2.running = wan2Interface.running
+                ? "Running"
+                : "Not Running";
             } else {
               console.warn("WAN2 interface data not found");
             }
           } else {
-            console.error("Error fetching interface data:", interfaceResponse.statusText);
+            console.error(
+              "Error fetching interface data:",
+              interfaceResponse.statusText
+            );
           }
         } catch (error) {
           console.error("Error fetching interface details:", error);
@@ -157,58 +208,82 @@ const DeviceDetails: React.FC = () => {
     }
   }, [deviceId]);
 
-  if (!deviceData) return <p>Loading device data...</p>;
+  if (!deviceData)
+    return (
+      <div className="flex items-center text-3xl  font-semibold justify-center h-screen">
+        <h1>Loading Device Data...</h1>
+      </div>
+    );
+     
+
+    const backme = () => {
+      router.push("/device");
+    };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Device Dashboard - {deviceId}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Card for Date & Time */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Date & Time</h2>
-          <p className="text-gray-700">{deviceData.date}</p>
+    <>
+      <Header />
+      <Sidebar />
+
+      <div className="container mx-auto px-24 py-28">
+        <div className="flex justify-end mb-4">
+          <button onClick={backme} className="bg-red-700 p-2 text-white rounded-md">Back</button>
         </div>
-        {/* Card for Uptime */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Uptime</h2>
-          <p className="text-gray-700">{deviceData.uptime}</p>
-        </div>
-        {/* Card for OS Version */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">OS Version</h2>
-          <p className="text-gray-700">{deviceData.osVersion}</p>
-        </div>
-        {/* Card for CPU Load */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">CPU Load</h2>
-          <p className="text-gray-700">{deviceData.cpuLoad}</p>
-        </div>
-        {/* Card for Free Memory */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Free Memory</h2>
-          <p className="text-gray-700">{deviceData.freeMemory}</p>
-        </div>
-        {/* Card for Total Memory */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Total Memory</h2>
-          <p className="text-gray-700">{deviceData.totalMemory}</p>
-        </div>
-        {/* Card for WAN 1 */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
-          <p className="text-gray-700">IP Address: {deviceData.wan1.address}</p>
-          <p className="text-gray-700">Status: {deviceData.wan1.status}</p>
-          <p className="text-gray-700">Internet: {deviceData.wan1.internet}</p> {/* Display internet */}
-        </div>
-        {/* Card for WAN 2 */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
-          <p className="text-gray-700">IP Address: {deviceData.wan2.address}</p>
-          <p className="text-gray-700">Status: {deviceData.wan2.status}</p>
-          <p className="text-gray-700">Internet: {deviceData.wan2.internet}</p> {/* Display internet */}
+        <h1 className="text-2xl font-bold mb-8">
+          Device Dashboard - {deviceId}
+        </h1>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
+          <div className="bg-gray-100 rounded-lg shadow-md p-4 border border-gray-200 w-full max-w-sm">
+            {" "}
+            <h2 className="text-lg font-semibold mb-2">Date & Time </h2>
+            <p className="text-gray-700">{deviceData.date}</p>
+            <h2 className="text-lg font-semibold mb-2">Uptime</h2>
+            <p className="text-gray-700">{deviceData.uptime}</p>
+          </div>
+
+          <div className="bg-gray-100 rounded-lg shadow-md p-4 border border-gray-200 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-2">Memory Usage</h2>
+            <p className="text-gray-700">
+              {deviceData.totalMemory}/{deviceData.freeMemory}
+            </p>
+            <h2 className="text-lg font-semibold mb-2">CPU Load</h2>
+            <p className="text-gray-700">{deviceData.cpuLoad}%</p>
+          </div>
+
+          {/* Card for OS Version */}
+          <div className="bg-gray-100 rounded-lg shadow-md p-4 border border-gray-200 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-2">OS Version</h2>
+            <p className="text-gray-700">{deviceData.osVersion}</p>
+            <h2 className="text-lg font-semibold mb-2">Idenity</h2>
+            <p className="text-gray-700">{deviceData.name}</p>
+          </div>
+
+          {/* Card for WAN 1 */}
+          <div className="bg-gray-100 rounded-lg shadow-md p-4 border border-gray-200 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
+            <p className="text-gray-700">
+              IP Address: {deviceData.wan1.address}
+            </p>
+            <p className="text-gray-700">Status: {deviceData.wan1.status}</p>
+            <p className="text-gray-700">
+              Internet: {deviceData.wan1.internet}
+            </p>
+          </div>
+          {/* Card for WAN 2 */}
+          <div className="bg-gray-100 rounded-lg shadow-md p-4 border border-gray-200 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
+            <p className="text-gray-700">
+              IP Address: {deviceData.wan2.address}
+            </p>
+            <p className="text-gray-700">Status: {deviceData.wan2.status}</p>
+            <p className="text-gray-700">
+              Internet: {deviceData.wan2.internet}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

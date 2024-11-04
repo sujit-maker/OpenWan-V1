@@ -84,6 +84,7 @@ const DeviceTable: React.FC = () => {
   return (
     <>
       <Header />
+      
       <div
         className="container mx-auto px-4 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
@@ -95,6 +96,7 @@ const DeviceTable: React.FC = () => {
           >
             Add Device
           </button>
+
           <div className="relative mt-4 md:mt-0">
             <input
               type="text"
@@ -109,17 +111,14 @@ const DeviceTable: React.FC = () => {
             />
           </div>
         </div>
+        
         <div className="overflow-x-auto ml-8">
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-10">
             <thead className="bg-gray-200">
               <tr>
-                <th className="border p-1 text-xs md:text-sm">Device ID</th>
-                <th className="border p-1 text-xs md:text-sm">Device Name</th>
-                <th className="border p-1 text-xs md:text-sm">Device Type</th>
-                <th className="border p-1 text-xs md:text-sm">Device IP</th>
-                <th className="border p-1 text-xs md:text-sm">Device Port</th>
-                <th className="border p-1 text-xs md:text-sm">Username</th>
-                <th className="border p-1 text-xs md:text-sm">Password</th>
+                <th className="border p-0 md:text-sm">Device ID</th>
+                <th className="border p-0 md:text-sm">Device Name</th>
+                <th className="border p-0 md:text-sm">Device Type</th>
                 <th className="border p-1 text-xs md:text-sm">Actions</th>
               </tr>
             </thead>
@@ -129,10 +128,6 @@ const DeviceTable: React.FC = () => {
                   <td className="border p-1">{device.deviceId}</td>
                   <td className="border p-1">{device.deviceName}</td>
                   <td className="border p-1">{device.deviceType}</td>
-                  <td className="border p-1">{device.deviceIp}</td>
-                  <td className="border p-1">{device.devicePort}</td>
-                  <td className="border p-1">{device.deviceUsername}</td>
-                  <td className="border p-1">{device.devicePassword}</td>
                   <td className="border p-1 text-center">
                     <button
                       onClick={() => handleConnect(device)}
