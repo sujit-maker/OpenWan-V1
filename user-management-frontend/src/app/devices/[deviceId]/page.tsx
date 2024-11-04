@@ -12,13 +12,13 @@ interface DeviceData {
   wan1: {
     address: string;
     status: string;
-    internetStatus: string;
+    internet: string;
     running: string; // Keep as string to directly show the value
   };
   wan2: {
     address: string;
     status: string;
-    internetStatus: string;
+    internet: string;
     running: string; // Keep as string to directly show the value
   };
 }
@@ -30,31 +30,29 @@ const DeviceDetails: React.FC = () => {
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
-        console.log("Fetching data for device ID:", deviceId);
         const response = await fetch(`http://localhost:8000/devices/${deviceId}/data`);
         if (!response.ok) {
           throw new Error("Failed to fetch device data");
         }
         const data = await response.json();
-        console.log("Fetched data:", data);
 
         const filteredData: DeviceData = {
           date: `${data["system/clock"].date} ${data["system/clock"].time}` || "N/A",
           uptime: `${data["system/resource"].uptime}` || "N/A",
           osVersion: `${data["system/resource"].version}` || "N/A",
           cpuLoad: `${data["system/resource"]["cpu-load"]}` || "N/A",
-          freeMemory: `${data["system/resource"]["free-memory"]}` || "N/A",
-          totalMemory: `${data["system/resource"]["total-memory"]}` || "N/A",
+          freeMemory: `${(data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
+          totalMemory: `${(data["system/resource"]["total-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
           wan1: {
             address: "N/A",
             status: "Disconnected",
-            internetStatus: "Disconnected",
+            internet: "Disconnected",
             running: "N/A" // Initialize as "N/A"
           },
           wan2: {
             address: "N/A",
             status: "Disconnected",
-            internetStatus: "Disconnected",
+            internet: "Disconnected",
             running: "N/A" // Initialize as "N/A"
           }
         };
@@ -64,7 +62,6 @@ const DeviceDetails: React.FC = () => {
           const wan1IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN1`);
           if (wan1IpResponse.ok) {
             const wan1IpData = await wan1IpResponse.json();
-            console.log("WAN1 IP Data:", wan1IpData);
             if (Array.isArray(wan1IpData) && wan1IpData.length > 0) {
               filteredData.wan1.address = wan1IpData[0].address || "N/A";
               filteredData.wan1.status = "Connected";
@@ -83,7 +80,6 @@ const DeviceDetails: React.FC = () => {
           const wan2IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN2`);
           if (wan2IpResponse.ok) {
             const wan2IpData = await wan2IpResponse.json();
-            console.log("WAN2 IP Data:", wan2IpData);
             if (Array.isArray(wan2IpData) && wan2IpData.length > 0) {
               filteredData.wan2.address = wan2IpData[0].address || "N/A";
               filteredData.wan2.status = "Connected";
@@ -108,10 +104,10 @@ const DeviceDetails: React.FC = () => {
             const wan2Status = netwatchData.find((entry: any) => entry.comment === 'WAN2');
 
             if (wan1Status) {
-              filteredData.wan1.internetStatus = wan1Status.status || "N/A";
+              filteredData.wan1.internet = wan1Status.status || "N/A";
             }
             if (wan2Status) {
-              filteredData.wan2.internetStatus = wan2Status.status || "N/A";
+              filteredData.wan2.internet = wan2Status.status || "N/A";
             }
           } else {
             console.error("Error fetching netwatch data:", netwatchResponse.statusText);
@@ -125,7 +121,6 @@ const DeviceDetails: React.FC = () => {
           const interfaceResponse = await fetch(`http://localhost:8000/devices/${deviceId}/interface`);
           if (interfaceResponse.ok) {
             const interfaceData = await interfaceResponse.json();
-            console.log("Interface Data:", interfaceData);
 
             // Assuming interfaceData is an array and includes WAN1 and WAN2
             const wan1Interface = interfaceData.find((entry: any) => entry.name === 'WAN1');
@@ -133,7 +128,6 @@ const DeviceDetails: React.FC = () => {
 
             // Check the running status for WAN1
             if (wan1Interface) {
-              console.log("WAN1 Interface Running Status:", wan1Interface.running); // Debugging line
               filteredData.wan1.running = wan1Interface.running ? "Running" : "Not Running"; // Update running status directly
             } else {
               console.warn("WAN1 interface data not found");
@@ -141,7 +135,6 @@ const DeviceDetails: React.FC = () => {
 
             // Check the running status for WAN2
             if (wan2Interface) {
-              console.log("WAN2 Interface Running Status:", wan2Interface.running); // Debugging line
               filteredData.wan2.running = wan2Interface.running ? "Running" : "Not Running"; // Update running status directly
             } else {
               console.warn("WAN2 interface data not found");
@@ -205,14 +198,14 @@ const DeviceDetails: React.FC = () => {
           <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
           <p className="text-gray-700">IP Address: {deviceData.wan1.address}</p>
           <p className="text-gray-700">Status: {deviceData.wan1.status}</p>
-          <p className="text-gray-700">Internet Status: {deviceData.wan1.internetStatus}</p> {/* Display Internet Status */}
+          <p className="text-gray-700">Internet: {deviceData.wan1.internet}</p> {/* Display internet */}
         </div>
         {/* Card for WAN 2 */}
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
           <p className="text-gray-700">IP Address: {deviceData.wan2.address}</p>
           <p className="text-gray-700">Status: {deviceData.wan2.status}</p>
-          <p className="text-gray-700">Internet Status: {deviceData.wan2.internetStatus}</p> {/* Display Internet Status */}
+          <p className="text-gray-700">Internet: {deviceData.wan2.internet}</p> {/* Display internet */}
         </div>
       </div>
     </div>
