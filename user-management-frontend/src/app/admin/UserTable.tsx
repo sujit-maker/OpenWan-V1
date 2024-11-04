@@ -203,10 +203,10 @@ interface User {
             {" "}
             <thead className="bg-gray-200">
               <tr>
-                <th className="border p-1 text-xs md:text-sm">Username</th>
-                <th className="border p-1 text-xs md:text-sm">User Type</th>
-                <th className="border p-1 text-xs md:text-sm">Manager Name</th>
-                <th className="border p-1 text-xs md:text-sm">Actions</th>
+                <th className="border p-2 text-xs md:text-sm">Username</th>
+                <th className="border p-2 text-xs md:text-sm">User Type</th>
+                <th className="border p-2 text-xs md:text-sm">Manager Name</th>
+                <th className="border p-2 text-xs md:text-sm">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -214,7 +214,7 @@ interface User {
                 <tr key={user.id}>
                   <td className="border p-1">{user.username}</td>
                   <td className="border p-1">{user.usertype}</td>
-                  <td className="border p-3">
+                  <td className="border p-1">
                   {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
                 </td>
                   <td className="border p-1 text-center">

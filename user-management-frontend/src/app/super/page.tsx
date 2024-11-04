@@ -6,7 +6,7 @@ export default function AdminPage() {
   return (
     <>
     <div>
-      
+      <Header/>
       <Sidebar/>
        <UserTable/>
     </div>

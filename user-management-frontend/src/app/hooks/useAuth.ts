@@ -11,7 +11,7 @@ interface LoginResponse {
   usertype: UserType;
 }
 
-export const useAuth = () => {
+  export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
@@ -64,7 +64,7 @@ export const useAuth = () => {
         setAdminId(id);
       } else if (usertype === 'SUPERADMIN') {
         setSuperadminId(id);
-      }
+      } 
 
       setLocalStorage('access_token', access_token);
       setLocalStorage('userId', id);
@@ -75,16 +75,16 @@ export const useAuth = () => {
 
       switch (usertype) {
         case 'ADMIN':
-          router.push('/admin');
+          router.push('/dashboard');
           break;
         case 'EXECUTIVE':
           router.push('/executive');
           break;
         case 'MANAGER':
-          router.push('/manager');
+          router.push('/dashboard');
           break;
         case 'SUPERADMIN':
-          router.push('/super');
+          router.push('/dashboard');
           break;
         default:
           throw new Error('Invalid usertype');

@@ -1,113 +1,221 @@
-// src/app/devices/[deviceId]/page.tsx
 "use client";
-import Sidebar from "@/app/components/Sidebar";
 import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
-type DeviceData = {
-  deviceId: string;
-  deviceName: string;
-  deviceType: string;
-  deviceIp: string;
-  devicePort: string;
-  deviceUsername: string;
-  devicePassword: string;
-};
+interface DeviceData {
+  date: string;
+  uptime: string;
+  osVersion: string;
+  cpuLoad: string;
+  freeMemory: string;
+  totalMemory: string;
+  wan1: {
+    address: string;
+    status: string;
+    internetStatus: string;
+    running: string; // Keep as string to directly show the value
+  };
+  wan2: {
+    address: string;
+    status: string;
+    internetStatus: string;
+    running: string; // Keep as string to directly show the value
+  };
+}
 
-const DeviceDetails = ({ params }: { params: { deviceId: string } }) => {
-  const { deviceId } = params;
-  const router = useRouter();
-
+const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { deviceId } = useParams();
 
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
-        const response = await fetch(
-          `http://40.0.0.109:8000/devices/${deviceId}`,
-          {
-            next: { revalidate: 10 },
-          }
-        );
-
+        console.log("Fetching data for device ID:", deviceId);
+        const response = await fetch(`http://localhost:8000/devices/${deviceId}/data`);
         if (!response.ok) {
-          throw new Error("Device not found");
+          throw new Error("Failed to fetch device data");
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data);
+
+        const filteredData: DeviceData = {
+          date: `${data["system/clock"].date} ${data["system/clock"].time}` || "N/A",
+          uptime: `${data["system/resource"].uptime}` || "N/A",
+          osVersion: `${data["system/resource"].version}` || "N/A",
+          cpuLoad: `${data["system/resource"]["cpu-load"]}` || "N/A",
+          freeMemory: `${data["system/resource"]["free-memory"]}` || "N/A",
+          totalMemory: `${data["system/resource"]["total-memory"]}` || "N/A",
+          wan1: {
+            address: "N/A",
+            status: "Disconnected",
+            internetStatus: "Disconnected",
+            running: "N/A" // Initialize as "N/A"
+          },
+          wan2: {
+            address: "N/A",
+            status: "Disconnected",
+            internetStatus: "Disconnected",
+            running: "N/A" // Initialize as "N/A"
+          }
+        };
+
+        // Fetch WAN IP details directly for WAN1
+        try {
+          const wan1IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN1`);
+          if (wan1IpResponse.ok) {
+            const wan1IpData = await wan1IpResponse.json();
+            console.log("WAN1 IP Data:", wan1IpData);
+            if (Array.isArray(wan1IpData) && wan1IpData.length > 0) {
+              filteredData.wan1.address = wan1IpData[0].address || "N/A";
+              filteredData.wan1.status = "Connected";
+            } else {
+              console.warn("WAN1 IP data is not in expected format or is empty:", wan1IpData);
+            }
+          } else {
+            console.error("Error fetching WAN1 IP:", wan1IpResponse.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching WAN1 IP details:", error);
         }
 
-        const data: DeviceData = await response.json();
-        setDeviceData(data);
+        // Fetch WAN IP details directly for WAN2
+        try {
+          const wan2IpResponse = await fetch(`http://localhost:8000/devices/${deviceId}/wan-ip?wan=WAN2`);
+          if (wan2IpResponse.ok) {
+            const wan2IpData = await wan2IpResponse.json();
+            console.log("WAN2 IP Data:", wan2IpData);
+            if (Array.isArray(wan2IpData) && wan2IpData.length > 0) {
+              filteredData.wan2.address = wan2IpData[0].address || "N/A";
+              filteredData.wan2.status = "Connected";
+            } else {
+              console.warn("WAN2 IP data is not in expected format or is empty:", wan2IpData);
+            }
+          } else {
+            console.error("Error fetching WAN2 IP:", wan2IpResponse.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching WAN2 IP details:", error);
+        }
+
+        // Fetch Netwatch status for both WANs
+        try {
+          const netwatchResponse = await fetch(`http://localhost:8000/devices/${deviceId}/tool/netwatch`);
+          if (netwatchResponse.ok) {
+            const netwatchData = await netwatchResponse.json();
+            console.log("Netwatch Data:", netwatchData);
+
+            const wan1Status = netwatchData.find((entry: any) => entry.comment === 'WAN1');
+            const wan2Status = netwatchData.find((entry: any) => entry.comment === 'WAN2');
+
+            if (wan1Status) {
+              filteredData.wan1.internetStatus = wan1Status.status || "N/A";
+            }
+            if (wan2Status) {
+              filteredData.wan2.internetStatus = wan2Status.status || "N/A";
+            }
+          } else {
+            console.error("Error fetching netwatch data:", netwatchResponse.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching netwatch details:", error);
+        }
+
+        // Fetch interface data to get the running status
+        try {
+          const interfaceResponse = await fetch(`http://localhost:8000/devices/${deviceId}/interface`);
+          if (interfaceResponse.ok) {
+            const interfaceData = await interfaceResponse.json();
+            console.log("Interface Data:", interfaceData);
+
+            // Assuming interfaceData is an array and includes WAN1 and WAN2
+            const wan1Interface = interfaceData.find((entry: any) => entry.name === 'WAN1');
+            const wan2Interface = interfaceData.find((entry: any) => entry.name === 'WAN2');
+
+            // Check the running status for WAN1
+            if (wan1Interface) {
+              console.log("WAN1 Interface Running Status:", wan1Interface.running); // Debugging line
+              filteredData.wan1.running = wan1Interface.running ? "Running" : "Not Running"; // Update running status directly
+            } else {
+              console.warn("WAN1 interface data not found");
+            }
+
+            // Check the running status for WAN2
+            if (wan2Interface) {
+              console.log("WAN2 Interface Running Status:", wan2Interface.running); // Debugging line
+              filteredData.wan2.running = wan2Interface.running ? "Running" : "Not Running"; // Update running status directly
+            } else {
+              console.warn("WAN2 interface data not found");
+            }
+          } else {
+            console.error("Error fetching interface data:", interfaceResponse.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching interface details:", error);
+        }
+
+        setDeviceData(filteredData);
       } catch (error) {
-        console.error(error);
-        setDeviceData(null);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching device data:", error);
       }
     };
 
-    fetchDeviceData();
+    if (deviceId) {
+      fetchDeviceData();
+    }
   }, [deviceId]);
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
-
-  if (!deviceData) {
-    return <div className="text-center">Device not found.</div>;
-  }
-
-  const handleBackClick = () => {
-    router.push("/device");
-  };
+  if (!deviceData) return <p>Loading device data...</p>;
 
   return (
-    <>
-      <Sidebar />
-      <div className="container mt-5">
-        <h1 className="text-center mb-4">Device Details</h1>
-        <div className="text-center mb-3">
-          <button
-            onClick={handleBackClick}
-            className="btn btn-primary"
-            aria-label="Back to device list"
-          >
-            Back
-          </button>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">Device Dashboard - {deviceId}</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Card for Date & Time */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">Date & Time</h2>
+          <p className="text-gray-700">{deviceData.date}</p>
         </div>
-
-        <div className="table-responsive">
-          <table className="table table-bordered text-center mx-auto" style={{ maxWidth: "600px" }}>
-            <tbody>
-              <tr>
-                <th scope="row">Device Name</th>
-                <td>{deviceData.deviceName}</td>
-              </tr>
-              <tr>
-                <th scope="row">Type</th>
-                <td>{deviceData.deviceType}</td>
-              </tr>
-              <tr>
-                <th scope="row">IP</th>
-                <td>{deviceData.deviceIp}</td>
-              </tr>
-              <tr>
-                <th scope="row">Port</th>
-                <td>{deviceData.devicePort}</td>
-              </tr>
-              <tr>
-                <th scope="row">Username</th>
-                <td>{deviceData.deviceUsername}</td>
-              </tr>
-              <tr>
-                <th scope="row">Password</th>
-                <td>{deviceData.devicePassword}</td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Card for Uptime */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">Uptime</h2>
+          <p className="text-gray-700">{deviceData.uptime}</p>
+        </div>
+        {/* Card for OS Version */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">OS Version</h2>
+          <p className="text-gray-700">{deviceData.osVersion}</p>
+        </div>
+        {/* Card for CPU Load */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">CPU Load</h2>
+          <p className="text-gray-700">{deviceData.cpuLoad}</p>
+        </div>
+        {/* Card for Free Memory */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">Free Memory</h2>
+          <p className="text-gray-700">{deviceData.freeMemory}</p>
+        </div>
+        {/* Card for Total Memory */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">Total Memory</h2>
+          <p className="text-gray-700">{deviceData.totalMemory}</p>
+        </div>
+        {/* Card for WAN 1 */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
+          <p className="text-gray-700">IP Address: {deviceData.wan1.address}</p>
+          <p className="text-gray-700">Status: {deviceData.wan1.status}</p>
+          <p className="text-gray-700">Internet Status: {deviceData.wan1.internetStatus}</p> {/* Display Internet Status */}
+        </div>
+        {/* Card for WAN 2 */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
+          <p className="text-gray-700">IP Address: {deviceData.wan2.address}</p>
+          <p className="text-gray-700">Status: {deviceData.wan2.status}</p>
+          <p className="text-gray-700">Internet Status: {deviceData.wan2.internetStatus}</p> {/* Display Internet Status */}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

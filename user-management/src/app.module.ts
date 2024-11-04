@@ -10,9 +10,11 @@ import { CustomerModule } from './customer/customer.module';
 import { SiteModule } from './site/site.module';
 import { TasksModule } from './tasks/tasks.module';
 import { DevicesModule } from './devices/devices.module';
+import { EmailModule } from './email/email.module';
+import { MikroTikModule } from './mikrotik/mikroTik.module';
 
 @Module({
-  imports: [AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule],
+  imports: [AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule, EmailModule,MikroTikModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

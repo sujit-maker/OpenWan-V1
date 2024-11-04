@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
-import Header from "../components/Header";
 
 interface Manager {
   id: number;
@@ -137,7 +136,7 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-    <Header/>
+
       <div className="container mx-auto px-4 py-6 lg:pl-72" style={{ marginTop: 80 }}>
 
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -163,10 +162,10 @@ const UserTable: React.FC = () => {
         <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-16">
   <thead>
     <tr>
-      <th className="border p-3">Username</th>
-      <th className="border p-3">User Type</th>
-      <th className="border p-3">Manager Name</th>
-      <th className="border p-3">Actions</th>
+      <th className="border p-1">Username</th>
+      <th className="border p-1">User Type</th>
+      <th className="border p-1">Manager Name</th>
+      <th className="border p-1">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -177,7 +176,7 @@ const UserTable: React.FC = () => {
         <td className="border p-1">
           {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
         </td>
-        <td className="border p-3 text-center">
+        <td className="border p-1 text-center">
           <button
             onClick={() => handleEdit(user)}
             className="text-blue-500 hover:text-blue-700 mr-2"

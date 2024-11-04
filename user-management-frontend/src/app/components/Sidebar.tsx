@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import { List, ListItemButton, ListItemIcon, ListItemText, Divider, IconButton } from '@mui/material';
-import { Dashboard, Person, Settings, ShoppingCart, LocationOn, Task, Menu as MenuIcon, Devices, BakeryDining, FoodBank, LocalPostOffice, HomeMax, Domain } from '@mui/icons-material';
+import { Dashboard, Person, Settings,  LocationOn, Task, Menu as MenuIcon, Devices, Domain } from '@mui/icons-material';
 import { drawerWidth, drawerCollapsedWidth } from './constants';
 import { useAuth } from '../hooks/useAuth'; 
 
@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <Drawer variant="permanent" open={open} >
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: theme.spacing(1) }} >
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: theme.spacing(2.5) }} >
         <IconButton onClick={handleDrawerToggle} sx={{ color: 'white' }}>
           <MenuIcon />
         </IconButton>
@@ -80,6 +80,7 @@ const Sidebar: React.FC = () => {
           <ListItemIcon sx={{ color: 'white' }}><Settings /></ListItemIcon>
           <ListItemText primary="Services" sx={{ display: open ? 'block' : 'none', color: 'white' }} />
         </ListItemButton> */}
+
         <ListItemButton onClick={() => handleNavigation('/customer')}>
           <ListItemIcon sx={{ color: 'white' }}><Domain /></ListItemIcon>
           <ListItemText primary="Customer" sx={{ display: open ? 'block' : 'none', color: 'white' }} />
@@ -92,10 +93,12 @@ const Sidebar: React.FC = () => {
           <ListItemIcon sx={{ color: 'white' }}><Devices /></ListItemIcon>
           <ListItemText primary="Devices" sx={{ display: open ? 'block' : 'none', color: 'white' }} />
         </ListItemButton>
+
         {/* <ListItemButton onClick={() => handleNavigation('/task')}>
           <ListItemIcon sx={{ color: 'white' }}><Task /></ListItemIcon>
           <ListItemText primary="Task" sx={{ display: open ? 'block' : 'none', color: 'white' }} />
         </ListItemButton> */}
+        
       </List>
     </Drawer>
   );

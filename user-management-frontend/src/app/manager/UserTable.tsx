@@ -142,6 +142,7 @@ const UserTable: React.FC = () => {
   return (
     <>
       <Header />
+      
       <div
         className="container mx-auto px-4 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
@@ -180,8 +181,8 @@ const UserTable: React.FC = () => {
             <tbody>
               {currentUsers.map((user) => (
                 <tr key={user.id}>
-                  <td className="border p-4">{user.username}</td>
-                  <td className="border p-4">{user.usertype}</td>
+                  <td className="border p-1">{user.username}</td>
+                  <td className="border p-1">{user.usertype}</td>
                   <td className="border p-1 text-center">
                     <button
                       onClick={() => handleEdit(user)}
