@@ -6,6 +6,7 @@ import EditDeviceModal from "./EditDeviceModal";
 import Header from "../components/Header";
 import { Device } from "./types";
 import { useRouter } from "next/navigation";
+import Sidebar from "../components/Sidebar";
 
 const DeviceTable: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -33,7 +34,7 @@ const DeviceTable: React.FC = () => {
 
   const fetchDevices = async () => {
     try {
-      const response = await fetch("http://localhost:8000/devices");
+      const response = await fetch("http://40.0.0.109:8000/devices");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -47,7 +48,7 @@ const DeviceTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
       try {
-        const response = await fetch(`http://localhost:8000/devices/${id}`, {
+        const response = await fetch(`http://40.0.0.109:8000/devices/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {
@@ -84,15 +85,12 @@ const DeviceTable: React.FC = () => {
   return (
     <>
       <Header />
-      
-      <div
-        className="container mx-auto px-4 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
+      <Sidebar />
+      <div className="container mx-auto px-4 py-6 lg:pl-72" style={{ marginTop: 80 }}>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
           >
             Add Device
           </button>
@@ -103,7 +101,7 @@ const DeviceTable: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search devices..."
-              className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
+              className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 md:w-64"
             />
             <FaSearch
               className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
@@ -111,24 +109,25 @@ const DeviceTable: React.FC = () => {
             />
           </div>
         </div>
-        
-        <div className="overflow-x-auto ml-8">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-10">
+
+        {/* Responsive table wrapper */}
+        <div className="overflow-x-auto w-full px-8 lg:px-8 ml-8">
+          <table className="min-w-full bg-white shadow-lg rounded-lg">
             <thead className="bg-gray-200">
               <tr>
-                <th className="border p-0 md:text-sm">Device ID</th>
-                <th className="border p-0 md:text-sm">Device Name</th>
-                <th className="border p-0 md:text-sm">Device Type</th>
-                <th className="border p-1 text-xs md:text-sm">Actions</th>
+                <th className="border p-2 text-center">Device ID</th>
+                <th className="border p-2 text-center">Device Name</th>
+                <th className="border p-2 text-center">Device Type</th>
+                <th className="border p-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredDevices.map((device) => (
                 <tr key={device.id}>
-                  <td className="border p-1">{device.deviceId}</td>
-                  <td className="border p-1">{device.deviceName}</td>
-                  <td className="border p-1">{device.deviceType}</td>
-                  <td className="border p-1 text-center">
+                  <td className="border p-2 text-center">{device.deviceId}</td>
+                  <td className="border p-2 text-center">{device.deviceName}</td>
+                  <td className="border p-2 text-center">{device.deviceType}</td>
+                  <td className="border p-2 text-center">
                     <button
                       onClick={() => handleConnect(device)}
                       className="text-yellow-500 hover:text-yellow-700 mr-2"
@@ -154,6 +153,7 @@ const DeviceTable: React.FC = () => {
             </tbody>
           </table>
         </div>
+
         {isCreateModalOpen && (
           <CreateDeviceModal
             isOpen={isCreateModalOpen}

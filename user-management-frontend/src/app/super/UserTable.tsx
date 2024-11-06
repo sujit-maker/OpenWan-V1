@@ -25,7 +25,6 @@ const UserTable: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
 
@@ -56,18 +55,17 @@ const UserTable: React.FC = () => {
       console.error("Failed to fetch users:", error);
     }
   };
-  
 
   const fetchManagerId = async () => {
     try {
-      const response = await fetch('http://40.0.0.109:8000/users/managers');
+      const response = await fetch("http://40.0.0.109:8000/users/managers");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const data: Manager[] = await response.json();
       setManagers(data);
     } catch (error) {
-      console.error('Error fetching managers:', error);
+      console.error("Error fetching managers:", error);
     }
   };
 
@@ -76,11 +74,13 @@ const UserTable: React.FC = () => {
       alert("SuperAdmin user cannot be deleted!");
       return;
     }
-  
+
     // Confirm deletion with the user
-    const confirmDelete = confirm(`Are you sure you want to delete user ${username}?`);
+    const confirmDelete = confirm(
+      `Are you sure you want to delete user ${username}?`
+    );
     if (!confirmDelete) return;
-    
+
     try {
       const response = await fetch(`http://40.0.0.109:8000/users/${id}`, {
         method: "DELETE",
@@ -92,12 +92,11 @@ const UserTable: React.FC = () => {
         alert(`This User Has Associated User So You Cant Directly delete`);
         return;
       }
-      fetchUsers(); 
+      fetchUsers();
     } catch (error) {
       console.error("Failed to delete user:", error);
     }
   };
-
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -111,9 +110,7 @@ const UserTable: React.FC = () => {
 
   const handleUserUpdated = (updatedUser: User) => {
     setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      )
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
     handleCloseEditModal();
   };
@@ -136,13 +133,14 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-
-      <div className="container mx-auto px-4 py-6 lg:pl-72" style={{ marginTop: 80 }}>
-
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-      <button
+      <div
+        className="container mx-auto px-4 py-6 lg:pl-72"
+        style={{ marginTop: 80 }}
+      >
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+          <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>
@@ -154,47 +152,53 @@ const UserTable: React.FC = () => {
               placeholder="Search users..."
               className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
             />
-            <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+            <FaSearch
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+              size={20}
+            />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-16">
-  <thead>
-    <tr>
-      <th className="border p-1">Username</th>
-      <th className="border p-1">User Type</th>
-      <th className="border p-1">Manager Name</th>
-      <th className="border p-1">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {currentUsers.map((user) => (
-      <tr key={user.id}>
-        <td className="border p-1">{user.username}</td>
-        <td className="border p-1">{user.usertype}</td>
-        <td className="border p-1">
-          {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
-        </td>
-        <td className="border p-1 text-center">
-          <button
-            onClick={() => handleEdit(user)}
-            className="text-blue-500 hover:text-blue-700 mr-2"
-          >
-            <FaEdit />
-          </button>
-          <button
-            onClick={() => handleDelete(user.id, user.username)}
-            className="text-red-500 hover:text-red-700"
-          >
-            <FaTrash />
-          </button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
+        <div className="overflow-x-auto lg:overflow-hidden ml-14">
+          {/* Added mobile-scroll class */}
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
+            {" "}
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="border p-1">Username</th>
+                <th className="border p-1">User Type</th>
+                <th className="border p-1">Manager Name</th>
+                <th className="border p-1">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentUsers.map((user) => (
+                <tr key={user.id}>
+                  <td className="border p-1 text-center">{user.username}</td>
+                  <td className="border p-1 text-center">{user.usertype}</td>
+                  <td className="border p-1 text-center">
+                    {user.usertype === "EXECUTIVE"
+                      ? getManagerName(user.managerId)
+                      : "N/A"}
+                  </td>
+                  <td className="border p-1 text-center">
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="text-blue-500 hover:text-blue-700 mr-2"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id, user.username)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination controls */}
@@ -202,7 +206,11 @@ const UserTable: React.FC = () => {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 border rounded-md ${currentPage === 1 ? 'text-gray-400' : 'text-blue-500 hover:bg-gray-200'}`}
+            className={`px-3 py-1 border rounded-md ${
+              currentPage === 1
+                ? "text-gray-400"
+                : "text-blue-500 hover:bg-gray-200"
+            }`}
           >
             Previous
           </button>
@@ -210,7 +218,11 @@ const UserTable: React.FC = () => {
             <button
               key={index}
               onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 border rounded-md ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'text-blue-500 hover:bg-gray-200'}`}
+              className={`px-3 py-1 border rounded-md ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "text-blue-500 hover:bg-gray-200"
+              }`}
             >
               {index + 1}
             </button>
@@ -218,7 +230,11 @@ const UserTable: React.FC = () => {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 border rounded-md ${currentPage === totalPages ? 'text-gray-400' : 'text-blue-500 hover:bg-gray-200'}`}
+            className={`px-3 py-1 border rounded-md ${
+              currentPage === totalPages
+                ? "text-gray-400"
+                : "text-blue-500 hover:bg-gray-200"
+            }`}
           >
             Next
           </button>

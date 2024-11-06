@@ -48,7 +48,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
         setError(null);
         onUserCreated();
         resetForm();
-        setTimeout(onClose, 2000); // Close modal after 2 seconds
+        setTimeout(onClose, 2000); 
       } else {
         const data = await response.json();
         setError(data.message || 'An error occurred while creating the user.');
@@ -70,7 +70,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
   };
 
   const handleManagerSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedManagerId = Number(e.target.value); // Convert the selected value to a number (managerId)
+    const selectedManagerId = Number(e.target.value); 
     setSelectedManagerId(selectedManagerId);
   };
   
@@ -80,7 +80,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
       <Dialog
         as="div"
         onClose={onClose}
-        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50"
+        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
+        aria-labelledby="create-user-title"
+        aria-describedby="create-user-description"
       >
         <Dialog.Panel className="max-w-sm w-full bg-white rounded-lg shadow-lg p-6">
           <Dialog.Title className="text-xl font-semibold mb-4">Create User</Dialog.Title>

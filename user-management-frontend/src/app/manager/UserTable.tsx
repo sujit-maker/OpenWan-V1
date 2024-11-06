@@ -142,7 +142,7 @@ const UserTable: React.FC = () => {
   return (
     <>
       <Header />
-      
+
       <div
         className="container mx-auto px-4 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
@@ -150,7 +150,7 @@ const UserTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>
@@ -169,21 +169,23 @@ const UserTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-16">
-            <thead>
+        <div className="overflow-x-auto lg:overflow-hidden ml-14">
+          {/* Added mobile-scroll class */}
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
+            {" "}
+            <thead className="bg-gray-200">
               <tr>
-                <th className="border p-1">Username</th>
-                <th className="border p-1">User Type</th>
-                <th className="border p-1">Actions</th>
+                <th className="border p-1 ">Username</th>
+                <th className="border p-1 ">User Type</th>
+                <th className="border p-1 ">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentUsers.map((user) => (
                 <tr key={user.id}>
-                  <td className="border p-1">{user.username}</td>
-                  <td className="border p-1">{user.usertype}</td>
-                  <td className="border p-1 text-center">
+                  <td className="border p-2 text-center">{user.username}</td>
+                  <td className="border p-2 text-center">{user.usertype}</td>
+                  <td className="border p-2 text-center">
                     <button
                       onClick={() => handleEdit(user)}
                       className="text-blue-500 hover:text-blue-700 mr-2"

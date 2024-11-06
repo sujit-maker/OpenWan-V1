@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Device } from './types'; // Adjust path as needed
+import { Device } from './types'; 
 
 interface EditDeviceModalProps {
   device: Device;
@@ -40,8 +40,8 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
       }
 
       const updatedDeviceData = await response.json();
-      onDeviceUpdated(updatedDeviceData); // Notify parent component of updated device
-      closeModal(); // Close the modal after successful update
+      onDeviceUpdated(updatedDeviceData); 
+      closeModal(); 
     } catch (error) {
       console.error('Failed to update device:', error);
     }
@@ -115,7 +115,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Device Password</label>
           <input
-            type="password"
+            type="text"
             value={updatedDevice.devicePassword}
             onChange={(e) => handleInputChange('devicePassword', e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"

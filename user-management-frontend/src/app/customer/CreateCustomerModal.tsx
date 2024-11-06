@@ -25,8 +25,8 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({ isOpen, onClo
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      onCustomerCreated(); // Refresh the customer list
-      onClose(); // Close the modal
+      onCustomerCreated(); 
+      onClose();
     } catch (error) {
       console.error('Failed to create customer:', error);
     }

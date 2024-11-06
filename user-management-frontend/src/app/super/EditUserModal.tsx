@@ -11,25 +11,25 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onUserUpdated, clos
   const [username, setUsername] = useState(user.username);
   const [usertype, setUsertype] = useState(user.usertype);
   const [managerId, setManagerId] = useState<number | null>(user.managerId || null);
-  const [password, setPassword] = useState(''); // State for password
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     setUsername(user.username);
     setUsertype(user.usertype);
     setManagerId(user.managerId || null);
-    setPassword(''); // Clear the password field on modal open
+    setPassword(''); 
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await fetch(`http://40.0.0.109:8000/users/${user.id}`, {
-        method: 'PATCH', // Use PATCH instead of PUT
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username,
           usertype,
-          password: password || undefined, // Send password only if not empty
+          password: password || undefined, 
           managerId: usertype === 'EXECUTIVE' ? managerId : null,
         }),
       });

@@ -19,7 +19,7 @@ interface User {
   adminId?: number;
 }
 
-  const UserTable: React.FC = () => {
+const UserTable: React.FC = () => {
   const { currentUserType, adminId } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -31,7 +31,7 @@ interface User {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(20); 
+  const [usersPerPage] = useState(20);
 
   useEffect(() => {
     if (adminId) {
@@ -171,7 +171,7 @@ interface User {
 
   return (
     <>
-    <Header/>
+      <Header />
       <div
         className="container mx-auto px-4 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
@@ -179,7 +179,7 @@ interface User {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500  text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>
@@ -198,25 +198,28 @@ interface User {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-16">
+        <div className="overflow-x-auto lg:overflow-hidden ml-14">
+          {/* Added mobile-scroll  */}
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
             {" "}
             <thead className="bg-gray-200">
               <tr>
-                <th className="border p-2 text-xs md:text-sm">Username</th>
-                <th className="border p-2 text-xs md:text-sm">User Type</th>
-                <th className="border p-2 text-xs md:text-sm">Manager Name</th>
-                <th className="border p-2 text-xs md:text-sm">Actions</th>
+                <th className="border p-2">Username</th>
+                <th className="border p-2">User Type</th>
+                <th className="border p-2">Manager Name</th>
+                <th className="border p-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentUsers.map((user) => (
                 <tr key={user.id}>
-                  <td className="border p-1">{user.username}</td>
-                  <td className="border p-1">{user.usertype}</td>
-                  <td className="border p-1">
-                  {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
-                </td>
+                  <td className="border p-1 text-center">{user.username}</td>
+                  <td className="border p-1 text-center">{user.usertype}</td>
+                  <td className="border p-1 text-center">
+                    {user.usertype === "EXECUTIVE"
+                      ? getManagerName(user.managerId)
+                      : "N/A"}
+                  </td>
                   <td className="border p-1 text-center">
                     <button
                       onClick={() => handleEdit(user)}
@@ -262,7 +265,7 @@ interface User {
             onClose={() => setIsCreateModalOpen(false)}
             onUserCreated={() => {
               if (adminId) fetchUsers(adminId);
-              fetchManagers(); 
+              fetchManagers();
             }}
             currentUserType={currentUserType}
             adminId={adminId ? Number(adminId) : null}

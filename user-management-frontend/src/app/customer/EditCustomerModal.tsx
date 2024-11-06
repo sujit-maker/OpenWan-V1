@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Customer } from './types'; // Adjust path as needed
+import { Customer } from './types'; 
 
 interface EditCustomerModalProps {
   customer: Customer;

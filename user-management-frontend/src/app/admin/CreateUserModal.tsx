@@ -6,7 +6,7 @@ interface CreateUserModalProps {
   onClose: () => void;
   onUserCreated: () => void;
   currentUserType: string | null;
-  adminId: number | null; // Ensure adminId is of type `number`
+  adminId: number | null; 
 }
 
 const CreateUserModal: React.FC<CreateUserModalProps> = ({
@@ -86,14 +86,14 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess("User created successfully!"); // Set success message
+        setSuccess("User created successfully!"); 
         setError(null);
         onUserCreated();
         resetForm();
-        // Close modal after a delay
+
         setTimeout(() => {
           onClose();
-          setSuccess(null); // Reset success message after closing
+          setSuccess(null);
         }, 2000);
       } else if (data.message === "User already exists") {
         setError("User already exists. Please choose another username.");

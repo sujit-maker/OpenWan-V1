@@ -5,8 +5,7 @@ import ServiceTable from "./CustomerTable";
 export default function CustomerPage() {
   return (
     <>
-    <div>
-      
+    <div> 
       <Sidebar/>
        <ServiceTable/>
     </div>

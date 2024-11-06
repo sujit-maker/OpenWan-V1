@@ -101,7 +101,6 @@ const Dashboard: React.FC = () => {
           </>
         )}
 
-        {/* Existing logic for managers and admins */}
         {!superadminId && (
           <>
             {userCount !== null && (

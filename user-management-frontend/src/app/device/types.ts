@@ -1,4 +1,4 @@
-// types.ts
+
 export interface Device {
     id: number;
     deviceId: string; 
