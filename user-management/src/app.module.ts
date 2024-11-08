@@ -12,10 +12,14 @@ import { TasksModule } from './tasks/tasks.module';
 import { DevicesModule } from './devices/devices.module';
 import { EmailModule } from './email/email.module';
 import { MikroTikModule } from './mikrotik/mikroTik.module';
+import { WanStatusService } from './wan-status/wan-status.service';
+import { WanStatusController } from './wan-status/wan-status.controller';
+import { WanStatusModule } from './wan-status/wan-status.module';
+
 
 @Module({
-  imports: [AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule, EmailModule,MikroTikModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService],
+  imports: [AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule, EmailModule,MikroTikModule, WanStatusModule],
+  controllers: [AppController, WanStatusController],
+  providers: [AppService, PrismaService, WanStatusService],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar'; // Sidebar remains
+import Sidebar from '../components/Sidebar'; 
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 
@@ -8,7 +8,7 @@ const Dashboard: React.FC = () => {
   const { userId, managerId, adminId, superadminId } = useAuth(); // Get userId, managerId, adminId, and superadminId
   const [userCount, setUserCount] = useState<number | null>(null);
   const [adminUserCount, setAdminUserCount] = useState<number | null>(null);
-  const [executiveCount, setExecutiveCount] = useState<number | null>(null); // New state for executive count
+  const [executiveCount, setExecutiveCount] = useState<number | null>(null); 
 
   useEffect(() => {
     const fetchUserCounts = async () => {

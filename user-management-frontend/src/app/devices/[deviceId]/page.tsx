@@ -6,7 +6,7 @@ import Sidebar from "@/app/components/Sidebar";
 
 interface DeviceData {
   date: string;
-  uptime: string;
+  uptime: string;                                                   
   osVersion: string;
   cpuLoad: string;
   freeMemory: string;
@@ -28,10 +28,31 @@ interface DeviceData {
   };
 }
 
+interface WanLog {
+  id: number;
+  identity: string;
+  comment: string;
+  status: string;
+  since: string;
+  timeStamp: string;
+}
+
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
   const { deviceId } = useParams();
+  const [wanLogs, setWanLogs] = useState<WanLog[]>([]);
+  const [showLogs, setShowLogs] = useState(false);
+  const [isTableVisible, setIsTableVisible] = useState(true);
+  const [dropdownValue, setDropdownValue] = useState('reset'); 
+
   const router = useRouter();
+
+  const closeTable = () => {
+    setIsTableVisible(false);
+    setDropdownValue('reset'); 
+
+  };
+
 
   useEffect(() => {
     const fetchDeviceData = async () => {
@@ -214,9 +235,33 @@ const DeviceDetails: React.FC = () => {
       </div>
     );
 
+    const handleShowLogs = async () => {
+      try {
+        setIsTableVisible(true);
+        const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch WAN logs");
+        }
+        const data = await response.json();
+        setWanLogs(data.data);
+        setShowLogs(true);
+      } catch (error) {
+        console.error("Error fetching WAN logs:", error);
+      }
+    };
+
+    
+
   const backme = () => {
     router.push("/device");
   };
+
+  if (!deviceData)
+    return (
+      <div className="flex items-center text-3xl font-semibold justify-center h-screen">
+        <h1>Loading Device Data...</h1>
+      </div>
+    );
 
   return (
     <>
@@ -301,7 +346,67 @@ const DeviceDetails: React.FC = () => {
               Internet: {deviceData.wan2.internet}
             </p>
           </div>
+
+          {/* <label>Wan Status</label> */}
+          <select
+        onChange={(e) => {
+          if (e.target.value === 'wan') {
+            handleShowLogs();  
+          }
+        }}
+        className="cursor-pointer"
+      >
+          <select
+        onChange={(e) => {
+          if (e.target.value === 'reset') {
+            handleShowLogs();  
+          }
+        }}
+        className="cursor-pointer"
+      ></select>
+        <option className="cursor-pointer" value="reset">Select Option</option>
+        <option className="cursor-pointer"  value="wan">WAN Status</option>
+      </select>
         </div>
+
+
+
+
+   
+        {showLogs && wanLogs.length > 0 && (
+          <div className="mt-8">
+            
+            <div className="mb-4">
+  <h2 className="text-lg font-semibold mb-4">WAN Logs</h2>
+  {isTableVisible && (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse border min-w-max">
+        <thead className="bg-gray-400">
+          <tr>
+            <th className="border p-2 text-center   text-sm md:text-base">Identity</th>
+            <th className="border p-2 text-center  text-sm md:text-base">Comment</th>
+            <th className="border p-2 text-center  text-sm md:text-base">Status</th>
+            <th className="border p-2 text-center  text-sm md:text-base">Since</th>
+          </tr>
+        </thead>
+        <tbody>
+          {wanLogs.map((log) => (
+            <tr key={log.id}>
+              <td className="border p-2 text-center  text-sm md:text-base">{log.identity}</td>
+              <td className="border p-2 text-center  text-sm md:text-base">{log.comment}</td>
+              <td className="border p-2 text-center  text-sm md:text-base">{log.status}</td>
+              <td className="border p-2 text-center  text-sm md:text-base">{log.since}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
+          </div>
+          
+        )}
       </div>
     </>
   );

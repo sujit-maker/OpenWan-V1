@@ -97,3 +97,12 @@ model Task {
   site        Site        @relation(fields: [siteId], references: [id])
   service     Service     @relation(fields: [serviceId], references: [id])
 }
+
+model MikroTik {
+  id        Int      @id @default(autoincrement())
+  identity  String
+  comment   String
+  status    String
+  since     DateTime
+  timeStamp DateTime @default(now())
+}
