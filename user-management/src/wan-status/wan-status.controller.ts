@@ -10,11 +10,13 @@ export class WanStatusController {
     @Body() data: { identity: string; comment: string; status: string; since: string },
   ): Promise<{ message: string; data: any }> {
     try {
-      const sinceDate = new Date(data.since);
+      // Convert the 'since' string to a Date and then back to a string (ISO format)
+      const sinceDateString = new Date(data.since).toISOString();
 
+      // Pass the formatted string to the service
       await this.wanStatusService.saveData({
         ...data,
-        since: sinceDate,
+        since: sinceDateString,  // now it's a string in ISO format
       });
 
       return { message: 'Data saved successfully', data };
@@ -38,5 +40,4 @@ export class WanStatusController {
       );
     }
   }
-  
 }

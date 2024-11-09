@@ -51,7 +51,7 @@ const UserTable: React.FC = () => {
   const fetchUsers = async (adminId: string) => {
     try {
       const response = await fetch(
-        `http://40.0.0.109:8000/users/ad?adminId=${adminId}`
+        `http://40.0.0.25:8000/users/ad?adminId=${adminId}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -74,7 +74,7 @@ const UserTable: React.FC = () => {
 
   const fetchManagers = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/users/managers");
+      const response = await fetch("http://40.0.0.25:8000/users/managers");
       if (!response.ok) {
         throw new Error("Failed to fetch managers");
       }
@@ -98,7 +98,7 @@ const UserTable: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://40.0.0.109:8000/users/${id}`, {
+      const response = await fetch(`http://40.0.0.25:8000/users/${id}`, {
         method: "DELETE",
       });
 

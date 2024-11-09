@@ -35,7 +35,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       if (adminId) {
         try {
           const response = await fetch(
-            `http://40.0.0.109:8000/users/managers/admin?adminId=${adminId}`
+            `http://40.0.0.25:8000/users/managers/admin?adminId=${adminId}`
           );
           const data = await response.json();
           if (response.ok) {
@@ -76,7 +76,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
     try {
       setIsLoading(true);
-      const response = await fetch("http://40.0.0.109:8000/users/register", {
+      const response = await fetch("http://40.0.0.25:8000/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -24,7 +24,7 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
 
   @Get(':deviceId/data')
   async fetchDeviceData(@Param('deviceId') deviceId: string) {
-    const device = await this.devicesService.getDeviceById(deviceId); // Ensure this method exists to fetch device details
+    const device = await this.devicesService.getDeviceById(deviceId); 
 
     if (!device) {
       throw new NotFoundException(`Device with ID ${deviceId} not found`);
@@ -34,7 +34,7 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
     const auth = {
       username: device.deviceUsername,
       password: device.devicePassword,
-    };
+    };                
 
     // Call the fetchAllData method to get all merged data
     return this.mikrotikService.fetchAllData(routerUrl, auth);

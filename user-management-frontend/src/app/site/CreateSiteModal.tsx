@@ -25,7 +25,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('http://40.0.0.109:8000/customers');
+      const response = await fetch('http://40.0.0.25:8000/customers');
       const data: Customer[] = await response.json();
       setCustomers(data);
     } catch (error) {
@@ -44,7 +44,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
     };
 
     try {
-      const response = await fetch('http://40.0.0.109:8000/site', {
+      const response = await fetch('http://40.0.0.25:8000/site', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newSite),

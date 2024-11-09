@@ -103,6 +103,8 @@ model MikroTik {
   identity  String
   comment   String
   status    String
-  since     DateTime
+  since     String
+createdAt DateTime @default(now()) 
   timeStamp DateTime @default(now())
+
 }

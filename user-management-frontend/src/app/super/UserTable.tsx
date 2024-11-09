@@ -43,7 +43,7 @@ const UserTable: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/users");
+      const response = await fetch("http://40.0.0.25:8000/users");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -58,7 +58,7 @@ const UserTable: React.FC = () => {
 
   const fetchManagerId = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/users/managers");
+      const response = await fetch("http://40.0.0.25:8000/users/managers");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -82,7 +82,7 @@ const UserTable: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://40.0.0.109:8000/users/${id}`, {
+      const response = await fetch(`http://40.0.0.25:8000/users/${id}`, {
         method: "DELETE",
       });
 
@@ -140,7 +140,7 @@ const UserTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 mx-16 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>

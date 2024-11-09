@@ -36,7 +36,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
     try {
       setIsLoading(true);
-      const response = await fetch('http://40.0.0.109:8000/devices', {
+      const response = await fetch('http://40.0.0.25:8000/devices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

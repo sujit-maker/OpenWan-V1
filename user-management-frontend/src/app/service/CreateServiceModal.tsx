@@ -28,7 +28,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
 
     try {
       setIsLoading(true);
-      const response = await fetch('http://40.0.0.109:8000/services', {
+      const response = await fetch('http://40.0.0.25:8000/services', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

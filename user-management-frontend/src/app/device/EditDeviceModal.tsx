@@ -20,7 +20,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://40.0.0.109:8000/devices/${updatedDevice.id}`, {
+      const response = await fetch(`http://40.0.0.25:8000/devices/${updatedDevice.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

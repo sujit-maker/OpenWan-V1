@@ -17,7 +17,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({ isOpen, onClo
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://40.0.0.109:8000/customers', {
+      const response = await fetch('http://40.0.0.25:8000/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customerName, customerAddress, gstNumber, contactName, contactNumber, email }),
