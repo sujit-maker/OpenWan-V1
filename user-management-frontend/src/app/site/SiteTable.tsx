@@ -87,13 +87,13 @@ const SiteTable: React.FC = () => {
     <>
       <Header />
       <div
-        className="container mx-auto px-4 py-6 lg:pl-72"
+        className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 mx-12 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+            className="bg-blue-500 text-white px-4 mx-16 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
           >
             Add Site
           </button>

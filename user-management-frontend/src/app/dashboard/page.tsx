@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 
 const Dashboard: React.FC = () => {
-  const { userId, managerId, adminId, superadminId } = useAuth(); // Get userId, managerId, adminId, and superadminId
+  const {managerId, adminId, superadminId } = useAuth(); 
   const [userCount, setUserCount] = useState<number | null>(null);
   const [adminUserCount, setAdminUserCount] = useState<number | null>(null);
   const [executiveCount, setExecutiveCount] = useState<number | null>(null); 
@@ -70,61 +70,62 @@ const Dashboard: React.FC = () => {
     fetchUserCounts();
   }, [managerId, adminId, superadminId]); 
   return (
-    <>
-      <Header />
-      <Sidebar />
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-50">
-        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+<>
+  <Header />
+  <Sidebar />
+  <div className="my-28 px-4">
+    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6 ">Dashboard</h1>
 
-        {/* Show all counts if superadmin */}
-        {superadminId && (
-          <>
+    <div className="flex flex-col items-center space-y-6 md:space-y-0 md:flex-row md:flex-wrap justify-center md:space-x-6">
+      {/* Show all counts if superadmin */}
+      {superadminId ? (
+        <>
           {adminUserCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Admin Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{adminUserCount}</p>
-              </div>
-            )}
-            {userCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{userCount}</p>
-              </div>
-            )}
-            
-            {executiveCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{executiveCount}</p>
-              </div>
-            )}
-          </>
-        )}
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Admins Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{adminUserCount}</p>
+            </div>
+          )}
+          {userCount !== null && (
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{userCount}</p>
+            </div>
+          )}
+          {executiveCount !== null && (
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{executiveCount}</p>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {userCount !== null && (
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Executive Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{userCount}</p>
+            </div>
+          )}
+          {adminUserCount !== null && (
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{adminUserCount}</p>
+            </div>
+          )}
+          {executiveCount !== null && (
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
+              <p className="text-4xl font-bold text-gray-800 text-center mt-2">{executiveCount}</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+</>
 
-        {!superadminId && (
-          <>
-            {userCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Executive Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{userCount}</p>
-              </div>
-            )}
-            {adminUserCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{adminUserCount}</p>
-              </div>
-            )}
-            {executiveCount !== null && (
-              <div className="mt-6 w-full max-w-sm bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
-                <p className="text-3xl font-bold text-gray-800 text-center">{executiveCount}</p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </>
+
   );
 };
 

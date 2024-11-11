@@ -270,8 +270,8 @@ const DeviceDetails: React.FC = () => {
           Device Dashboard - {deviceId}
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
-          <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-4  lg:grid-cols-5 gap-4 justify-items-center">
+          <div className="bg-gray-400 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-4 border border-gray-200 w-full max-w-sm">
             {" "}
             <h2 className="text-lg text-black font-semibold mb-2">
               Date & Time{" "}
@@ -281,7 +281,7 @@ const DeviceDetails: React.FC = () => {
             <p className="text-black">{deviceData.uptime}</p>
           </div>
 
-          <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm">
+          <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm">
             <h2 className="text-lg text-black font-semibold mb-2">
               Memory Usage
             </h2>
@@ -292,7 +292,7 @@ const DeviceDetails: React.FC = () => {
             <p className="text-black">{deviceData.cpuLoad}%</p>
           </div>
 
-          <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm">
+          <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-300 hover:scale-105 hover:shadow-xl">
             <h2 className="text-lg text-black font-semibold mb-2">
               OS Version
             </h2>
@@ -303,7 +303,7 @@ const DeviceDetails: React.FC = () => {
 
           {/* Card for WAN 1 */}
           <div
-            className={`rounded-lg shadow-2xl p-4 border w-full max-w-sm ${
+            className={`rounded-lg shadow-2xl p-4 border w-full max-w-sm transform transition duration-300 hover:scale-105 hover:shadow-xl ${
               deviceData.wan1.internet.toLowerCase() === "up"
                 ? "bg-green-400"
                 : "bg-red-500"
@@ -319,7 +319,7 @@ const DeviceDetails: React.FC = () => {
 
           {/* Card for WAN 2 */}
           <div
-            className={`rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm ${
+            className={`rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-100 hover:scale-105 hover:shadow-xl ${
               deviceData.wan2.internet.toLowerCase() === "up"
                 ? "bg-green-400"
                 : "bg-red-500"

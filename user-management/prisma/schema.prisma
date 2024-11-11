@@ -80,6 +80,7 @@ model Device{
   deviceType  String
   deviceIp    String
   devicePort  String
+  numberPort  String
   deviceUsername  String
   devicePassword  String
 }

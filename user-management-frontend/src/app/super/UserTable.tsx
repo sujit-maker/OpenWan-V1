@@ -134,13 +134,13 @@ const UserTable: React.FC = () => {
   return (
     <>
       <div
-        className="container mx-auto px-4 py-6 lg:pl-72"
+        className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 mx-16 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>
@@ -159,9 +159,9 @@ const UserTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden ml-10 ">
+        <div className="overflow-x-auto lg:overflow-hidden ml-14 ">
           {/* Added mobile-scroll class */}
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
             {" "}
             <thead className="bg-gray-200">
               <tr>

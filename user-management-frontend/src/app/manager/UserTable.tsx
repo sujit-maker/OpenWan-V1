@@ -144,7 +144,7 @@ const UserTable: React.FC = () => {
       <Header />
 
       <div
-        className="container mx-auto px-4 py-6 lg:pl-72"
+        className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">

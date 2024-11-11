@@ -78,11 +78,14 @@ const CustomerTable: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-6 py-6 lg:pl-72" style={{ marginTop: 80 }}>
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+      <div
+        className="container mx-auto px-8 py-6 lg:pl-72"
+        style={{ marginTop: 80 }}
+      >        
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 mx-9 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+            className="bg-blue-500 mx-14 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
           >
             Add Customer
           </button>
