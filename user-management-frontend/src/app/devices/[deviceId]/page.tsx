@@ -14,14 +14,18 @@ interface DeviceData {
   freeMemory: string;
   totalMemory: string;
   name: string;
-  wanPorts: WANData[]; // Changed from wan1, wan2, etc. to a dynamic array of WAN data.
-}
-
-interface WANData {
-  address: string;
-  status: string;
-  internet: string;
-  running: string;
+  wan1: {
+    address: string;
+    status: string;
+    internet: string;
+    running: string;
+  };
+  wan2: {
+    address: string;
+    status: string;
+    internet: string;
+    running: string;
+  };
 }
 
 interface WanLog {
@@ -112,8 +116,6 @@ const DeviceDetails: React.FC = () => {
 
         const wan1 = await fetchWANDetails("WAN1");
         const wan2 = await fetchWANDetails("WAN2");
-        const wan3 = await fetchWANDetails("WAN3");
-        const wan4 = await fetchWANDetails("WAN4");
         const internetStatus = await fetchNetwatchStatus();
         const runningStatus = await fetchInterfaceStatus();
 
@@ -121,16 +123,22 @@ const DeviceDetails: React.FC = () => {
           date: `${data["system/clock"].date} ${data["system/clock"].time}` || "N/A",
           uptime: data["system/resource"].uptime || "N/A",
           osVersion: data["system/resource"].version || "N/A",
-          cpuLoad: `${data["system/resource"]["cpu-load"]}` || "N/A",
-          freeMemory: `${(data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
-          totalMemory: `${(data["system/resource"]["total-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
+          cpuLoad: data["system/resource"]["cpu-load"] || "N/A",
+          freeMemory: (data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(2) + " MB" || "N/A",
+          totalMemory: (data["system/resource"]["total-memory"] / (1024 * 1024)).toFixed(2) + " MB" || "N/A",
           name: data["system/identity"]["name"] || "N/A",
-          wanPorts: [
-            { ...wan1, internet: internetStatus.wan1, running: runningStatus.wan1 },
-            { ...wan2, internet: internetStatus.wan2, running: runningStatus.wan2 },
-            { ...wan3, internet: internetStatus.wan3, running: runningStatus.wan3 },
-            { ...wan4, internet: internetStatus.wan4, running: runningStatus.wan4 }
-          ]
+          wan1: {
+            address: wan1.address,
+            status: wan1.status,
+            internet: internetStatus.wan1,
+            running: runningStatus.wan1,
+          },
+          wan2: {
+            address: wan2.address,
+            status: wan2.status,
+            internet: internetStatus.wan2,
+            running: runningStatus.wan2,
+          },
         });
       } catch (error) {
         console.error("Error fetching device data:", error);
@@ -139,7 +147,6 @@ const DeviceDetails: React.FC = () => {
 
     const fetchWanLogs = async () => {
       try {
-        setIsTableVisible(true);
         const response = await fetch(`http://40.0.0.25:8000/wanstatus`);
         if (!response.ok) throw new Error("Failed to fetch WAN logs");
         const data = await response.json();
@@ -185,6 +192,7 @@ const DeviceDetails: React.FC = () => {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
+          {/* Device Data Cards */}
           <div className="bg-gray-400 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-4 border border-gray-200 w-full max-w-sm">
             <h2 className="text-lg text-black font-semibold mb-2">Date & Time</h2>
             <p className="text-black">{deviceData.date}</p>
@@ -208,23 +216,28 @@ const DeviceDetails: React.FC = () => {
             <p className="text-black">{deviceData.name}</p>
           </div>
 
-          {/* Render WAN cards dynamically based on deviceData.wanPorts */}
-          {deviceData.wanPorts.map((wan, index) => (
-            <div
-              key={index}
-              className={`rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-100 hover:scale-105 hover:shadow-xl ${wan.internet.toLowerCase() === "up"
-                ? "bg-green-400"
-                : "bg-red-500"
-                }`}
-            >
-              <h2 className="text-lg font-semibold mb-2">WAN {index + 1}</h2>
-              <p className="text-gray-900">IP: {wan.address}</p>
-              <p className="text-black">Status: {wan.status}</p>
-              <p className="text-black">Internet: {wan.internet}</p>
-            </div>
-          ))}
+          {/* WAN 1 */}
+          <div
+            className={`bg-${deviceData.wan1.internet.toLowerCase() === "up" ? "green" : "red"}-400 rounded-lg shadow-2xl p-4 border w-full max-w-sm`}
+          >
+            <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
+            <p className="text-gray-900">IP Address: {deviceData.wan1.address}</p>
+            <p className="text-black">Status: {deviceData.wan1.status}</p>
+            <p className="text-black">Internet: {deviceData.wan1.internet}</p>
+          </div>
+
+          {/* WAN 2 */}
+          <div
+            className={`bg-${deviceData.wan2.internet.toLowerCase() === "up" ? "green" : "red"}-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm`}
+          >
+            <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
+            <p className="text-gray-900">IP Address: {deviceData.wan2.address}</p>
+            <p className="text-black">Status: {deviceData.wan2.status}</p>
+            <p className="text-black">Internet: {deviceData.wan2.internet}</p>
+          </div>
         </div>
 
+        {/* WAN Logs */}
         {showLogs && wanLogs.length > 0 && (
           <div className="mt-8">
             <div className="mb-4 flex items-center justify-between">
