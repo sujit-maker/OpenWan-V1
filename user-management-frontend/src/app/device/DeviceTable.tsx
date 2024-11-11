@@ -130,20 +130,20 @@ const DeviceTable: React.FC = () => {
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleConnect(device)}
-                      className="text-yellow-500 hover:text-yellow-700 mr-2"
+                      className="text-yellow-500 hover:text-yellow-700 mr-3"
                       title="Connect"
                     >
                       <FaLink />
                     </button>
                     <button
                       onClick={() => handleEdit(device)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
+                      className="text-blue-500 hover:text-blue-700 mr-3"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(device.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 mr-3"
                     >
                       <FaTrash />
                     </button>

@@ -47,7 +47,6 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
 
   @Get(':deviceId/wan-ip')
   async getWanIp(@Param('deviceId') deviceId: string, @Query('wan') wan: 'WAN1' | 'WAN2') {
-    // Validate the WAN parameter
     if (!['WAN1', 'WAN2'].includes(wan)) {
       throw new NotFoundException(`Invalid WAN type: ${wan}`);
     }
@@ -86,7 +85,7 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
       throw new NotFoundException(`Device with ID ${deviceId} not found`);
     }
 
-    return this.devicesService.getNetwatchData(deviceId); // Ensure this is correct
+    return this.devicesService.getNetwatchData(deviceId); 
   }
 
 

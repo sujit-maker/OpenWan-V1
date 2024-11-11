@@ -42,7 +42,7 @@ export class AuthService {
     };
   }
 
-  // Change Password logic
+  // Change Password
   async changePassword(
     userId: number,
     newPassword: string,

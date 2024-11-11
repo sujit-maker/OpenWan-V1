@@ -7,14 +7,13 @@ export class MikroTikService {
     return `Basic ${Buffer.from(`${auth.username}:${auth.password}`).toString('base64')}`;
   }
 
-  // New method to fetch the device name from system/identity
   async fetchDeviceName(routerUrl: string, auth: { username: string; password: string }): Promise<string | null> {
     try {
       const authHeader = this.createAuthHeader(auth);
       const response = await axios.get(`${routerUrl}/rest/system/identity`, {
         headers: { Authorization: authHeader },
       });
-      return response.data.name || null; // Assuming `name` is the property with the device name
+      return response.data.name || null; 
     } catch (error) {
       console.error('Error fetching device name from system/identity:', error);
       throw new HttpException(

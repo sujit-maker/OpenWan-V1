@@ -105,6 +105,5 @@ model MikroTik {
   status    String
   since     String
 createdAt DateTime @default(now()) 
-  timeStamp DateTime @default(now())
 
 }

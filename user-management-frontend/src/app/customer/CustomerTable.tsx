@@ -78,7 +78,7 @@ const CustomerTable: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-6 lg:pl-72" style={{ marginTop: 80 }}>
+      <div className="container mx-auto px-6 py-6 lg:pl-72" style={{ marginTop: 80 }}>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -122,10 +122,10 @@ const CustomerTable: React.FC = () => {
                   <td className="border p-3 text-center">{customer.contactNumber}</td>
                   <td className="border p-3 text-center">{customer.email}</td>
                   <td className="border p-3 text-center">
-                    <button onClick={() => handleEdit(customer)} className="text-blue-500 hover:text-blue-700 mr-2">
+                    <button onClick={() => handleEdit(customer)} className="text-blue-500 hover:text-blue-700 m-1">
                       <FaEdit />
                     </button>
-                    <button onClick={() => handleDelete(customer.id)} className="text-red-500 hover:text-red-700">
+                    <button onClick={() => handleDelete(customer.id)} className="text-red-500 hover:text-red-700 m-1">
                       <FaTrash />
                     </button>
                   </td>

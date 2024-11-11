@@ -26,7 +26,7 @@ const UserTable: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 6;
+  const usersPerPage = 4;
 
   useEffect(() => {
     fetchUsers();
@@ -159,7 +159,7 @@ const UserTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden ml-14">
+        <div className="overflow-x-auto lg:overflow-hidden ml-10 ">
           {/* Added mobile-scroll class */}
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
             {" "}

@@ -16,7 +16,7 @@ export class WanStatusService {
           comment: data.comment,
           status: data.status,
           since: formattedSince,
-          // createdAt is handled automatically because of @default(now())
+
         },
       });
     } catch (error) {
@@ -33,7 +33,7 @@ export class WanStatusService {
         const formattedCreatedAt = format(new Date(log.createdAt), 'dd/MM/yyyy , HH:mm:ss');
         return {
           ...log,
-          createdAt: formattedCreatedAt, // Format createdAt for display
+          createdAt: formattedCreatedAt,
         };
       });
 

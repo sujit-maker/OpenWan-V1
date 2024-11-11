@@ -377,7 +377,7 @@ const DeviceDetails: React.FC = () => {
                 <td className="border p-2 text-center text-sm md:text-base">{log.comment}</td>
                 <td className="border p-2 text-center text-sm md:text-base">{log.status}</td>
                 <td className="border p-2 text-center text-sm md:text-base">{log.since}</td>
-              </tr>
+               </tr>
             ))}
           </tbody>
         </table>
