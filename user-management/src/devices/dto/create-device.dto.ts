@@ -21,6 +21,10 @@ export class CreateDeviceDto {
 
   @IsNotEmpty()
   @IsString()
+  portCount: string;
+
+  @IsNotEmpty()
+  @IsString()
   deviceUsername: string;
 
   @IsNotEmpty()

@@ -16,6 +16,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   const [deviceType, setDeviceType] = useState('');
   const [deviceIp, setDeviceIp] = useState('');
   const [devicePort, setDevicePort] = useState('');
+  const [portCount, setPortCount] = useState ('');
   const [deviceUsername, setDeviceUsername] = useState('');
   const [devicePassword, setDevicePassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +31,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       deviceType,
       deviceIp,
       devicePort,
+      portCount,
       deviceUsername,
       devicePassword,
     };
@@ -71,6 +73,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
     setDeviceType('');
     setDeviceIp('');
     setDevicePort('');
+    setPortCount ('');
     setDeviceUsername('');
     setDevicePassword('');
   };
@@ -138,6 +141,17 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
                 type="text"
                 value={devicePort}
                 onChange={(e) => setDevicePort(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="portCount" className="block text-gray-700">Number Of Wan</label>
+              <input
+                id="portCount"
+                type="text"
+                value={portCount}
+                onChange={(e) => setPortCount(e.target.value)}
                 required
                 className="w-full border rounded p-2 mt-1"
               />

@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/app/components/Header";
 import Sidebar from "@/app/components/Sidebar";
-import { FaDownload } from "react-icons/fa"; // Import the download icon
-import * as XLSX from "xlsx"; // Import xlsx for Excel file creation
+import { FaDownload } from "react-icons/fa";
+import * as XLSX from "xlsx";
 
 interface DeviceData {
   date: string;
@@ -14,20 +14,14 @@ interface DeviceData {
   freeMemory: string;
   totalMemory: string;
   name: string;
+  wanPorts: WANData[]; // Changed from wan1, wan2, etc. to a dynamic array of WAN data.
+}
 
-  wan1: {
-    address: string;
-    status: string;
-    internet: string;
-    running: string;
-  };
-
-  wan2: {
-    address: string;
-    status: string;
-    internet: string;
-    running: string;
-  };
+interface WANData {
+  address: string;
+  status: string;
+  internet: string;
+  running: string;
 }
 
 interface WanLog {
@@ -45,176 +39,109 @@ const DeviceDetails: React.FC = () => {
   const [wanLogs, setWanLogs] = useState<WanLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [isTableVisible, setIsTableVisible] = useState(true);
-
   const router = useRouter();
 
   const handleDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(wanLogs);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "WAN Logs");
-  
-    // Create a file and download it
     XLSX.writeFile(workbook, "WAN_Logs.xlsx");
   };
-  
+
+  const fetchWANDetails = async (wan: string) => {
+    try {
+      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/wan-ip?wan=${wan}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data[0] ? { address: data[0].address, status: "Connected" } : { address: "N/A", status: "Disconnected" };
+      } else {
+        console.error(`Error fetching ${wan} IP:`, response.statusText);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${wan} IP details:`, error);
+    }
+    return { address: "N/A", status: "Disconnected" };
+  };
+
+  const fetchNetwatchStatus = async () => {
+    try {
+      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/tool/netwatch`);
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          wan1: data.find((entry: any) => entry.comment === "WAN1")?.status || "N/A",
+          wan2: data.find((entry: any) => entry.comment === "WAN2")?.status || "N/A",
+          wan3: data.find((entry: any) => entry.comment === "WAN3")?.status || "N/A",
+          wan4: data.find((entry: any) => entry.comment === "WAN4")?.status || "N/A",
+        };
+      } else {
+        console.error("Error fetching netwatch data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching netwatch details:", error);
+    }
+    return { wan1: "N/A", wan2: "N/A", wan3: "N/A", wan4: "N/A" };
+  };
+
+  const fetchInterfaceStatus = async () => {
+    try {
+      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/interface`);
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          wan1: data.find((entry: any) => entry.name === "WAN1")?.running ? "Running" : "Not Running",
+          wan2: data.find((entry: any) => entry.name === "WAN2")?.running ? "Running" : "Not Running",
+          wan3: data.find((entry: any) => entry.name === "WAN3")?.running ? "Running" : "Not Running",
+          wan4: data.find((entry: any) => entry.name === "WAN4")?.running ? "Running" : "Not Running",
+        };
+      } else {
+        console.error("Error fetching interface data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching interface details:", error);
+    }
+    return { wan1: "Not Running", wan2: "Not Running", wan3: "Not Running", wan4: "Not Running" };
+  };
 
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
-        const response = await fetch(
-          `http://40.0.0.25:8000/devices/${deviceId}/data`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch device data");
-        }
+        const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/data`);
+        if (!response.ok) throw new Error("Failed to fetch device data");
         const data = await response.json();
 
-        const filteredData = {
+        const wan1 = await fetchWANDetails("WAN1");
+        const wan2 = await fetchWANDetails("WAN2");
+        const wan3 = await fetchWANDetails("WAN3");
+        const wan4 = await fetchWANDetails("WAN4");
+        const internetStatus = await fetchNetwatchStatus();
+        const runningStatus = await fetchInterfaceStatus();
+
+        setDeviceData({
           date: `${data["system/clock"].date} ${data["system/clock"].time}` || "N/A",
-          uptime: `${data["system/resource"].uptime}` || "N/A",
-          osVersion: `${data["system/resource"].version}` || "N/A",
+          uptime: data["system/resource"].uptime || "N/A",
+          osVersion: data["system/resource"].version || "N/A",
           cpuLoad: `${data["system/resource"]["cpu-load"]}` || "N/A",
           freeMemory: `${(data["system/resource"]["free-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
           totalMemory: `${(data["system/resource"]["total-memory"] / (1024 * 1024)).toFixed(2)} MB` || "N/A",
           name: data["system/identity"]["name"] || "N/A",
-          wan1: { address: "N/A", status: "Disconnected", internet: "Disconnected", running: "N/A" },
-          wan2: { address: "N/A", status: "Disconnected", internet: "Disconnected", running: "N/A" },
-        };
-
-
-        // Fetch WAN IP details directly for WAN1
-        try {
-          const wan1IpResponse = await fetch(
-            `http://40.0.0.25:8000/devices/${deviceId}/wan-ip?wan=WAN1`
-          );
-          if (wan1IpResponse.ok) {
-            const wan1IpData = await wan1IpResponse.json();
-            if (Array.isArray(wan1IpData) && wan1IpData.length > 0) {
-              filteredData.wan1.address = wan1IpData[0].address || "N/A";
-              filteredData.wan1.status = "Connected";
-            } else {
-              console.warn(
-                "WAN1 IP data is not in expected format or is empty:",
-                wan1IpData
-              );
-            }
-          } else {
-            console.error("Error fetching WAN1 IP:", wan1IpResponse.statusText);
-          }
-        } catch (error) {
-          console.error("Error fetching WAN1 IP details:", error);
-        }
-
-        // Fetch WAN IP details directly for WAN2
-        try {
-          const wan2IpResponse = await fetch(
-            `http://40.0.0.25:8000/devices/${deviceId}/wan-ip?wan=WAN2`
-          );
-          if (wan2IpResponse.ok) {
-            const wan2IpData = await wan2IpResponse.json();
-            if (Array.isArray(wan2IpData) && wan2IpData.length > 0) {
-              filteredData.wan2.address = wan2IpData[0].address || "N/A";
-              filteredData.wan2.status = "Connected";
-            } else {
-              console.warn(
-                "WAN2 IP data is not in expected format or is empty:",
-                wan2IpData
-              );
-            }
-          } else {
-            console.error("Error fetching WAN2 IP:", wan2IpResponse.statusText);
-          }
-        } catch (error) {
-          console.error("Error fetching WAN2 IP details:", error);
-        }
-
-        // Fetch Netwatch status for both WANs
-        try {
-          const netwatchResponse = await fetch(
-            `http://40.0.0.25:8000/devices/${deviceId}/tool/netwatch`
-          );
-          if (netwatchResponse.ok) {
-            const netwatchData = await netwatchResponse.json();
-            const wan1Status = netwatchData.find(
-              (entry: any) => entry.comment === "WAN1"
-            );
-            const wan2Status = netwatchData.find(
-              (entry: any) => entry.comment === "WAN2"
-            );
-
-            if (wan1Status) {
-              filteredData.wan1.internet = wan1Status.status || "N/A";
-            }
-            if (wan2Status) {
-              filteredData.wan2.internet = wan2Status.status || "N/A";
-            }
-          } else {
-            console.error(
-              "Error fetching netwatch data:",
-              netwatchResponse.statusText
-            );
-          }
-        } catch (error) {
-          console.error("Error fetching netwatch details:", error);
-        }
-
-        // Fetch interface data to get the running status
-        try {
-          const interfaceResponse = await fetch(
-            `http://40.0.0.25:8000/devices/${deviceId}/interface`
-          );
-          if (interfaceResponse.ok) {
-            const interfaceData = await interfaceResponse.json();
-
-            // Assuming interfaceData is an array and includes WAN1 and WAN2
-            const wan1Interface = interfaceData.find(
-              (entry: any) => entry.name === "WAN1"
-            );
-            const wan2Interface = interfaceData.find(
-              (entry: any) => entry.name === "WAN2"
-            );
-
-            // Check the running status for WAN1
-            if (wan1Interface) {
-              filteredData.wan1.running = wan1Interface.running
-                ? "Running"
-                : "Not Running";
-            } else {
-              console.warn("WAN1 interface data not found");
-            }
-
-            // Check the running status for WAN2
-            if (wan2Interface) {
-              filteredData.wan2.running = wan2Interface.running
-                ? "Running"
-                : "Not Running";
-            } else {
-              console.warn("WAN2 interface data not found");
-            }
-          } else {
-            console.error(
-              "Error fetching interface data:",
-              interfaceResponse.statusText
-            );
-          }
-        } catch (error) {
-          console.error("Error fetching interface details:", error);
-        }
-
-        setDeviceData(filteredData);
+          wanPorts: [
+            { ...wan1, internet: internetStatus.wan1, running: runningStatus.wan1 },
+            { ...wan2, internet: internetStatus.wan2, running: runningStatus.wan2 },
+            { ...wan3, internet: internetStatus.wan3, running: runningStatus.wan3 },
+            { ...wan4, internet: internetStatus.wan4, running: runningStatus.wan4 }
+          ]
+        });
       } catch (error) {
         console.error("Error fetching device data:", error);
       }
     };
 
-    
-    const handleShowLogs = async () => {
+    const fetchWanLogs = async () => {
       try {
         setIsTableVisible(true);
         const response = await fetch(`http://40.0.0.25:8000/wanstatus`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch WAN logs");
-        }
+        if (!response.ok) throw new Error("Failed to fetch WAN logs");
         const data = await response.json();
         setWanLogs(data.data);
         setShowLogs(true);
@@ -225,43 +152,30 @@ const DeviceDetails: React.FC = () => {
 
     if (deviceId) {
       fetchDeviceData();
-      handleShowLogs();
+      fetchWanLogs();
 
-      // Set up polling to refresh data every 5 seconds
       const interval = setInterval(() => {
         fetchDeviceData();
-        handleShowLogs();
+        fetchWanLogs();
       }, 5000);
 
-      // Clear interval on component unmount
       return () => clearInterval(interval);
     }
   }, [deviceId]);
 
-  if (!deviceData)
-    return (
-      <div className="flex items-center text-3xl  font-semibold justify-center h-screen">
-        <h1>Loading Device Data...</h1>
-      </div>
-    );
+  if (!deviceData) return <div>Loading...</div>;
 
   const backme = () => {
     router.push("/device");
   };
 
-  
-
   return (
     <>
       <Header />
       <Sidebar />
-
-      <div className="  mx-auto px-24 py-24">
+      <div className="mx-auto px-24 py-24">
         <div className="flex mx-6 my-0 justify-end">
-          <button
-            onClick={backme}
-            className="bg-red-600  p-2 w-15 text-white rounded-md"
-          >
+          <button onClick={backme} className="bg-red-600 p-2 w-15 text-white rounded-md">
             Back
           </button>
         </div>
@@ -270,21 +184,16 @@ const DeviceDetails: React.FC = () => {
           Device Dashboard - {deviceId}
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4  lg:grid-cols-5 gap-4 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
           <div className="bg-gray-400 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-4 border border-gray-200 w-full max-w-sm">
-            {" "}
-            <h2 className="text-lg text-black font-semibold mb-2">
-              Date & Time{" "}
-            </h2>
+            <h2 className="text-lg text-black font-semibold mb-2">Date & Time</h2>
             <p className="text-black">{deviceData.date}</p>
             <h2 className="text-lg text-black font-semibold mb-2">Uptime</h2>
             <p className="text-black">{deviceData.uptime}</p>
           </div>
 
           <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm">
-            <h2 className="text-lg text-black font-semibold mb-2">
-              Memory Usage
-            </h2>
+            <h2 className="text-lg text-black font-semibold mb-2">Memory Usage</h2>
             <p className="text-black">
               {deviceData.totalMemory}/{deviceData.freeMemory}
             </p>
@@ -293,97 +202,64 @@ const DeviceDetails: React.FC = () => {
           </div>
 
           <div className="bg-gray-400 rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-300 hover:scale-105 hover:shadow-xl">
-            <h2 className="text-lg text-black font-semibold mb-2">
-              OS Version
-            </h2>
+            <h2 className="text-lg text-black font-semibold mb-2">OS Version</h2>
             <p className="text-black">{deviceData.osVersion}</p>
-            <h2 className="text-lg  text-black font-semibold mb-2">Idenity</h2>
+            <h2 className="text-lg text-black font-semibold mb-2">Identity</h2>
             <p className="text-black">{deviceData.name}</p>
           </div>
 
-          {/* Card for WAN 1 */}
-          <div
-            className={`rounded-lg shadow-2xl p-4 border w-full max-w-sm transform transition duration-300 hover:scale-105 hover:shadow-xl ${
-              deviceData.wan1.internet.toLowerCase() === "up"
+          {/* Render WAN cards dynamically based on deviceData.wanPorts */}
+          {deviceData.wanPorts.map((wan, index) => (
+            <div
+              key={index}
+              className={`rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-100 hover:scale-105 hover:shadow-xl ${wan.internet.toLowerCase() === "up"
                 ? "bg-green-400"
                 : "bg-red-500"
-            }`}
-          >
-            <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
-            <p className="text-gray-900">
-              IP : {deviceData.wan1.address}
-            </p>
-            <p className="text-black">Status: {deviceData.wan1.status}</p>
-            <p className="text-black">Internet: {deviceData.wan1.internet}</p>
-          </div>
-
-          {/* Card for WAN 2 */}
-          <div
-            className={`rounded-lg shadow-2xl p-4 border border-gray-200 w-full max-w-sm transform transition duration-100 hover:scale-105 hover:shadow-xl ${
-              deviceData.wan2.internet.toLowerCase() === "up"
-                ? "bg-green-400"
-                : "bg-red-500"
-            }`}
-          >
-            <h2 className="text-lg font-semibold  mb-2">WAN 2</h2>
-            <p className="text-gray-900">
-              IP : {deviceData.wan2.address}
-            </p>
-            <p className="text-gray-900">Status: {deviceData.wan2.status}</p>
-            <p className="text-gray-900">
-              Internet: {deviceData.wan2.internet}
-            </p>
-          </div>
-
-          {/* <label>Wan Status</label> */}
-          <select
-            onChange={(e) => {
-              if (e.target.value === "wan") {
-              }
-            }}
-            className="cursor-pointer"
-          >
-            <option className="cursor-pointer" value="wan">
-              WAN Status
-            </option>
-          </select>
+                }`}
+            >
+              <h2 className="text-lg font-semibold mb-2">WAN {index + 1}</h2>
+              <p className="text-gray-900">IP: {wan.address}</p>
+              <p className="text-black">Status: {wan.status}</p>
+              <p className="text-black">Internet: {wan.internet}</p>
+            </div>
+          ))}
         </div>
 
         {showLogs && wanLogs.length > 0 && (
           <div className="mt-8">
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-lg font-semibold">WAN Logs</h2>
-      <button onClick={handleDownload} className="text-blue-500 hover:text-blue-700">
-        <FaDownload className="inline mr-2" /> Download
-      </button>
-    </div>
-    {isTableVisible && (
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse border min-w-max">
-          <thead className="bg-gray-400">
-            <tr>
-              <th className="border p-2 text-center text-sm md:text-base">Date & Time</th>
-              <th className="border p-2 text-center text-sm md:text-base">Identity</th>
-              <th className="border p-2 text-center text-sm md:text-base">Comment</th>
-              <th className="border p-2 text-center text-sm md:text-base">Status</th>
-              <th className="border p-2 text-center text-sm md:text-base">Since</th>
-            </tr>
-          </thead>
-          <tbody>
-            {wanLogs.map((log) => (
-              <tr key={log.id}>
-                <td className="border p-2 text-center text-sm md:text-base">{log.createdAt}</td>
-                <td className="border p-2 text-center text-sm md:text-base">{log.identity}</td>
-                <td className="border p-2 text-center text-sm md:text-base">{log.comment}</td>
-                <td className="border p-2 text-center text-sm md:text-base">{log.status}</td>
-                <td className="border p-2 text-center text-sm md:text-base">{log.since}</td>
-               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )}
-  </div>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">WAN Logs</h2>
+              <button onClick={handleDownload} className="text-blue-500 hover:text-blue-700">
+                <FaDownload className="inline mr-2" /> Download
+              </button>
+            </div>
+            {isTableVisible && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse border min-w-max">
+                  <thead className="bg-gray-400">
+                    <tr>
+                      <th className="border p-2 text-center text-sm md:text-base">Date & Time</th>
+                      <th className="border p-2 text-center text-sm md:text-base">Identity</th>
+                      <th className="border p-2 text-center text-sm md:text-base">Comment</th>
+                      <th className="border p-2 text-center text-sm md:text-base">Status</th>
+                      <th className="border p-2 text-center text-sm md:text-base">Since</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {wanLogs.map((log) => (
+                      <tr key={log.id}>
+                        <td className="border p-2 text-center text-sm md:text-base">{log.createdAt}</td>
+                        <td className="border p-2 text-center text-sm md:text-base">{log.identity}</td>
+                        <td className="border p-2 text-center text-sm md:text-base">{log.comment}</td>
+                        <td className="border p-2 text-center text-sm md:text-base">{log.status}</td>
+                        <td className="border p-2 text-center text-sm md:text-base">{log.since}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>

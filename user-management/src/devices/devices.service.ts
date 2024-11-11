@@ -16,33 +16,17 @@ export class DevicesService {
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
     const newDeviceId = await this.generateNewDeviceId();
 
-    // Prepare the router URL and credentials for MikroTik access
-    const routerUrl = `http://${createDeviceDto.deviceIp}:${createDeviceDto.devicePort}`;
-    const auth = {
-      username: createDeviceDto.deviceUsername,
-      password: createDeviceDto.devicePassword,
-    };
-
-    // Fetch the device name from MikroTik if not provided in `CreateDeviceDto`
-    let deviceName = createDeviceDto.deviceName;
-    if (!deviceName) {
-      try {
-        deviceName = await this.mikrotikService.fetchDeviceName(routerUrl, auth);
-      } catch (error) {
-        throw new HttpException(
-          `Failed to retrieve device name: ${error.message}`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    }
+    // Check if portCount is a string (log for debugging)
+    console.log('portCount:', createDeviceDto.portCount); // Ensure it's a string
 
     return this.prisma.device.create({
       data: {
         deviceId: newDeviceId,
-        deviceName: deviceName || 'Unknown Device', // Fallback in case the name couldn't be fetched
+        deviceName: createDeviceDto.deviceName,
         deviceType: createDeviceDto.deviceType,
         deviceIp: createDeviceDto.deviceIp,
         devicePort: createDeviceDto.devicePort,
+        portCount: createDeviceDto.portCount, 
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
       },

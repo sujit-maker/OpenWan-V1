@@ -89,7 +89,7 @@ export class MikroTikService {
     }
   }
 
-  // Helper method to fetch WAN IP address by comment
+  //  method to fetch WAN IP address by comment
   async fetchWanIpAddressByComment(routerUrl: string, auth: { username: string; password: string }, comment: string): Promise<string | null> {
     try {
       const interfaceResponse = await axios.get(`${routerUrl}/rest/interface?comment=${comment}`, {
@@ -123,5 +123,15 @@ export class MikroTikService {
   // Method to fetch WAN2 IP address
   async fetchWan2IpAddress(routerUrl: string, auth: { username: string; password: string }): Promise<string | null> {
     return this.fetchWanIpAddressByComment(routerUrl, auth, 'WAN2');
+  }
+  
+   // Method to fetch WAN3 IP address
+   async fetchWan3IpAddress(routerUrl: string, auth: { username: string; password: string }): Promise<string | null> {
+    return this.fetchWanIpAddressByComment(routerUrl, auth, 'WAN3');
+  }
+
+   // Method to fetch WAN4 IP address
+   async fetchWan4IpAddress(routerUrl: string, auth: { username: string; password: string }): Promise<string | null> {
+    return this.fetchWanIpAddressByComment(routerUrl, auth, 'WAN4');
   }
 }

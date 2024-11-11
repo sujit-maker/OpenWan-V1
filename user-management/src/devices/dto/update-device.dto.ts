@@ -1,6 +1,6 @@
 // src/devices/dto/update-device.dto.ts
 
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDeviceDto {
   @IsOptional()
@@ -18,6 +18,10 @@ export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
   devicePort?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  portCount: string;
 
   @IsOptional()
   @IsString()

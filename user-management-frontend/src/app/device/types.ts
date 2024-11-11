@@ -6,6 +6,7 @@ export interface Device {
     deviceType: string;
     deviceIp: string;
     devicePort: string;
+    portCount :string;
     deviceUsername: string;
     devicePassword: string;
   }
