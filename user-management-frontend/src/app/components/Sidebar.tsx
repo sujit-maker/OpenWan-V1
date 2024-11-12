@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { styled, useTheme } from "@mui/material/styles";
@@ -148,7 +148,7 @@ const Sidebar: React.FC = () => {
       {loading && (
         <div
           role="status"
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
         >
           <svg
             aria-hidden="true"
@@ -166,7 +166,7 @@ const Sidebar: React.FC = () => {
               fill="currentFill"
             />
           </svg>
-          <span className="sr-only ">Loading...</span>
+          <span className="sr-only">Loading...</span>
         </div>
       )}
     </div>

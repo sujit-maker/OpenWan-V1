@@ -120,6 +120,7 @@ const DeviceTable: React.FC = () => {
                 <th className="border p-2 text-center">Device ID</th>
                 <th className="border p-2 text-center">Device Name</th>
                 <th className="border p-2 text-center">Device Type</th>
+                 <th className="border p-2 text-center">Port Count</th>
                 <th className="border p-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -129,6 +130,7 @@ const DeviceTable: React.FC = () => {
                   <td className="border p-2 text-center">{device.deviceId}</td>
                   <td className="border p-2 text-center">{device.deviceName}</td>
                   <td className="border p-2 text-center">{device.deviceType}</td>
+                  <td className="border p-2 text-center">{device.portCount}</td>                  
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleConnect(device)}
