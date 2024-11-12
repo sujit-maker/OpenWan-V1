@@ -54,7 +54,7 @@ const DeviceDetails: React.FC = () => {
 
   const fetchWANDetails = async (wan: string) => {
     try {
-      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/wan-ip?wan=${wan}`);
+      const response = await fetch(`http://40.0.0.109:8000/devices/${deviceId}/wan-ip?wan=${wan}`);
       if (response.ok) {
         const data = await response.json();
         return data[0] ? { address: data[0].address, status: "Connected" } : { address: "N/A", status: "Disconnected" };
@@ -69,7 +69,7 @@ const DeviceDetails: React.FC = () => {
 
   const fetchNetwatchStatus = async () => {
     try {
-      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/tool/netwatch`);
+      const response = await fetch(`http://40.0.0.109:8000/devices/${deviceId}/tool/netwatch`);
       if (response.ok) {
         const data = await response.json();
         return {
@@ -89,7 +89,7 @@ const DeviceDetails: React.FC = () => {
 
   const fetchInterfaceStatus = async () => {
     try {
-      const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/interface`);
+      const response = await fetch(`http://40.0.0.109:8000/devices/${deviceId}/interface`);
       if (response.ok) {
         const data = await response.json();
         return {
@@ -110,7 +110,7 @@ const DeviceDetails: React.FC = () => {
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
-        const response = await fetch(`http://40.0.0.25:8000/devices/${deviceId}/data`);
+        const response = await fetch(`http://40.0.0.109:8000/devices/${deviceId}/data`);
         if (!response.ok) throw new Error("Failed to fetch device data");
         const data = await response.json();
 
@@ -147,7 +147,7 @@ const DeviceDetails: React.FC = () => {
 
     const fetchWanLogs = async () => {
       try {
-        const response = await fetch(`http://40.0.0.25:8000/wanstatus`);
+        const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
         if (!response.ok) throw new Error("Failed to fetch WAN logs");
         const data = await response.json();
         setWanLogs(data.data);

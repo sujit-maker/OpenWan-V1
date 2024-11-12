@@ -31,7 +31,7 @@ const SiteTable: React.FC = () => {
 
   const fetchSites = async () => {
     try {
-      const response = await fetch("http://40.0.0.25:8000/site");
+      const response = await fetch("http://40.0.0.109:8000/site");
       if (!response.ok) {
         throw new Error("Failed to fetch sites");
       }
@@ -44,7 +44,7 @@ const SiteTable: React.FC = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch("http://40.0.0.25:8000/customers");
+      const response = await fetch("http://40.0.0.109:8000/customers");
       if (!response.ok) {
         throw new Error("Failed to fetch customers");
       }
@@ -70,7 +70,7 @@ const SiteTable: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://40.0.0.25:8000/site/${id}`, {
+      const response = await fetch(`http://40.0.0.109:8000/site/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {

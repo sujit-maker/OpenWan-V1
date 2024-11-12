@@ -32,7 +32,7 @@ const EditSiteModal: React.FC<EditSiteModalProps> = ({ isOpen, site, customers, 
   const handleSave = async () => {
     if (updatedSite) {
       try {
-        const response = await fetch(`http://40.0.0.25:8000/site/${updatedSite.id}`, {
+        const response = await fetch(`http://40.0.0.109:8000/site/${updatedSite.id}`, {
           method: 'PATCH', // Use PATCH for updating resources
           headers: {
             'Content-Type': 'application/json',

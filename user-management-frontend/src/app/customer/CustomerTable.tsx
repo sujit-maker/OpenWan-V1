@@ -31,7 +31,7 @@ const CustomerTable: React.FC = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch("http://40.0.0.25:8000/customers");
+      const response = await fetch("http://40.0.0.109:8000/customers");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -45,7 +45,7 @@ const CustomerTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
-        const response = await fetch(`http://40.0.0.25:8000/customers/${id}`, {
+        const response = await fetch(`http://40.0.0.109:8000/customers/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {
