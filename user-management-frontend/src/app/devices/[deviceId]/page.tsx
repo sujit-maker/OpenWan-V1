@@ -18,25 +18,21 @@ interface DeviceData {
     address: string;
     status: string;
     internet: string;
-    running: string;
   };
   wan2: {
     address: string;
     status: string;
     internet: string;
-    running: string;
   };
   wan3: {
     address: string;
     status: string;
     internet: string;
-    running: string;
   };
   wan4: {
     address: string;
     status: string;
     internet: string;
-    running: string;
   };
 }
 
@@ -51,12 +47,24 @@ interface WanLog {
 
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
-  const { deviceId } = useParams(); // Get deviceId from URL parameters
+  const { deviceId } = useParams(); 
   const [wanLogs, setWanLogs] = useState<WanLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [isTableVisible] = useState(true);
-  const [portCount, setPortCount] = useState<number>(0); // Add this state
+  const [portCount, setPortCount] = useState<number>(0); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 6;
   const router = useRouter();
+
+  const totalPages = Math.ceil(wanLogs.length / entriesPerPage);
+
+// Calculate paginated entries
+const indexOfLastEntry = currentPage * entriesPerPage;
+const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
+const currentLogs = wanLogs.slice(indexOfFirstEntry, indexOfLastEntry);
+
+const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   // Handle file download of WAN logs
   const handleDownload = () => {
@@ -84,13 +92,12 @@ const DeviceDetails: React.FC = () => {
       const data = await response.json();
 
       const portCount = data.portCount;
-      setPortCount(portCount); // Save port count in state
+      setPortCount(portCount); 
     } catch (error) {
       console.error("Failed to fetch:", error);
     }
   };
 
-  // Fetch device data when the component mounts or deviceId changes
   useEffect(() => {
     if (deviceId) {
       fetchDevices();
@@ -105,15 +112,13 @@ const DeviceDetails: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         return data[0]
-          ? { address: data[0].address, status: "Connected", internet: "Up" } // Add "internet" here
-          : { address: "N/A", status: "Disconnected", internet: "Down" }; // Add "internet" here for "Disconnected"
-      } else {
-        console.error(`Error fetching ${wan} IP:`, response.statusText);
+          ? { address: data[0].address, status: "Connected", internet: "Up" } 
+          : { address: "N/A", status: "Disconnected", internet: "Down" }; 
       }
     } catch (error) {
       console.error(`Error fetching ${wan} IP details:`, error);
     }
-    return { address: "N/A", status: "Disconnected", internet: "Down" }; // Ensure "internet" exists
+    return { address: "NOT CONFIG", status: "NOT CONFIG", internet: "Down" }; 
   };
 
   const fetchNetwatchStatus = async () => {
@@ -126,16 +131,16 @@ const DeviceDetails: React.FC = () => {
         return {
           wan1:
             data.find((entry: any) => entry.comment === "WAN1")?.status ||
-            "N/A",
+            "NOT CONFIG",
           wan2:
             data.find((entry: any) => entry.comment === "WAN2")?.status ||
-            "N/A",
+            "NOT CONFIG",
           wan3:
             data.find((entry: any) => entry.comment === "WAN3")?.status ||
-            "N/A",
+            "NOT CONFIG",
           wan4:
             data.find((entry: any) => entry.comment === "WAN4")?.status ||
-            "N/A",
+            "NOT CONFIG",
         };
       } else {
         console.error("Error fetching netwatch data:", response.statusText);
@@ -144,41 +149,6 @@ const DeviceDetails: React.FC = () => {
       console.error("Error fetching netwatch details:", error);
     }
     return { wan1: "N/A", wan2: "N/A", wan3: "N/A", wan4: "N/A" };
-  };
-
-  const fetchInterfaceStatus = async () => {
-    try {
-      const response = await fetch(
-        `http://40.0.0.109:8000/devices/${deviceId}/interface`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          wan1: data.find((entry: any) => entry.name === "WAN1")?.running
-            ? "Running"
-            : "Not Running",
-          wan2: data.find((entry: any) => entry.name === "WAN2")?.running
-            ? "Running"
-            : "Not Running",
-          wan3: data.find((entry: any) => entry.name === "WAN3")?.running
-            ? "Running"
-            : "Not Running",
-          wan4: data.find((entry: any) => entry.name === "WAN4")?.running
-            ? "Running"
-            : "Not Running",
-        };
-      } else {
-        console.error("Error fetching interface data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching interface details:", error);
-    }
-    return {
-      wan1: "Not Running",
-      wan2: "Not Running",
-      wan3: "Not Running",
-      wan4: "Not Running",
-    };
   };
 
   useEffect(() => {
@@ -196,7 +166,6 @@ const DeviceDetails: React.FC = () => {
         const wan4 = await fetchWANDetails("WAN4");
 
         const internetStatus = await fetchNetwatchStatus();
-        const runningStatus = await fetchInterfaceStatus();
 
         setDeviceData({
           date:
@@ -218,25 +187,21 @@ const DeviceDetails: React.FC = () => {
             address: wan1.address,
             status: wan1.status,
             internet: internetStatus.wan1,
-            running: runningStatus.wan1,
           },
           wan2: {
             address: wan2.address,
             status: wan2.status,
             internet: internetStatus.wan2,
-            running: runningStatus.wan2,
           },
           wan3: {
             address: wan3.address,
             status: wan3.status,
             internet: internetStatus.wan3,
-            running: runningStatus.wan3,
           },
           wan4: {
             address: wan4.address,
             status: wan4.status,
             internet: internetStatus.wan4,
-            running: runningStatus.wan4,
           },
         });
       } catch (error) {
@@ -270,8 +235,18 @@ const DeviceDetails: React.FC = () => {
     }
   }, [deviceId]);
 
-  if (!deviceData) return <div>Loading...</div>;
-
+  if (!deviceData) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-blue-500 animate-pulse">Loading...</h1>
+          <div className="mt-4">
+            <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const backme = () => {
     router.push("/device");
   };
@@ -332,15 +307,12 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan1.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full max-w-sm`}
+              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
-              <p className="text-gray-900">
-                IP Address: {deviceData.wan1.address}
-              </p>
+              <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
               <p className="text-black">Status: {deviceData.wan1.status}</p>
               <p className="text-black">Internet: {deviceData.wan1.internet}</p>
-              <p className="text-black">Running: {deviceData.wan1.running}</p>
             </div>
           )}
 
@@ -351,15 +323,12 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan2.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full max-w-sm`}
+              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
-              <p className="text-gray-900">
-                IP Address: {deviceData.wan2.address}
-              </p>
+              <p className="text-gray-900">IP : {deviceData.wan2.address}</p>
               <p className="text-black">Status: {deviceData.wan2.status}</p>
               <p className="text-black">Internet: {deviceData.wan2.internet}</p>
-              <p className="text-black">Running: {deviceData.wan2.running}</p>
             </div>
           )}
 
@@ -370,7 +339,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan3.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full max-w-sm`}
+              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 3</h2>
               <p className="text-gray-900">
@@ -378,7 +347,6 @@ const DeviceDetails: React.FC = () => {
               </p>
               <p className="text-black">Status: {deviceData.wan3.status}</p>
               <p className="text-black">Internet: {deviceData.wan3.internet}</p>
-              <p className="text-black">Running: {deviceData.wan3.running}</p>
             </div>
           )}
 
@@ -389,7 +357,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan4.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full max-w-sm`}
+              }-400 rounded-lg bg-red-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 4</h2>
               <p className="text-gray-900">
@@ -397,71 +365,89 @@ const DeviceDetails: React.FC = () => {
               </p>
               <p className="text-black">Status: {deviceData.wan4.status}</p>
               <p className="text-black">Internet: {deviceData.wan4.internet}</p>
-              <p className="text-black">Running: {deviceData.wan4.running}</p>
             </div>
           )}
         </div>
+{/* WAN Logs */}
+{showLogs && wanLogs.length > 0 && (
+  <div className="mt-8">
+    <div className="mb-4 flex items-center justify-between">
+      <h2 className="text-lg font-semibold">WAN Logs</h2>
+      <button
+        onClick={handleDownload}
+        className="text-blue-500 hover:text-blue-700"
+      >
+        <FaDownload className="inline mr-2" /> Download
+      </button>
+    </div>
 
-        {/* WAN Logs */}
-        {showLogs && wanLogs.length > 0 && (
-          <div className="mt-8">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">WAN Logs</h2>
-              <button
-                onClick={handleDownload}
-                className="text-blue-500 hover:text-blue-700"
-              >
-                <FaDownload className="inline mr-2" /> Download
-              </button>
-            </div>
-            {isTableVisible && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse border min-w-max">
-                  <thead className="bg-gray-400">
-                    <tr>
-                      <th className="border p-2 text-center text-sm md:text-base">
-                        Date & Time
-                      </th>
-                      <th className="border p-2 text-center text-sm md:text-base">
-                        Identity
-                      </th>
-                      <th className="border p-2 text-center text-sm md:text-base">
-                        Comment
-                      </th>
-                      <th className="border p-2 text-center text-sm md:text-base">
-                        Status
-                      </th>
-                      <th className="border p-2 text-center text-sm md:text-base">
-                        Since
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {wanLogs.map((log) => (
-                      <tr key={log.id}>
-                        <td className="border p-2 text-center text-sm md:text-base">
-                          {log.createdAt}
-                        </td>
-                        <td className="border p-2 text-center text-sm md:text-base">
-                          {log.identity}
-                        </td>
-                        <td className="border p-2 text-center text-sm md:text-base">
-                          {log.comment}
-                        </td>
-                        <td className="border p-2 text-center text-sm md:text-base">
-                          {log.status}
-                        </td>
-                        <td className="border p-2 text-center text-sm md:text-base">
-                          {log.since}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
+    {isTableVisible && (
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse border min-w-max">
+          <thead className="bg-gray-400">
+            <tr>
+              <th className="border p-2 text-center text-xs md:text-base">
+                Date & Time
+              </th>
+              <th className="border p-2 text-center text-xs md:text-base">
+                Identity
+              </th>
+              <th className="border p-2 text-center text-xs md:text-base">
+                Comment
+              </th>
+              <th className="border p-2 text-center text-xs md:text-base">
+                Status
+              </th>
+              <th className="border p-2 text-center text-xs md:text-base">
+                Since
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentLogs.map((log) => (
+              <tr key={log.id}>
+                <td className="border p-2 text-center text-xs md:text-base">
+                  {log.createdAt}
+                </td>
+                <td className="border p-2 text-center text-xs md:text-base">
+                  {log.identity}
+                </td>
+                <td className="border p-2 text-center text-xs md:text-base">
+                  {log.comment}
+                </td>
+                <td className="border p-2 text-center text-xs md:text-base">
+                  {log.status}
+                </td>
+                <td className="border p-2 text-center text-xs md:text-base">
+                  {log.since}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4  space-x-6">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 text-xs  bg-gray-200 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={indexOfLastEntry >= wanLogs.length}
+            className="px-3 py-1 text-xs size-10 w-16 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
       </div>
     </>
   );

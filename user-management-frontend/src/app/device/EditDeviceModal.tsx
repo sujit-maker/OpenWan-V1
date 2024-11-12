@@ -49,11 +49,11 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+      <div className="bg-white h-screen p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
         <h2 className="text-lg font-semibold mb-4">Edit Device</h2>
         
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device ID</label>
           <input
             type="text"
@@ -63,7 +63,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device Name</label>
           <input
             type="text"
@@ -73,7 +73,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device Type</label>
           <input
             type="text"
@@ -83,7 +83,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device IP</label>
           <input
             type="text"
@@ -93,7 +93,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device Port</label>
           <input
             type="text"
@@ -103,7 +103,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Number of Wan</label>
           <input
             type="text"
@@ -113,7 +113,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device Username</label>
           <input
             type="text"
@@ -123,7 +123,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium mb-1">Device Password</label>
           <input
             type="text"
