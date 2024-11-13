@@ -10,7 +10,7 @@ export class EmailService {
   emailTransport() {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>('EMAIL_HOST'),
-      port: this.configService.get<number>('PORT'),
+      port: this.configService.get<number>('EMAIL_PORT'),
       secure: false, // Change to true if using port 465
       auth: {
         user: this.configService.get<string>('EMAIL_USER'),
@@ -18,7 +18,6 @@ export class EmailService {
       },
     });
 
-    console.log('Transporter created with host:', this.configService.get<string>('EMAIL_HOST'), 'and port:', this.configService.get<number>('PORT'));
 
     return transporter;
   }

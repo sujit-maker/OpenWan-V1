@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/app/components/Header";
 import Sidebar from "@/app/components/Sidebar";
@@ -45,26 +45,93 @@ interface WanLog {
   createdAt: string;
 }
 
+
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
-  const { deviceId } = useParams(); 
+  const { deviceId } = useParams();
   const [wanLogs, setWanLogs] = useState<WanLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [isTableVisible] = useState(true);
-  const [portCount, setPortCount] = useState<number>(0); 
+  const [portCount, setPortCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 6;
   const router = useRouter();
 
-  const totalPages = Math.ceil(wanLogs.length / entriesPerPage);
+  
+   // Use useRef for previous WAN status and last email time to prevent re-renders
+   const previousWanStatusRef = useRef<string | null>(null);
+   const lastEmailSentTimeRef = useRef<number>(0);  // Timestamp of last email
 
-// Calculate paginated entries
-const indexOfLastEntry = currentPage * entriesPerPage;
-const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-const currentLogs = wanLogs.slice(indexOfFirstEntry, indexOfLastEntry);
+    // Minimum time interval between emails in milliseconds (e.g., 1 minute)
+  const emailCooldownInterval = 60 * 1000;
 
-const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+      // Function to send email
+  const sendEmailNotification = async (status: string) => {
+    try {
+      const emailData = {
+        recipients: "waghmaresujit008@gmail.com", // Replace with your actual recipient
+        subject: "WAN Status Change",
+        html: `<h1>Alert: WAN Status ${status}</h1><p>Your WAN connection is ${status}. Please check the status.</p>`,
+      };
+
+      const response = await fetch('http://40.0.0.109:8000/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      if (response.ok) {
+        console.log("Email sent successfully!");
+      } else {
+        console.error("Failed to send email:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+    }
+  };
+
+  // Fetch WAN logs
+  const fetchWanLogs = async () => {
+    try {
+      const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
+      if (!response.ok) throw new Error("Failed to fetch WAN logs");
+      const data = await response.json();
+
+      setWanLogs(data.data);
+      setShowLogs(true);
+
+      // Get the current WAN status (assumed to be the last log entry)
+      const currentStatus = data.data[data.data.length - 1].status.toLowerCase();
+      const currentTime = Date.now();
+
+      // Check if status has changed and cooldown period has passed
+      if (
+        previousWanStatusRef.current !== currentStatus &&
+        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval
+      ) {
+        // Send email and update last email time
+        sendEmailNotification(currentStatus);
+        lastEmailSentTimeRef.current = currentTime; // Update last email time
+        previousWanStatusRef.current = currentStatus; // Update previous status
+      }
+
+    } catch (error) {
+      console.error("Error fetching WAN logs:", error);
+    }
+  };
+
+
+
+
+  // Calculate paginated entries
+  const indexOfLastEntry = currentPage * entriesPerPage;
+  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
+  const currentLogs = wanLogs.slice(indexOfFirstEntry, indexOfLastEntry);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   // Handle file download of WAN logs
   const handleDownload = () => {
@@ -73,6 +140,7 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
     XLSX.utils.book_append_sheet(workbook, worksheet, "WAN Logs");
     XLSX.writeFile(workbook, "WAN_Logs.xlsx");
   };
+
 
   // Function to fetch device data
   const fetchDevices = async () => {
@@ -92,7 +160,7 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
       const data = await response.json();
 
       const portCount = data.portCount;
-      setPortCount(portCount); 
+      setPortCount(portCount);
     } catch (error) {
       console.error("Failed to fetch:", error);
     }
@@ -112,13 +180,13 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
       if (response.ok) {
         const data = await response.json();
         return data[0]
-          ? { address: data[0].address, status: "Connected", internet: "Up" } 
-          : { address: "N/A", status: "Disconnected", internet: "Down" }; 
+          ? { address: data[0].address, status: "Connected", internet: "Up" }
+          : { address: "N/A", status: "Disconnected", internet: "Down" };
       }
     } catch (error) {
       console.error(`Error fetching ${wan} IP details:`, error);
     }
-    return { address: "NOT CONFIG", status: "NOT CONFIG", internet: "Down" }; 
+    return { address: "NOT CONFIG", status: "NOT CONFIG", internet: "Down" };
   };
 
   const fetchNetwatchStatus = async () => {
@@ -150,6 +218,8 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
     }
     return { wan1: "N/A", wan2: "N/A", wan3: "N/A", wan4: "N/A" };
   };
+
+
 
   useEffect(() => {
     const fetchDeviceData = async () => {
@@ -209,37 +279,31 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
       }
     };
 
-    const fetchWanLogs = async () => {
-      try {
-        const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
-        if (!response.ok) throw new Error("Failed to fetch WAN logs");
-        const data = await response.json();
-
-        setWanLogs(data.data);
-        setShowLogs(true);
-      } catch (error) {
-        console.error("Error fetching WAN logs:", error);
-      }
-    };
-
+    
     if (deviceId) {
+      // Initial fetch
       fetchDeviceData();
       fetchWanLogs();
 
+      // Set interval to fetch data every 5 seconds
       const interval = setInterval(() => {
         fetchDeviceData();
         fetchWanLogs();
       }, 5000);
 
+      // Clean up interval when the component unmounts or deviceId changes
       return () => clearInterval(interval);
     }
   }, [deviceId]);
+
 
   if (!deviceData) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-blue-500 animate-pulse">Loading...</h1>
+          <h1 className="text-4xl font-bold text-blue-500 animate-pulse">
+            Loading...
+          </h1>
           <div className="mt-4">
             <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
           </div>
@@ -323,7 +387,7 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
                 deviceData.wan2.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
               <p className="text-gray-900">IP : {deviceData.wan2.address}</p>
@@ -357,7 +421,7 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
                 deviceData.wan4.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg bg-red-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 4</h2>
               <p className="text-gray-900">
@@ -368,86 +432,85 @@ const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
             </div>
           )}
         </div>
-{/* WAN Logs */}
-{showLogs && wanLogs.length > 0 && (
-  <div className="mt-8">
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-lg font-semibold">WAN Logs</h2>
-      <button
-        onClick={handleDownload}
-        className="text-blue-500 hover:text-blue-700"
-      >
-        <FaDownload className="inline mr-2" /> Download
-      </button>
-    </div>
+        {/* WAN Logs */}
+        {showLogs && wanLogs.length > 0 && (
+          <div className="mt-8">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">WAN Logs</h2>
+              <button
+                onClick={handleDownload}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <FaDownload className="inline mr-2" /> Download
+              </button>
+            </div>
 
-    {isTableVisible && (
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse border min-w-max">
-          <thead className="bg-gray-400">
-            <tr>
-              <th className="border p-2 text-center text-xs md:text-base">
-                Date & Time
-              </th>
-              <th className="border p-2 text-center text-xs md:text-base">
-                Identity
-              </th>
-              <th className="border p-2 text-center text-xs md:text-base">
-                Comment
-              </th>
-              <th className="border p-2 text-center text-xs md:text-base">
-                Status
-              </th>
-              <th className="border p-2 text-center text-xs md:text-base">
-                Since
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentLogs.map((log) => (
-              <tr key={log.id}>
-                <td className="border p-2 text-center text-xs md:text-base">
-                  {log.createdAt}
-                </td>
-                <td className="border p-2 text-center text-xs md:text-base">
-                  {log.identity}
-                </td>
-                <td className="border p-2 text-center text-xs md:text-base">
-                  {log.comment}
-                </td>
-                <td className="border p-2 text-center text-xs md:text-base">
-                  {log.status}
-                </td>
-                <td className="border p-2 text-center text-xs md:text-base">
-                  {log.since}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            {isTableVisible && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse border min-w-max">
+                  <thead className="bg-gray-400">
+                    <tr>
+                      <th className="border p-2 text-center text-xs md:text-base">
+                        Date & Time
+                      </th>
+                      <th className="border p-2 text-center text-xs md:text-base">
+                        Identity
+                      </th>
+                      <th className="border p-2 text-center text-xs md:text-base">
+                        Comment
+                      </th>
+                      <th className="border p-2 text-center text-xs md:text-base">
+                        Status
+                      </th>
+                      <th className="border p-2 text-center text-xs md:text-base">
+                        Since
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentLogs.map((log) => (
+                      <tr key={log.id}>
+                        <td className="border p-2 text-center text-xs md:text-base">
+                          {log.createdAt}
+                        </td>
+                        <td className="border p-2 text-center text-xs md:text-base">
+                          {log.identity}
+                        </td>
+                        <td className="border p-2 text-center text-xs md:text-base">
+                          {log.comment}
+                        </td>
+                        <td className="border p-2 text-center text-xs md:text-base">
+                          {log.status}
+                        </td>
+                        <td className="border p-2 text-center text-xs md:text-base">
+                          {log.since}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-center mt-4  space-x-6">
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-3 py-1 text-xs  bg-gray-200 rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={indexOfLastEntry >= wanLogs.length}
-            className="px-3 py-1 text-xs size-10 w-16 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
-)}
-
+                {/* Pagination Controls */}
+                <div className="flex justify-center mt-4  space-x-6">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-balance  text-white bg-gray-600 rounded-3xl disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={indexOfLastEntry >= wanLogs.length}
+                    className="px-3 py-1 text-balance size-10 w-16 text-white bg-gray-600 rounded-3xl disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
