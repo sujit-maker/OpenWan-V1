@@ -70,7 +70,7 @@ const DeviceDetails: React.FC = () => {
   const sendEmailNotification = async (status: string) => {
     try {
       const emailData = {
-        recipients: "waghmaresujit008@gmail.com", // Replace with your actual recipient
+        recipients: ["waghmaresujit008@gmail.com"], // Replace with your actual recipient
         subject: "WAN Status Change",
         html: `<h1>Alert: WAN Status ${status}</h1><p>Your WAN connection is ${status}. Please check the status.</p>`,
       };
@@ -371,7 +371,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan1.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg bg-green-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
               <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
@@ -387,7 +387,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan2.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg bg-green-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
               <p className="text-gray-900">IP : {deviceData.wan2.address}</p>
@@ -403,7 +403,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan3.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg bg-red-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 3</h2>
               <p className="text-gray-900">
@@ -421,7 +421,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan4.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg bg-red-500  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 4</h2>
               <p className="text-gray-900">
