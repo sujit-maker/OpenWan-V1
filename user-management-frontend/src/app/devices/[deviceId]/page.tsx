@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/app/components/Header";
 import Sidebar from "@/app/components/Sidebar";
@@ -45,6 +45,8 @@ interface WanLog {
   createdAt: string;
 }
 
+ // Minimum time interval between emails in milliseconds (e.g., 1 minute)
+const emailCooldownInterval = 60 * 1000;
 
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
@@ -60,41 +62,46 @@ const DeviceDetails: React.FC = () => {
   
    // Use useRef for previous WAN status and last email time to prevent re-renders
    const previousWanStatusRef = useRef<string | null>(null);
-   const lastEmailSentTimeRef = useRef<number>(0);  // Timestamp of last email
-
-    // Minimum time interval between emails in milliseconds (e.g., 1 minute)
-  const emailCooldownInterval = 60 * 1000;
+  const lastEmailSentTimeRef = useRef<number>(0);
 
 
-      // Function to send email
-  const sendEmailNotification = async (status: string) => {
-    try {
-      const emailData = {
-        recipients: ["waghmaresujit008@gmail.com"], // Replace with your actual recipient
-        subject: "WAN Status Change",
-        html: `<h1>Alert: WAN Status ${status}</h1><p>Your WAN connection is ${status}. Please check the status.</p>`,
-      };
-
-      const response = await fetch('http://40.0.0.109:8000/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailData),
-      });
-
-      if (response.ok) {
-        console.log("Email sent successfully!");
-      } else {
-        console.error("Failed to send email:", await response.text());
+     // Function to send email
+     const sendEmailNotification = async (status: string) => {
+      try {
+        // Determine image URL based on status
+        const imageUrl = status === "up"
+          ? "https://www.freeiconspng.com/uploads/green-up-arrow-png-10.png"
+          : "https://www.shutterstock.com/image-vector/red-3d-arrow-going-down-600nw-2502286831.jpg";
+    
+        const emailData = {
+          recipients: ["waghmaresujit008@gmail.com"], // Replace with your actual recipient
+          subject: `WAN Status Change - ${status.toUpperCase()}`,
+          html: `
+            <h1>Alert: WAN Status ${status.toUpperCase()}</h1>
+            <p>Your WAN connection is <strong>${status}</strong>. Please check the status.</p>
+            <img src="${imageUrl}" alt="${status}" width="100" height="100" style="display: block; margin-top: 20px;">
+          `,
+        };
+    
+        const response = await fetch('http://40.0.0.109:8000/email/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(emailData),
+        });
+    
+        if (response.ok) {
+        } else {
+          console.error("Failed to send email:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error sending email:", error);
       }
-    } catch (error) {
-      console.error("Error sending email:", error);
-    }
-  };
-
-  // Fetch WAN logs
-  const fetchWanLogs = async () => {
+    };
+    
+  // Function to fetch WAN logs and check status changes
+  const fetchWanLogs = useCallback(async () => {
     try {
       const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
       if (!response.ok) throw new Error("Failed to fetch WAN logs");
@@ -107,23 +114,34 @@ const DeviceDetails: React.FC = () => {
       const currentStatus = data.data[data.data.length - 1].status.toLowerCase();
       const currentTime = Date.now();
 
-      // Check if status has changed and cooldown period has passed
+      // Check if status has actually changed and if the cooldown period has passed
       if (
-        previousWanStatusRef.current !== currentStatus &&
-        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval
+        previousWanStatusRef.current !== currentStatus && // Check if status changed
+        (currentStatus === "up" || currentStatus === "down") && // Ensure valid status
+        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval // Check cooldown
       ) {
         // Send email and update last email time
-        sendEmailNotification(currentStatus);
+        await sendEmailNotification(currentStatus);
         lastEmailSentTimeRef.current = currentTime; // Update last email time
         previousWanStatusRef.current = currentStatus; // Update previous status
+      } else {
+        console.log("No status change or cooldown period not met");
       }
-
     } catch (error) {
       console.error("Error fetching WAN logs:", error);
     }
-  };
+  }, []);
 
+  // Set up interval to fetch WAN logs
+  useEffect(() => {
+    // Fetch logs immediately when the component mounts
+    fetchWanLogs();
 
+    // Set up interval to fetch WAN logs every minute
+    const interval = setInterval(fetchWanLogs, 60000);
+
+    return () => clearInterval(interval); // Clear interval on unmount
+  }, [fetchWanLogs]);
 
 
   // Calculate paginated entries
@@ -283,12 +301,11 @@ const DeviceDetails: React.FC = () => {
     if (deviceId) {
       // Initial fetch
       fetchDeviceData();
-      fetchWanLogs();
+      
 
       // Set interval to fetch data every 5 seconds
       const interval = setInterval(() => {
         fetchDeviceData();
-        fetchWanLogs();
       }, 5000);
 
       // Clean up interval when the component unmounts or deviceId changes
@@ -366,19 +383,17 @@ const DeviceDetails: React.FC = () => {
 
           {/* WAN 1 */}
           {portCount >= 1 && (
-            <div
-              className={`bg-${
-                deviceData.wan1.internet.toLowerCase() === "up"
-                  ? "green"
-                  : "red"
-              }-400 rounded-lg bg-green-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
-            >
-              <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
-              <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
-              <p className="text-black">Status: {deviceData.wan1.status}</p>
-              <p className="text-black">Internet: {deviceData.wan1.internet}</p>
-            </div>
-          )}
+  <div
+    className={`${
+      deviceData.wan1.internet.toLowerCase() === "up" ? "bg-green-400" : "bg-red-400"
+    } rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+  >
+    <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
+    <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
+    <p className="text-black">Status: {deviceData.wan1.status}</p>
+    <p className="text-black">Internet: {deviceData.wan1.internet}</p>
+  </div>
+)}
 
           {/* WAN 2 */}
           {portCount >= 2 && (
@@ -387,7 +402,7 @@ const DeviceDetails: React.FC = () => {
                 deviceData.wan2.internet.toLowerCase() === "up"
                   ? "green"
                   : "red"
-              }-400 rounded-lg bg-green-500 shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+              }-400 rounded-lg  shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
             >
               <h2 className="text-lg font-semibold mb-2">WAN 2</h2>
               <p className="text-gray-900">IP : {deviceData.wan2.address}</p>

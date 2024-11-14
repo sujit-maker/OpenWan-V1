@@ -1,39 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUserCreated: () => void;
+  onUserCreated: (newManager: { id: number; username: string }) => void;
   managers: { id: number; username: string }[];
 }
 
-const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUserCreated, managers }) => {
+const CreateUserModal: React.FC<CreateUserModalProps> = ({
+  isOpen,
+  onClose,
+  onUserCreated,
+}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usertype, setUsertype] = useState('EXECUTIVE');
   const [selectedManagerId, setSelectedManagerId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [managers, setManagers] = useState<{ id: number; username: string }[]>([]);
+
+  // Fetch managers when modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      const fetchManagers = async () => {
+        try {
+          const response = await fetch('http://40.0.0.109:8000/users/managers');
+          if (response.ok) {
+            const data = await response.json();
+            setManagers(data);
+          } else {
+            setError('Failed to load managers.');
+          }
+        } catch (err) {
+          setError('An error occurred while fetching managers.');
+        }
+      };
+
+      fetchManagers();
+    }
+  }, [isOpen]); // Fetch managers whenever `isOpen` changes to true
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    // Validate manager selection for "EXECUTIVE" user type
+
     if (usertype === 'EXECUTIVE' && selectedManagerId === null) {
       setError('Please select a valid manager.');
       return;
     }
-  
-    // Create payload for the API request
+
     const payload = {
       username,
       password,
       usertype,
       managerId: usertype === 'EXECUTIVE' ? selectedManagerId : null,
     };
-  
-  
+
     try {
       const response = await fetch('http://40.0.0.109:8000/users/register', {
         method: 'POST',
@@ -42,13 +65,19 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
         },
         body: JSON.stringify(payload),
       });
-  
+
       if (response.ok) {
-        setSuccess('User created successfully!');
+        const newUser = await response.json();
+        setSuccess('User created successfully!'); // Display success message
         setError(null);
-        onUserCreated();
+        onUserCreated(newUser); // Notify the parent to update the managers list
         resetForm();
-        setTimeout(onClose, 2000); 
+        
+        // Clear success message after 2 seconds
+        setTimeout(() => setSuccess(null), 2000);
+
+        // Close the modal after a delay
+        setTimeout(onClose, 2000);
       } else {
         const data = await response.json();
         setError(data.message || 'An error occurred while creating the user.');
@@ -60,20 +89,19 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
       setSuccess(null);
     }
   };
-  
-  
+
   const resetForm = () => {
     setUsername('');
     setPassword('');
     setUsertype('EXECUTIVE');
     setSelectedManagerId(null);
+    setError(null);
   };
 
   const handleManagerSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedManagerId = Number(e.target.value); 
+    const selectedManagerId = Number(e.target.value);
     setSelectedManagerId(selectedManagerId);
   };
-  
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -128,12 +156,12 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
               <div className="mb-4">
                 <label htmlFor="manager" className="block text-gray-700">Select Manager</label>
                 <select
-                 id="manager"
-                 value={selectedManagerId || ''} // Show manager ID
-                 onChange={handleManagerSelection}
-                 className="w-full border rounded p-2 mt-1"
-               >
-                  <option value="">Select a manager</option>
+                  id="manager"
+                  value={selectedManagerId || ''}
+                  onChange={handleManagerSelection}
+                  className="w-full border rounded p-2 mt-1"
+                >
+                  <option value="">--Select Manager--</option>
                   {managers.map((manager) => (
                     <option key={manager.id} value={manager.id}>
                       {manager.username}

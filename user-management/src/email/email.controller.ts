@@ -9,6 +9,5 @@
   @Post('send')
   async sendMail(@Body() dto: sendEmailDto) {
     await this.emailService.sendEmail(dto);
-    return { message: 'Email sent successfully' };
   }
 }
