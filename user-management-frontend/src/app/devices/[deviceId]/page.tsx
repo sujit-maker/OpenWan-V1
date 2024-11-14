@@ -45,8 +45,6 @@ interface WanLog {
   createdAt: string;
 }
 
- // Minimum time interval between emails in milliseconds (e.g., 1 minute)
-const emailCooldownInterval = 60 * 1000;
 
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
@@ -60,45 +58,45 @@ const DeviceDetails: React.FC = () => {
   const router = useRouter();
 
   
-   // Use useRef for previous WAN status and last email time to prevent re-renders
-   const previousWanStatusRef = useRef<string | null>(null);
+  // Use useRef for previous WAN status and last email time to prevent re-renders
+  const previousWanStatusRef = useRef<string | null>(null);
   const lastEmailSentTimeRef = useRef<number>(0);
+  const emailCooldownInterval = 60 * 1000;
 
 
-     // Function to send email
-     const sendEmailNotification = async (status: string) => {
-      try {
-        // Determine image URL based on status
-        const imageUrl = status === "up"
-          ? "https://www.freeiconspng.com/uploads/green-up-arrow-png-10.png"
-          : "https://www.shutterstock.com/image-vector/red-3d-arrow-going-down-600nw-2502286831.jpg";
+    //  // Function to send email
+    //  const sendEmailNotification = async (status: string) => {
+    //   try {
+    //     const imageUrl = status === "up"
+    //       ? "https://www.freeiconspng.com/uploads/green-up-arrow-png-10.png"
+    //       : "https://www.shutterstock.com/image-vector/red-3d-arrow-going-down-600nw-2502286831.jpg";
     
-        const emailData = {
-          recipients: ["waghmaresujit008@gmail.com"], // Replace with your actual recipient
-          subject: `WAN Status Change - ${status.toUpperCase()}`,
-          html: `
-            <h1>Alert: WAN Status ${status.toUpperCase()}</h1>
-            <p>Your WAN connection is <strong>${status}</strong>. Please check the status.</p>
-            <img src="${imageUrl}" alt="${status}" width="100" height="100" style="display: block; margin-top: 20px;">
-          `,
-        };
+    //     const emailData = {
+    //       recipients: ["waghmaresujit008@gmail.com"], 
+    //       subject: `WAN Status Change - ${status.toUpperCase()}`,
+    //       html: `
+    //         <h1>Alert: WAN Status ${status.toUpperCase()}</h1>
+    //         <p>Your WAN connection is <strong>${status}</strong>. Please check the status.</p>
+    //         <img src="${imageUrl}" alt="${status}" width="100" height="100" style="display: block; margin-top: 20px;">
+    //       `,
+    //     };
     
-        const response = await fetch('http://40.0.0.109:8000/email/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(emailData),
-        });
+    //     const response = await fetch('http://40.0.0.109:8000/email/send', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(emailData),
+    //     });
     
-        if (response.ok) {
-        } else {
-          console.error("Failed to send email:", await response.text());
-        }
-      } catch (error) {
-        console.error("Error sending email:", error);
-      }
-    };
+    //     if (response.ok) {
+    //     } else {
+    //       console.error("Failed to send email:", await response.text());
+    //     }
+    //   } catch (error) {
+    //     console.error("Error sending email:", error);
+    //   }
+    // };
     
   // Function to fetch WAN logs and check status changes
   const fetchWanLogs = useCallback(async () => {
@@ -116,14 +114,15 @@ const DeviceDetails: React.FC = () => {
 
       // Check if status has actually changed and if the cooldown period has passed
       if (
-        previousWanStatusRef.current !== currentStatus && // Check if status changed
-        (currentStatus === "up" || currentStatus === "down") && // Ensure valid status
-        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval // Check cooldown
+        previousWanStatusRef.current !== currentStatus && 
+        (currentStatus === "up" || currentStatus === "down") && 
+        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval 
       ) {
         // Send email and update last email time
-        await sendEmailNotification(currentStatus);
-        lastEmailSentTimeRef.current = currentTime; // Update last email time
-        previousWanStatusRef.current = currentStatus; // Update previous status
+        // await sendEmailNotification(currentStatus);
+        
+        lastEmailSentTimeRef.current = currentTime; 
+        previousWanStatusRef.current = currentStatus; 
       } else {
         console.log("No status change or cooldown period not met");
       }
@@ -134,13 +133,11 @@ const DeviceDetails: React.FC = () => {
 
   // Set up interval to fetch WAN logs
   useEffect(() => {
-    // Fetch logs immediately when the component mounts
     fetchWanLogs();
-
     // Set up interval to fetch WAN logs every minute
     const interval = setInterval(fetchWanLogs, 60000);
 
-    return () => clearInterval(interval); // Clear interval on unmount
+    return () => clearInterval(interval);
   }, [fetchWanLogs]);
 
 

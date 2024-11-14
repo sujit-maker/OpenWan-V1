@@ -40,7 +40,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
       fetchManagers();
     }
-  }, [isOpen]); // Fetch managers whenever `isOpen` changes to true
+  }, [isOpen]); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,9 +68,9 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
       if (response.ok) {
         const newUser = await response.json();
-        setSuccess('User created successfully!'); // Display success message
+        setSuccess('User created successfully!'); 
         setError(null);
-        onUserCreated(newUser); // Notify the parent to update the managers list
+        onUserCreated(newUser); 
         resetForm();
         
         // Clear success message after 2 seconds

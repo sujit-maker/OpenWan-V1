@@ -15,10 +15,13 @@ import { MikroTikModule } from './mikrotik/mikroTik.module';
 import { WanStatusService } from './wan-status/wan-status.service';
 import { WanStatusController } from './wan-status/wan-status.controller';
 import { WanStatusModule } from './wan-status/wan-status.module';
+import { ScheduleModule } from '@nestjs/schedule';  // Import the ScheduleModule
+
 
 
 @Module({
-  imports: [AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule, EmailModule,MikroTikModule, WanStatusModule],
+  imports: [    ScheduleModule.forRoot(), // Enable scheduling
+    AuthModule,UserModule,PrismaModule, ServicesModule,CustomerModule, SiteModule,TasksModule, DevicesModule, EmailModule,MikroTikModule, WanStatusModule],
   controllers: [AppController, WanStatusController],
   providers: [AppService, PrismaService, WanStatusService],
 })
