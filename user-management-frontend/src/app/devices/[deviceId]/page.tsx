@@ -57,75 +57,14 @@ const DeviceDetails: React.FC = () => {
   const entriesPerPage = 6;
   const router = useRouter();
 
-  
-  // Use useRef for previous WAN status and last email time to prevent re-renders
-  const previousWanStatusRef = useRef<string | null>(null);
-  const lastEmailSentTimeRef = useRef<number>(0);
-  const emailCooldownInterval = 60 * 1000;
-
-
-    //  // Function to send email
-    //  const sendEmailNotification = async (status: string) => {
-    //   try {
-    //     const imageUrl = status === "up"
-    //       ? "https://www.freeiconspng.com/uploads/green-up-arrow-png-10.png"
-    //       : "https://www.shutterstock.com/image-vector/red-3d-arrow-going-down-600nw-2502286831.jpg";
     
-    //     const emailData = {
-    //       recipients: ["waghmaresujit008@gmail.com"], 
-    //       subject: `WAN Status Change - ${status.toUpperCase()}`,
-    //       html: `
-    //         <h1>Alert: WAN Status ${status.toUpperCase()}</h1>
-    //         <p>Your WAN connection is <strong>${status}</strong>. Please check the status.</p>
-    //         <img src="${imageUrl}" alt="${status}" width="100" height="100" style="display: block; margin-top: 20px;">
-    //       `,
-    //     };
-    
-    //     const response = await fetch('http://40.0.0.109:8000/email/send', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify(emailData),
-    //     });
-    
-    //     if (response.ok) {
-    //     } else {
-    //       console.error("Failed to send email:", await response.text());
-    //     }
-    //   } catch (error) {
-    //     console.error("Error sending email:", error);
-    //   }
-    // };
-    
-  // Function to fetch WAN logs and check status changes
   const fetchWanLogs = useCallback(async () => {
     try {
       const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
       if (!response.ok) throw new Error("Failed to fetch WAN logs");
       const data = await response.json();
-
       setWanLogs(data.data);
       setShowLogs(true);
-
-      // Get the current WAN status (assumed to be the last log entry)
-      const currentStatus = data.data[data.data.length - 1].status.toLowerCase();
-      const currentTime = Date.now();
-
-      // Check if status has actually changed and if the cooldown period has passed
-      if (
-        previousWanStatusRef.current !== currentStatus && 
-        (currentStatus === "up" || currentStatus === "down") && 
-        currentTime - lastEmailSentTimeRef.current >= emailCooldownInterval 
-      ) {
-        // Send email and update last email time
-        // await sendEmailNotification(currentStatus);
-        
-        lastEmailSentTimeRef.current = currentTime; 
-        previousWanStatusRef.current = currentStatus; 
-      } else {
-        console.log("No status change or cooldown period not met");
-      }
     } catch (error) {
       console.error("Error fetching WAN logs:", error);
     }
@@ -134,11 +73,11 @@ const DeviceDetails: React.FC = () => {
   // Set up interval to fetch WAN logs
   useEffect(() => {
     fetchWanLogs();
-    // Set up interval to fetch WAN logs every minute
-    const interval = setInterval(fetchWanLogs, 60000);
+    const interval = setInterval(fetchWanLogs, 5000); 
 
     return () => clearInterval(interval);
   }, [fetchWanLogs]);
+
 
 
   // Calculate paginated entries

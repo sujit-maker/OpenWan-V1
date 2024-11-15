@@ -19,9 +19,7 @@ export class WanStatusService {
         orderBy: { createdAt: 'desc' }, // Fetch the most recent record
       });
 
-      // Log the previous and current statuses for debugging
-      console.log('Previous Status:', previousStatus ? previousStatus.status : 'No previous status');
-      console.log('New Status:', data.status);
+      
 
       // Check if the status has changed (only allow up/down or down/up)
       if (!previousStatus || previousStatus.status !== data.status) {
@@ -45,7 +43,6 @@ export class WanStatusService {
           html: `The status for ${data.identity} has changed to: ${data.status}`,
         });
 
-        console.log(`Data saved and email sent for identity: ${data.identity}`);
       } else {
         console.log(`No status change for ${data.identity}. No email sent.`);
       }
