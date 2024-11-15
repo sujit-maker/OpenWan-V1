@@ -81,19 +81,19 @@ const Dashboard: React.FC = () => {
       {superadminId ? (
         <>
           {adminUserCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Admins Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{adminUserCount}</p>
             </div>
           )}
           {userCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{userCount}</p>
             </div>
           )}
           {executiveCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{executiveCount}</p>
             </div>
@@ -102,19 +102,19 @@ const Dashboard: React.FC = () => {
       ) : (
         <>
           {userCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Executive Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{userCount}</p>
             </div>
           )}
           {adminUserCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Managers Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{adminUserCount}</p>
             </div>
           )}
           {executiveCount !== null && (
-            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
+            <div className="w-full max-w-[300px] bg-white rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-6">
               <h3 className="text-lg font-semibold text-gray-700 text-center">Executives Count</h3>
               <p className="text-4xl font-bold text-gray-800 text-center mt-2">{executiveCount}</p>
             </div>

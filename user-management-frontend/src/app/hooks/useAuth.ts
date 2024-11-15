@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginUser, changeUserPassword } from '../authservice/authService';
+import { toast } from 'react-toastify';
 
 type UserType = 'ADMIN' | 'EXECUTIVE' | 'MANAGER' | 'SUPERADMIN';
 
@@ -49,52 +50,59 @@ interface LoginResponse {
   }, []);
 
   // Login function
-  const login = async (username: string, password: string) => {
-    setLoading(true);
-    setError(null);
+const login = async (username: string, password: string): Promise<boolean> => {
+  setLoading(true);
+  setError(null);
 
-    try {
-      const { access_token, id, usertype }: LoginResponse = await loginUser(username, password);
-      setCurrentUserType(usertype);
-      setUserId(id);
-      
-      if (usertype === 'MANAGER') {
-        setManagerId(id);
-      } else if (usertype === 'ADMIN') {
-        setAdminId(id);
-      } else if (usertype === 'SUPERADMIN') {
-        setSuperadminId(id);
-      } 
+  try {
+    const { access_token, id, usertype }: LoginResponse = await loginUser(username, password);
+    setCurrentUserType(usertype);
+    setUserId(id);
 
-      setLocalStorage('access_token', access_token);
-      setLocalStorage('userId', id);
-      setLocalStorage('userType', usertype);
-      setLocalStorage('managerId', usertype === 'MANAGER' ? id : null);
-      setLocalStorage('adminId', usertype === 'ADMIN' ? id : null);
-      setLocalStorage('superadminId', usertype === 'SUPERADMIN' ? id : null);
-
-      switch (usertype) {
-        case 'ADMIN':
-          router.push('/dashboard');
-          break;
-        case 'EXECUTIVE':
-          router.push('/executive');
-          break;
-        case 'MANAGER':
-          router.push('/dashboard');
-          break;
-        case 'SUPERADMIN':
-          router.push('/dashboard');
-          break;
-        default:
-          throw new Error('Invalid usertype');
-      }
-    } catch (error: any) {
-      setError(error.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+    if (usertype === 'MANAGER') {
+      setManagerId(id);
+    } else if (usertype === 'ADMIN') {
+      setAdminId(id);
+    } else if (usertype === 'SUPERADMIN') {
+      setSuperadminId(id);
     }
-  };
+
+    setLocalStorage('access_token', access_token);
+    setLocalStorage('userId', id);
+    setLocalStorage('userType', usertype);
+    setLocalStorage('managerId', usertype === 'MANAGER' ? id : null);
+    setLocalStorage('adminId', usertype === 'ADMIN' ? id : null);
+    setLocalStorage('superadminId', usertype === 'SUPERADMIN' ? id : null);
+
+     // Display success toast
+     toast.success("Login successful!");
+
+     // Delay for 1 second to allow the toast message to be visible
+     await new Promise(resolve => setTimeout(resolve, 500));
+
+    switch (usertype) {
+      case 'ADMIN':
+        router.push('/dashboard');
+        break;
+      case 'EXECUTIVE':
+        router.push('/executive');
+        break;
+      case 'MANAGER':
+      case 'SUPERADMIN':
+        router.push('/dashboard');
+        break;
+      default:
+        throw new Error('Invalid usertype');
+    }
+    return true; // Login successful
+  } catch (error: any) {
+    setError(error.message || 'Login failed. Please try again.');
+    return false; // Login failed
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Logout function
   const logout = () => {

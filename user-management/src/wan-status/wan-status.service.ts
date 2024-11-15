@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EmailService } from 'src/email/email.service'; // Inject EmailService
+import { EmailService } from 'src/email/email.service'; 
 import { format } from 'date-fns';
 
 @Injectable()
 export class WanStatusService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly emailService: EmailService, // Inject EmailService
+    private readonly emailService: EmailService, 
   ) {}
 
   // Function to save the data (only when status changes)
@@ -16,10 +16,8 @@ export class WanStatusService {
       // Fetch the most recent record for the given identity
       const previousStatus = await this.prisma.mikroTik.findFirst({
         where: { identity: data.identity },
-        orderBy: { createdAt: 'desc' }, // Fetch the most recent record
+        orderBy: { createdAt: 'desc' }, 
       });
-
-      
 
       // Check if the status has changed (only allow up/down or down/up)
       if (!previousStatus || previousStatus.status !== data.status) {
@@ -38,10 +36,20 @@ export class WanStatusService {
 
         // Send an email notification about the status change
         await this.emailService.sendEmail({
-          recipients: ['waghmaresujit008@gmail.com'], // Replace with actual recipients
-          subject: `Status changed for ${data.identity}`,
-          html: `The status for ${data.identity} has changed to: ${data.status}`,
+          recipients: ['waghmaresujit008@gmail.com'],
+          subject: `${data.identity} ${data.comment} is ${data.status}`,
+          html: `
+            <div>
+              <p>${data.identity} ${data.comment} is ${data.status}</p>
+              <img src="${
+                data.status.toLowerCase() === 'up' 
+                  ? 'https://thumbs.dreamstime.com/b/green-arrow-pointing-up-isolated-d-illustration-green-arrow-pointing-up-isolated-335047632.jpg'
+                  : 'https://media.istockphoto.com/id/1389684537/photo/red-down-arrow-isolated-on-white-background-with-shadow-fall-and-decline-concept-3d-render.jpg?s=612x612&w=0&k=20&c=xl0hH7k27JsIrUHPWvxxykim5J-SnawRSEPDnlWYPfc='
+              }" alt="${data.status === 'up' ? 'Green up arrow' : 'Red down arrow'}" style="width:50px;height:auto;" />
+            </div>
+          `,
         });
+        
 
       } else {
         console.log(`No status change for ${data.identity}. No email sent.`);

@@ -1,9 +1,9 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/app/components/Header";
 import Sidebar from "@/app/components/Sidebar";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaSpinner } from "react-icons/fa";
 import * as XLSX from "xlsx";
 
 interface DeviceData {
@@ -45,7 +45,6 @@ interface WanLog {
   createdAt: string;
 }
 
-
 const DeviceDetails: React.FC = () => {
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
   const { deviceId } = useParams();
@@ -57,7 +56,6 @@ const DeviceDetails: React.FC = () => {
   const entriesPerPage = 6;
   const router = useRouter();
 
-    
   const fetchWanLogs = useCallback(async () => {
     try {
       const response = await fetch(`http://40.0.0.109:8000/wanstatus`);
@@ -73,12 +71,10 @@ const DeviceDetails: React.FC = () => {
   // Set up interval to fetch WAN logs
   useEffect(() => {
     fetchWanLogs();
-    const interval = setInterval(fetchWanLogs, 5000); 
+    const interval = setInterval(fetchWanLogs, 5000);
 
     return () => clearInterval(interval);
   }, [fetchWanLogs]);
-
-
 
   // Calculate paginated entries
   const indexOfLastEntry = currentPage * entriesPerPage;
@@ -94,7 +90,6 @@ const DeviceDetails: React.FC = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "WAN Logs");
     XLSX.writeFile(workbook, "WAN_Logs.xlsx");
   };
-
 
   // Function to fetch device data
   const fetchDevices = async () => {
@@ -173,8 +168,6 @@ const DeviceDetails: React.FC = () => {
     return { wan1: "N/A", wan2: "N/A", wan3: "N/A", wan4: "N/A" };
   };
 
-
-
   useEffect(() => {
     const fetchDeviceData = async () => {
       try {
@@ -233,11 +226,9 @@ const DeviceDetails: React.FC = () => {
       }
     };
 
-    
     if (deviceId) {
       // Initial fetch
       fetchDeviceData();
-      
 
       // Set interval to fetch data every 5 seconds
       const interval = setInterval(() => {
@@ -249,19 +240,18 @@ const DeviceDetails: React.FC = () => {
     }
   }, [deviceId]);
 
-
   if (!deviceData) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-blue-500 animate-pulse">
-            Loading...
+      <div className="flex justify-center items-center min-h-screen">
+      <div className="text-center">
+          <h1 className="text-4xl font-serif text-blue-800 animate-pulse mb-4">
+              Loading...
           </h1>
-          <div className="mt-4">
-            <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+          <div className="flex justify-center items-center">
+              <FaSpinner className="animate-spin text-blue-800 text-6xl" />
           </div>
-        </div>
       </div>
+  </div>
     );
   }
   const backme = () => {
@@ -319,17 +309,19 @@ const DeviceDetails: React.FC = () => {
 
           {/* WAN 1 */}
           {portCount >= 1 && (
-  <div
-    className={`${
-      deviceData.wan1.internet.toLowerCase() === "up" ? "bg-green-400" : "bg-red-400"
-    } rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
-  >
-    <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
-    <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
-    <p className="text-black">Status: {deviceData.wan1.status}</p>
-    <p className="text-black">Internet: {deviceData.wan1.internet}</p>
-  </div>
-)}
+            <div
+              className={`${
+                deviceData.wan1.internet.toLowerCase() === "up"
+                  ? "bg-green-400"
+                  : "bg-red-400"
+              } rounded-lg shadow-2xl p-4 border w-full transform transition duration-300 hover:scale-105 hover:shadow-xl max-w-sm`}
+            >
+              <h2 className="text-lg font-semibold mb-2">WAN 1</h2>
+              <p className="text-gray-900">IP : {deviceData.wan1.address}</p>
+              <p className="text-black">Status: {deviceData.wan1.status}</p>
+              <p className="text-black">Internet: {deviceData.wan1.internet}</p>
+            </div>
+          )}
 
           {/* WAN 2 */}
           {portCount >= 2 && (
@@ -387,7 +379,9 @@ const DeviceDetails: React.FC = () => {
         {showLogs && wanLogs.length > 0 && (
           <div className="mt-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">WAN Logs</h2>
+              <select className="">
+                <option value="wan">WanLogs</option>
+              </select>
               <button
                 onClick={handleDownload}
                 className="text-blue-500 hover:text-blue-700"
