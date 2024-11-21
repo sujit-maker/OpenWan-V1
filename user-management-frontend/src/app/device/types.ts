@@ -1,8 +1,10 @@
 
 export interface Device {
+    site: any;
     id: number;
     deviceId: string; 
     deviceName: string;
+    siteId : number;
     deviceType: string;
     deviceIp: string;
     devicePort: string;
@@ -10,4 +12,7 @@ export interface Device {
     deviceUsername: string;
     devicePassword: string;
   }
-  
+  export interface Site {
+    id: number;
+    siteName: string; 
+  }

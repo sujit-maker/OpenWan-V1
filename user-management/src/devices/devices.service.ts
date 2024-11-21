@@ -15,23 +15,22 @@ export class DevicesService {
 
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
     const newDeviceId = await this.generateNewDeviceId();
-
-    // Check if portCount is a string (log for debugging)
-    console.log('portCount:', createDeviceDto.portCount); // Ensure it's a string
-
+  
     return this.prisma.device.create({
       data: {
         deviceId: newDeviceId,
         deviceName: createDeviceDto.deviceName,
+        siteId: createDeviceDto.siteId,
         deviceType: createDeviceDto.deviceType,
         deviceIp: createDeviceDto.deviceIp,
         devicePort: createDeviceDto.devicePort,
-        portCount: createDeviceDto.portCount, 
+        portCount: createDeviceDto.portCount,
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
       },
     });
   }
+  
 
   private async generateNewDeviceId(): Promise<string> {
     const lastDevice = await this.prisma.device.findFirst({ orderBy: { id: 'desc' } });

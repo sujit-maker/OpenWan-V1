@@ -68,7 +68,6 @@ const DeviceDetails: React.FC = () => {
     }
   }, []);
 
-  // Set up interval to fetch WAN logs
   useEffect(() => {
     fetchWanLogs();
     const interval = setInterval(fetchWanLogs, 5000);
@@ -76,14 +75,12 @@ const DeviceDetails: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchWanLogs]);
 
-  // Calculate paginated entries
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentLogs = wanLogs.slice(indexOfFirstEntry, indexOfLastEntry);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // Handle file download of WAN logs
   const handleDownload = () => {
     const worksheet = XLSX.utils.json_to_sheet(wanLogs);
     const workbook = XLSX.utils.book_new();
@@ -227,15 +224,12 @@ const DeviceDetails: React.FC = () => {
     };
 
     if (deviceId) {
-      // Initial fetch
       fetchDeviceData();
 
-      // Set interval to fetch data every 5 seconds
       const interval = setInterval(() => {
         fetchDeviceData();
       }, 5000);
 
-      // Clean up interval when the component unmounts or deviceId changes
       return () => clearInterval(interval);
     }
   }, [deviceId]);
@@ -262,7 +256,7 @@ const DeviceDetails: React.FC = () => {
     <>
       <Header />
       <Sidebar />
-      <div className="mx-auto px-24 py-24">
+      <div className="mx-auto px-24 py-24 ">
         <div className="flex mx-6 my-0 justify-end">
           <button
             onClick={backme}

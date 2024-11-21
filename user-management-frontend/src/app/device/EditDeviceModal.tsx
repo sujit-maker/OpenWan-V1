@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Device } from './types'; 
+import React, { useEffect, useState } from 'react';
+import { Device, Site } from './types';
 
 interface EditDeviceModalProps {
   device: Device;
@@ -13,6 +13,25 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
   closeModal,
 }) => {
   const [updatedDevice, setUpdatedDevice] = useState<Device>(device);
+  const [sites, setSites] = useState<Site[]>([]); // State to store sites
+
+  useEffect(() => {
+    // Fetch sites when the modal loads
+    const fetchSites = async () => {
+      try {
+        const response = await fetch('http://40.0.0.109:8000/site');
+        if (!response.ok) {
+          throw new Error('Failed to fetch sites');
+        }
+        const data: Site[] = await response.json();
+        setSites(data);
+      } catch (error) {
+        console.error('Error fetching sites:', error);
+      }
+    };
+
+    fetchSites();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setUpdatedDevice((prev) => ({ ...prev, [field]: value }));
@@ -29,9 +48,10 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           deviceType: updatedDevice.deviceType,
           deviceIp: updatedDevice.deviceIp,
           devicePort: updatedDevice.devicePort,
-          portCount : updatedDevice.portCount,
+          portCount: updatedDevice.portCount,
           deviceUsername: updatedDevice.deviceUsername,
           devicePassword: updatedDevice.devicePassword,
+          siteId: updatedDevice.siteId, // Include the selected site ID
         }),
       });
 
@@ -41,8 +61,8 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
       }
 
       const updatedDeviceData = await response.json();
-      onDeviceUpdated(updatedDeviceData); 
-      closeModal(); 
+      onDeviceUpdated(updatedDeviceData);
+      closeModal();
     } catch (error) {
       console.error('Failed to update device:', error);
     }
@@ -50,105 +70,124 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-      <div className="bg-white h-screen p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
-        <h2 className="text-lg font-semibold mb-4">Edit Device</h2>
-        
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device ID</label>
-          <input
-            type="text"
-            value={updatedDevice.deviceId}
-            readOnly
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device Name</label>
-          <input
-            type="text"
-            value={updatedDevice.deviceName}
-            onChange={(e) => handleInputChange('deviceName', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device Type</label>
-          <input
-            type="text"
-            value={updatedDevice.deviceType}
-            onChange={(e) => handleInputChange('deviceType', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device IP</label>
-          <input
-            type="text"
-            value={updatedDevice.deviceIp}
-            onChange={(e) => handleInputChange('deviceIp', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device Port</label>
-          <input
-            type="text"
-            value={updatedDevice.devicePort}
-            onChange={(e) => handleInputChange('devicePort', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Number of Wan</label>
-          <input
-            type="text"
-            value={updatedDevice.portCount}
-            onChange={(e) => handleInputChange('portCount', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device Username</label>
-          <input
-            type="text"
-            value={updatedDevice.deviceUsername}
-            onChange={(e) => handleInputChange('deviceUsername', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium mb-1">Device Password</label>
-          <input
-            type="text"
-            value={updatedDevice.devicePassword}
-            onChange={(e) => handleInputChange('devicePassword', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            onClick={closeModal}
-            className="bg-gray-500 text-white px-4 py-2 rounded shadow mr-2 hover:bg-gray-600"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-          >
-            Save
-          </button>
-        </div>
-      </div>
+  <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto">
+    <h2 className="text-lg font-semibold mb-4">Edit Device</h2>
+    
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device ID</label>
+      <input
+        type="text"
+        value={updatedDevice.deviceId}
+        readOnly
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
     </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device Name</label>
+      <input
+        type="text"
+        value={updatedDevice.deviceName}
+        onChange={(e) => handleInputChange('deviceName', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Site Name</label>
+      <select
+        value={updatedDevice.siteId || ''}
+        onChange={(e) => handleInputChange('siteId', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      >
+        <option value="" disabled>
+          Select a site
+        </option>
+        {sites.map((site) => (
+          <option key={site.id} value={site.id}>
+            {site.siteName}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device Type</label>
+      <input
+        type="text"
+        value={updatedDevice.deviceType}
+        onChange={(e) => handleInputChange('deviceType', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device IP</label>
+      <input
+        type="text"
+        value={updatedDevice.deviceIp}
+        onChange={(e) => handleInputChange('deviceIp', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device Port</label>
+      <input
+        type="text"
+        value={updatedDevice.devicePort}
+        onChange={(e) => handleInputChange('devicePort', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Number of Wan</label>
+      <input
+        type="text"
+        value={updatedDevice.portCount}
+        onChange={(e) => handleInputChange('portCount', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device Username</label>
+      <input
+        type="text"
+        value={updatedDevice.deviceUsername}
+        onChange={(e) => handleInputChange('deviceUsername', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="mb-2">
+      <label className="block text-sm font-medium mb-1">Device Password</label>
+      <input
+        type="text"
+        value={updatedDevice.devicePassword}
+        onChange={(e) => handleInputChange('devicePassword', e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div className="flex justify-end mt-4">
+      <button
+        onClick={closeModal}
+        className="bg-gray-500 text-white px-4 py-2 rounded shadow mr-2 hover:bg-gray-600"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSave}
+        className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 };
 

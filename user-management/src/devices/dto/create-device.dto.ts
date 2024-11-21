@@ -1,6 +1,4 @@
-// src/devices/dto/create-device.dto.ts
-
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsIP } from 'class-validator';
 
 export class CreateDeviceDto {
   @IsNotEmpty()
@@ -8,11 +6,15 @@ export class CreateDeviceDto {
   deviceName: string;
 
   @IsNotEmpty()
+  @IsInt()
+  siteId: number;
+
+  @IsNotEmpty()
   @IsString()
   deviceType: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsIP()
   deviceIp: string;
 
   @IsNotEmpty()

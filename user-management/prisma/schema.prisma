@@ -65,6 +65,7 @@ model Site {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   tasks         Task[]
+  device        Device[]
 }
 
 enum ServiceType {
@@ -77,6 +78,8 @@ model Device{
   id          Int    @id @default(autoincrement())
   deviceId    String  @unique
   deviceName  String 
+  site      Site @relation(fields: [siteId], references: [id])
+  siteId    Int
   deviceType  String
   deviceIp    String
   devicePort  String

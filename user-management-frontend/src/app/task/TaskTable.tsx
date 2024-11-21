@@ -83,8 +83,8 @@ import { Task } from "./types";
 
   return (
     <div
-      className="container mx-auto px-4 py-6 lg:pl-72"
-      style={{ marginTop: 80 }}
+    className="container mx-auto px-8 py-6 lg:pl-72"
+    style={{ marginTop: 80 }}
     >
       <Header />
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -112,7 +112,7 @@ import { Task } from "./types";
         {/* Added mobile-scroll class */}
         <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
           {" "}
-          <thead className="bg-gray-200">
+          <thead className="bg-gray-400">
             <tr>
               <th className="border p-2">Customer</th>
               <th className="border p-2">Site</th>

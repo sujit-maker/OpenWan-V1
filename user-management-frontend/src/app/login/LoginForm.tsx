@@ -42,7 +42,7 @@ const LoginForm: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 relative">
       <img
-        src="https://img.freepik.com/free-photo/cosmic-environment-with-colorful-neon-laser-lights_181624-34446.jpg?t=st=1731666277~exp=1731669877~hmac=b937ef115e4e94899cca35d5c26949c818551860aa88494af6ed4623e4e9b48e&w=1380"
+        src="https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg"
         alt="Background"
         className="absolute inset-0 object-cover w-full h-full opacity-100"
       />

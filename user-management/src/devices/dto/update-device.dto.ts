@@ -7,6 +7,9 @@ export class UpdateDeviceDto {
   @IsString()
   deviceName?: string;
 
+  @IsNotEmpty()
+  siteId: number; 
+
   @IsOptional()
   @IsString()
   deviceType?: string;

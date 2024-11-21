@@ -153,7 +153,7 @@ const Sidebar: React.FC = () => {
         >
           <span className="sr-only">Loading...</span>
           <div className="flex justify-center items-center">
-              <FaSpinner className="animate-spin text-blue-800 text-9xl" />
+              <FaSpinner className="animate-spin text-blue-800 text-9xl " />
           </div>
         </div>
       )}

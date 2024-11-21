@@ -4,7 +4,7 @@ import { FaEdit, FaTrash, FaSearch, FaLink } from "react-icons/fa";
 import CreateDeviceModal from "./CreateDeviceModal";
 import EditDeviceModal from "./EditDeviceModal";
 import Header from "../components/Header";
-import { Device } from "./types";
+import { Device, Site } from "./types";
 import { useRouter } from "next/navigation";
 import Sidebar from "../components/Sidebar";
 
@@ -15,10 +15,13 @@ const DeviceTable: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [sites, setSites] = useState<Site[]>([]);
+
   const router = useRouter();
 
   useEffect(() => {
     fetchDevices();
+    fetchSites();
   }, []);
 
   useEffect(() => {
@@ -44,6 +47,20 @@ const DeviceTable: React.FC = () => {
       console.error("Failed to fetch devices:", error);
     }
   };
+
+  const fetchSites = async () => {
+    try {
+      const response = await fetch("http://40.0.0.109:8000/site");
+      if (!response.ok) {
+        throw new Error("Failed to fetch sites");
+      }
+      const data: Site[] = await response.json();
+      setSites(data);
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+    }
+  };
+  
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
@@ -115,46 +132,52 @@ const DeviceTable: React.FC = () => {
         {/* Responsive table wrapper */}
         <div className="overflow-x-auto w-full px-8 lg:px-8 ml-8">
           <table className="min-w-full bg-white shadow-lg rounded-lg">
-            <thead className="bg-gray-200">
+            <thead className="bg-gray-400">
               <tr>
                 <th className="border p-2 text-center">Device ID</th>
                 <th className="border p-2 text-center">Device Name</th>
+                <th className="border p-2 text-center">Site Name</th>
                 <th className="border p-2 text-center">Device Type</th>
-                 <th className="border p-2 text-center">Port Count</th>
+                <th className="border p-2 text-center">Port Count</th>
                 <th className="border p-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredDevices.map((device) => (
-                <tr key={device.id}>
-                  <td className="border p-2 text-center">{device.deviceId}</td>
-                  <td className="border p-2 text-center">{device.deviceName}</td>
-                  <td className="border p-2 text-center">{device.deviceType}</td>
-                  <td className="border p-2 text-center">{device.portCount}</td>                  
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleConnect(device)}
-                      className="text-yellow-500 hover:text-yellow-700 mr-3"
-                      title="Connect"
-                    >
-                      <FaLink />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(device)}
-                      className="text-blue-500 hover:text-blue-700 mr-3"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(device.id)}
-                      className="text-red-500 hover:text-red-700 mr-3"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {filteredDevices.map((device) => {
+    const site = sites.find((site) => site.id === device.siteId); // Find the site by ID
+    return (
+      <tr key={device.id}>
+        <td className="border p-2 text-center">{device.deviceId}</td>
+        <td className="border p-2 text-center">{device.deviceName}</td>
+        <td className="border p-2 text-center">{site ? site.siteName : "N/A"}</td> {/* Display siteName */}
+        <td className="border p-2 text-center">{device.deviceType}</td>
+        <td className="border p-2 text-center">{device.portCount}</td>
+        <td className="border p-2 text-center">
+          <button
+            onClick={() => handleConnect(device)}
+            className="text-yellow-500 hover:text-yellow-700 mr-3"
+            title="Connect"
+          >
+            <FaLink />
+          </button>
+          <button
+            onClick={() => handleEdit(device)}
+            className="text-blue-500 hover:text-blue-700 mr-3"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={() => handleDelete(device.id)}
+            className="text-red-500 hover:text-red-700 mr-3"
+          >
+            <FaTrash />
+          </button>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+
           </table>
         </div>
 
@@ -170,6 +193,7 @@ const DeviceTable: React.FC = () => {
             device={selectedDevice}
             onDeviceUpdated={handleDeviceUpdated}
             closeModal={() => setIsEditModalOpen(false)}
+
           />
         )}
       </div>

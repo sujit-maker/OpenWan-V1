@@ -104,7 +104,7 @@ const CustomerTable: React.FC = () => {
           
            {/* Control overflow based on screen size */}
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
-            <thead className="bg-gray-200">
+            <thead className="bg-gray-400">
               <tr>
                 <th className="border p-1 ">Customer</th>
                 <th className="border p-1 ">Address</th>

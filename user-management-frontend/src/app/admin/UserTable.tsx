@@ -202,7 +202,7 @@ const UserTable: React.FC = () => {
           {/* Added mobile-scroll  */}
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
             {" "}
-            <thead className="bg-gray-200">
+            <thead className="bg-gray-400">
               <tr>
                 <th className="border p-2">Username</th>
                 <th className="border p-2">User Type</th>

@@ -6,7 +6,7 @@ import EditServiceModal from "./EditServiceModal";
 import Header from "../components/Header";
 import { Service } from "./types"; 
 
-const ServiceTable: React.FC = () => {
+  const ServiceTable: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,14 +79,14 @@ const ServiceTable: React.FC = () => {
 
   return (
     <div
-      className="container mx-auto px-4 py-6 lg:pl-72"
-      style={{ marginTop: 80 }}
+    className="container mx-auto px-8 py-6 lg:pl-72"
+    style={{ marginTop: 80 }}
     >
       <Header />
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-500 text-white px-4 mx-16 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+          className="bg-blue-500 text-white px-4 mx-20 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
         >
           Add Service
         </button>
@@ -108,7 +108,7 @@ const ServiceTable: React.FC = () => {
         {/* Added mobile-scroll class */}
         <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
           {" "}
-          <thead className="bg-gray-200">
+          <thead className="bg-gray-400">
             <tr>
               <th className="border p-2">Service ID</th>
               <th className="border p-2">Service Name</th>

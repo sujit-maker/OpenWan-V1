@@ -16,7 +16,9 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
   const [contactEmail, setContactEmail] = useState('');
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error message state
+
   useEffect(() => {
     if (isOpen) {
       fetchCustomers(); // Fetch customers when modal is open
@@ -30,10 +32,20 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
       setCustomers(data);
     } catch (error) {
       console.error('Error fetching customers:', error);
+      setError('Failed to fetch customers');
     }
   };
 
   const handleSubmit = async () => {
+    // Basic form validation
+    if (!siteName || !siteAddress || !contactName || !contactNumber || !contactEmail || !customerId) {
+      setError('Please fill all fields');
+      return;
+    }
+
+    setIsLoading(true); // Set loading to true while creating the site
+    setError(null); // Clear any previous errors
+
     const newSite = {
       siteName,
       siteAddress,
@@ -49,15 +61,20 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newSite),
       });
+
       if (!response.ok) {
         throw new Error('Failed to create site');
       }
+
       const data: Site = await response.json();
-      onSiteCreated(data);
-      fetchSites(); // Refetch sites after creation
-      onClose();
+      onSiteCreated(data); // Notify parent component about the new site
+      fetchSites(); // Refetch the sites list
+      onClose(); // Close the modal
     } catch (error) {
       console.error('Error creating site:', error);
+      setError('Failed to create site');
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -67,6 +84,10 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
         <h2 className="text-2xl font-semibold mb-6">Create Site</h2>
+
+        {/* Display error message if any */}
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Site Name</label>
           <input
@@ -76,6 +97,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Customer</label>
           <select
@@ -84,13 +106,14 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Customer</option>
-            {customers.map(customer => (
+            {customers.map((customer) => (
               <option key={customer.id} value={customer.id}>
                 {customer.customerName}
               </option>
             ))}
           </select>
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Site Address</label>
           <textarea
@@ -99,6 +122,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Contact Name</label>
           <input
@@ -108,6 +132,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Contact Number</label>
           <input
@@ -117,6 +142,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Contact Email</label>
           <input
@@ -126,6 +152,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
@@ -136,8 +163,9 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
           <button
             onClick={handleSubmit}
             className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+            disabled={isLoading}
           >
-            Create Site
+            {isLoading ? 'Creating...' : 'Create Site'}
           </button>
         </div>
       </div>

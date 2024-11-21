@@ -116,7 +116,7 @@ const SiteTable: React.FC = () => {
           {/* Added mobile-scroll class */}
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-2">
             {" "}
-            <thead className="bg-gray-200">
+            <thead className="bg-gray-400">
               <tr>
                 <th className="border p-2 ">Site</th>
                 <th className="border p-2 ">Customer</th>
