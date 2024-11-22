@@ -13,4 +13,6 @@ export interface Site {
   contactName: string;
   contactNumber: string;
   contactEmail: string;
+  adminId:number;
+    managerId:number;
 }

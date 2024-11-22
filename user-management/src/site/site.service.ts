@@ -9,22 +9,22 @@ export class SiteService {
 
   // Create a new Site
   async create(createSiteDto: CreateSiteDto) {
-    const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail } = createSiteDto;
-
+    const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail, adminId, managerId } = createSiteDto;
+  
     // Ensure customerId is provided and valid
     if (!customerId) {
       throw new BadRequestException('customerId is required');
     }
-
+  
     // Check if the customer exists
     const customer = await this.prisma.customer.findUnique({
       where: { id: customerId },
     });
-
+  
     if (!customer) {
       throw new NotFoundException(`Customer with ID ${customerId} does not exist.`);
     }
-
+  
     return this.prisma.site.create({
       data: {
         customer: {
@@ -35,9 +35,16 @@ export class SiteService {
         contactName,
         contactNumber,
         contactEmail,
+        admin: adminId
+          ? { connect: { id: adminId } }
+          : undefined,  // Connect admin if provided
+        manager: managerId
+          ? { connect: { id: managerId } }
+          : undefined,  // Connect manager if provided
       },
     });
   }
+  
 
   async findAll() {
     return this.prisma.site.findMany({
@@ -73,18 +80,18 @@ export class SiteService {
 
   // Update a Site
   async update(id: number, updateSiteDto: UpdateSiteDto) {
-    const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail } = updateSiteDto;
-
+    const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail, adminId, managerId } = updateSiteDto;
+  
     if (customerId) {
       const customer = await this.prisma.customer.findUnique({
         where: { id: customerId },
       });
-
+  
       if (!customer) {
         throw new NotFoundException(`Customer with ID ${customerId} does not exist.`);
       }
     }
-
+  
     return this.prisma.site.update({
       where: { id },
       data: {
@@ -94,13 +101,18 @@ export class SiteService {
         contactNumber,
         contactEmail,
         customer: customerId
-          ? {
-              connect: { id: customerId },
-            }
-          : undefined, 
+          ? { connect: { id: customerId } }
+          : undefined,
+        admin: adminId
+          ? { connect: { id: adminId } }
+          : undefined,  // Connect admin if provided
+        manager: managerId
+          ? { connect: { id: managerId } }
+          : undefined,  // Connect manager if provided
       },
     });
   }
+  
 
   // Delete a Site
   async remove(id: number) {

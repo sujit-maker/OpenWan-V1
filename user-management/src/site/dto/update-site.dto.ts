@@ -1,28 +1,38 @@
-import { IsString, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsOptional, IsInt } from 'class-validator';
 
 export class UpdateSiteDto {
   @IsOptional()
   customerId?: number; 
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  @IsOptional()
   siteName?: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  @IsOptional()
   siteAddress?: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  @IsOptional()
   contactName?: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  @IsOptional()
   contactNumber?: string;
 
-  @IsOptional()
   @IsEmail()
+  @IsOptional()
   contactEmail?: string;
+
+  @IsOptional()
+  @IsInt()
+  adminId?: number; // Optional field for admin
+
+  @IsOptional()
+  @IsInt()
+  managerId?: number; // Optional field for manager
 }
-
-

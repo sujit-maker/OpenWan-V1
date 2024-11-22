@@ -9,6 +9,12 @@ interface CreateSiteModalProps {
   fetchSites: () => void; // Add this prop
 }
 
+// Define the User type for the manager data
+interface User {
+  id: string;  // Assuming the manager's ID is a string
+  username: string;  // Assuming the manager's username is a string
+}
+
 const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSiteCreated, fetchSites }) => {
   const { currentUserType, adminId } = useAuth(); // Get currentUserType and adminId from the hook
   const [siteName, setSiteName] = useState('');
@@ -18,6 +24,8 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
   const [contactEmail, setContactEmail] = useState('');
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [managers, setManagers] = useState<User[]>([]); // Store managers with User type
+  const [managerId, setManagerId] = useState<string>(''); // Store selected managerId
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [error, setError] = useState<string | null>(null); // Error message state
 
@@ -26,6 +34,12 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
       fetchCustomers(); // Fetch customers when modal is open
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (currentUserType === 'ADMIN' && adminId) {
+      fetchManagers(); // Fetch managers if the user is an admin
+    }
+  }, [currentUserType, adminId]);
 
   const fetchCustomers = async () => {
     setIsLoading(true); // Set loading to true while fetching customers
@@ -50,46 +64,82 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
     }
   };
 
+  const fetchManagers = async () => {
+    setIsLoading(true); // Set loading to true while fetching managers
+    try {
+      const response = await fetch(`http://40.0.0.109:8000/users/managers/admin?adminId=${adminId}`);
+      const data: User[] = await response.json();  // Ensure you are typing the response correctly
+      setManagers(data);
+    } catch (error) {
+      console.error('Error fetching managers:', error);
+      setError('Failed to fetch managers');
+    } finally {
+      setIsLoading(false); // Reset loading state
+    }
+  };
+
   const handleSubmit = async () => {
-    // Basic form validation
+    // Validation
     if (!siteName || !siteAddress || !contactName || !contactNumber || !contactEmail || !customerId) {
-      setError('Please fill all fields');
+      alert("All fields are required!");
       return;
     }
-
-    setIsLoading(true); // Set loading to true while creating the site
-    setError(null); // Clear any previous errors
-
-    const newSite = {
+  
+    const siteData: any = {
       siteName,
       siteAddress,
       contactName,
       contactNumber,
       contactEmail,
-      customerId,
+      customerId: Number(customerId), // Convert customerId to an integer
+      adminId: Number(adminId), // Convert adminId to an integer
     };
-
-    try {
-      const response = await fetch('http://40.0.0.109:8000/site', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSite),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create site');
-      }
-
-      const data: Site = await response.json();
-      onSiteCreated(data); // Notify parent component about the new site
-      fetchSites(); // Refetch the sites list
-      onClose(); // Close the modal
-    } catch (error) {
-      console.error('Error creating site:', error);
-      setError('Failed to create site');
-    } finally {
-      setIsLoading(false); // Reset loading state
+  
+    // Only include managerId if the user is NOT a MANAGER
+    if (currentUserType !== "MANAGER" && managerId && managerId !== "") {
+      siteData.managerId = Number(managerId); // Convert managerId to an integer
     }
+  
+    // Log the data being sent for debugging
+    console.log("Site Data to be sent:", siteData);
+  
+    try {
+      const response = await fetch("http://40.0.0.109:8000/site", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(siteData),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error posting data:", errorText);
+        alert("Failed to create site: " + errorText);
+      } else {
+        const newSite: Site = await response.json(); // Assuming the API returns the created site
+        alert("Site created successfully!");
+        onSiteCreated(newSite); // Pass the created site to the parent component
+        fetchSites(); // Refetch the list of sites
+        resetForm(); // Reset the form fields
+        onClose(); // Close the modal
+      }
+    } catch (error) {
+      console.error("Failed to create site:", error);
+      alert("An error occurred while posting the data.");
+    }
+  };
+  
+
+  const resetForm = () => {
+    // Clear all form fields
+    setSiteName('');
+    setSiteAddress('');
+    setContactName('');
+    setContactNumber('');
+    setContactEmail('');
+    setCustomerId(null);
+    setManagerId(''); // Reset managerId
   };
 
   if (!isOpen) return null;
@@ -127,6 +177,25 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
             ))}
           </select>
         </div>
+
+        {/* Manager Dropdown for ADMIN users */}
+        {currentUserType === 'ADMIN' && adminId && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Select Manager</label>
+            <select
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Manager</option>
+              {managers.map((manager) => (
+                <option key={manager.id} value={manager.id}>
+                  {manager.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Site Address</label>
