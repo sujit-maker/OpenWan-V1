@@ -50,7 +50,7 @@ interface LoginResponse {
   }, []);
 
   // Login function
-const login = async (username: string, password: string): Promise<boolean> => {
+   const login = async (username: string, password: string): Promise<boolean> => {
   setLoading(true);
   setError(null);
 
@@ -88,15 +88,18 @@ const login = async (username: string, password: string): Promise<boolean> => {
         router.push('/executive');
         break;
       case 'MANAGER':
+        router.push('/dashboard');
+        break;
       case 'SUPERADMIN':
         router.push('/dashboard');
         break;
       default:
         throw new Error('Invalid usertype');
     }
-    return true; // Login successful
+    return true; 
   } catch (error: any) {
     setError(error.message || 'Login failed. Please try again.');
+    toast.error(error.message || 'Login failed. Please try again.');    
     return false; // Login failed
   } finally {
     setLoading(false);

@@ -24,6 +24,10 @@ model User {
   adminId Int?
 
   admins User[] @relation("UserAdmin")
+
+  // Relation to Customer for the admin
+  customers Customer[] @relation("UserAdmin") // Relation for admin customers
+  managedCustomers Customer[] @relation("UserManager") // Add this line for manager relation
 }
 
 enum UserType {
@@ -42,16 +46,23 @@ model Service {
 }
 
 model Customer {
-  id              Int    @id @default(autoincrement())
-  customerName    String @unique
+  id              Int      @id @default(autoincrement())
+  customerName    String   @unique
   customerAddress String
   gstNumber       String
   contactName     String
   contactNumber   String
   email           String
-  sites           Site[]
-  tasks           Task[]
+  sites           Site[]   // Assuming this is a related model
+  tasks           Task[]   // Assuming this is a related model
+  adminId         Int?     // Foreign key to the User model for the admin
+  managerId       Int?     // Foreign key to the User model for the manager
+
+  // Relations to the User model for admin and manager
+  admin           User?    @relation("UserAdmin", fields: [adminId], references: [id])
+  manager         User?    @relation("UserManager", fields: [managerId], references: [id])
 }
+
 
 model Site {
   id            Int      @id @default(autoincrement())
@@ -66,6 +77,7 @@ model Site {
   updatedAt     DateTime @updatedAt
   tasks         Task[]
   device        Device[]
+  
 }
 
 enum ServiceType {

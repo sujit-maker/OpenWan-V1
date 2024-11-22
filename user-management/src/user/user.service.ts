@@ -177,6 +177,13 @@ export class UserService {
     });
   }
 
+  async findAdmins() {
+    return this.prisma.user.findMany({
+      where: { usertype: UserType.ADMIN },
+      select: { id: true, username: true },
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 

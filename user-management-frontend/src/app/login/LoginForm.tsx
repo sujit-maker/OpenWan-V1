@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const LoginForm: React.FC = () => {
+  const LoginForm: React.FC = () => {
   const { login, loading, error } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

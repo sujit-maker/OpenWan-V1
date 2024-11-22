@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Customer, Site } from './types'; // Adjust path as needed
+import { useAuth } from '../hooks/useAuth'; // Adjust path as needed
 
 interface CreateSiteModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface CreateSiteModalProps {
 }
 
 const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSiteCreated, fetchSites }) => {
+  const { currentUserType, adminId } = useAuth(); // Get currentUserType and adminId from the hook
   const [siteName, setSiteName] = useState('');
   const [siteAddress, setSiteAddress] = useState('');
   const [contactName, setContactName] = useState('');
@@ -26,13 +28,25 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
   }, [isOpen]);
 
   const fetchCustomers = async () => {
+    setIsLoading(true); // Set loading to true while fetching customers
+    setError(null); // Clear any previous errors
+
     try {
-      const response = await fetch('http://40.0.0.109:8000/customers');
+      let url = 'http://40.0.0.109:8000/customers';
+      
+      // If the logged-in user is an ADMIN, fetch customers associated with adminId
+      if (currentUserType === 'ADMIN' && adminId) {
+        url = `http://40.0.0.109:8000/customers?adminId=${adminId}`;
+      }
+
+      const response = await fetch(url);
       const data: Customer[] = await response.json();
       setCustomers(data);
     } catch (error) {
       console.error('Error fetching customers:', error);
       setError('Failed to fetch customers');
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 

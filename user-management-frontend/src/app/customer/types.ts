@@ -1,6 +1,8 @@
 // src/customer/types.ts
 export interface Customer {
     customerId: any;
+    adminId:number;
+    managerId:number;
     id: number;
     customerName: string;
     customerAddress: string;

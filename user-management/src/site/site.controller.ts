@@ -6,9 +6,7 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 @Controller('site')
 export class SiteController {
   constructor(private readonly siteService: SiteService) {}
-
   
-
   @Post()
   create(@Body() createSiteDto: CreateSiteDto) {
     return this.siteService.create(createSiteDto);

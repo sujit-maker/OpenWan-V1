@@ -72,7 +72,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       if (response.ok) {
         // Create the success message with the device URL
         const deviceUrl = `/devices/${data.deviceId}`;
-        setSuccess(`Device created successfully!`);
+        alert("Customer created successfully!");
         setError(null);
         onDeviceCreated();
         resetForm();

@@ -1,5 +1,4 @@
-// src/customer/customer.controller.ts
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -14,9 +13,21 @@ export class CustomerController {
   }
 
   @Get()
-  findAll() {
-    return this.customerService.findAll();
+  async findAll(@Query('adminId') adminId?: string) {
+    try {
+      if (adminId) {
+        const adminIdInt = parseInt(adminId, 10);  // Convert to integer
+        if (isNaN(adminIdInt)) {
+          throw new BadRequestException('adminId must be a valid number');
+        }
+        return await this.customerService.findByAdminId(adminIdInt);  // Pass as integer
+      }
+      return await this.customerService.findAll();  // No filter
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch customers');
+    }
   }
+  
 
   @Get(':id')
   findOne(@Param('id') id: string) {

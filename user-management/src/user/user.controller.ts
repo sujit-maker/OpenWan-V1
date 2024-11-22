@@ -86,6 +86,16 @@ export class UserController {
     }
   }
 
+  @Get('admins')
+  async findAdmins() {
+    try {
+      return await this.userService.findAdmins();
+    } catch (error) {
+      console.error('Error in findAdmins controller:', error);
+      throw new InternalServerErrorException('Failed to fetch managers.');
+    }
+  }
+
   @Get('managers/admin')
   async findManagersByAdmin(@Query('adminId') adminId: string) {
     const id = parseInt(adminId, 10);

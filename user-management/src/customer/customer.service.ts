@@ -9,26 +9,61 @@ export class CustomerService {
 
   async create(data: CreateCustomerDto) {
     try {
-      
+      const customerData = {
+        ...data,
+        contactNumber: data.contactNumber.toString(),
+      };
+  
+      if (!data.adminId) {
+        delete customerData.adminId;
+      }
+  
+      if (!data.managerId) {
+        delete customerData.managerId;
+      }
+  
       return await this.prisma.customer.create({
-        data: {
-          ...data,
-          contactNumber: data.contactNumber.toString(), 
-        },
+        data: customerData,
       });
     } catch (error) {
+      console.error('Error creating customer:', error);
       throw new BadRequestException('Failed to create customer');
     }
   }
+  
 
-  async findAll() {
+
+
+  async findByAdminId(adminId: number) {
     try {
-      return await this.prisma.customer.findMany();
+      const customers = await this.prisma.customer.findMany({
+        where: { adminId: adminId },  // Expect adminId to be an integer
+      });
+      return customers;
+    } catch (error) {
+      console.error('Error fetching customers:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch customers');
+    }
+  }
+  
+  
+
+  // Modify the findAll method to filter customers by adminId
+  async findAll(adminId?: number) {
+    try {
+      if (adminId) {
+        return await this.prisma.customer.findMany({
+          where: { adminId },
+        });
+      } else {
+        return await this.prisma.customer.findMany();
+      }
     } catch (error) {
       throw new BadRequestException('Failed to fetch customers');
     }
   }
 
+  
   async findOne(id: number) {
     try {
       const customer = await this.prisma.customer.findUnique({ where: { id } });
@@ -47,12 +82,12 @@ export class CustomerService {
       if (!customer) {
         throw new NotFoundException(`Customer with ID ${id} not found`);
       }
-      
+
       return await this.prisma.customer.update({
         where: { id },
         data: {
           ...data,
-          contactNumber: data.contactNumber?.toString(), 
+          contactNumber: data.contactNumber?.toString(),
         },
       });
     } catch (error) {

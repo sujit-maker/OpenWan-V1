@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import CreateSiteModal from "./CreateSiteModal";
 import EditSiteModal from "./EditSiteModal";
-import { Customer, Site } from "./types"; // Adjust path as needed
+import { Customer, Site } from "./types"; 
 import Header from "../components/Header";
 
-const SiteTable: React.FC = () => {
+  const SiteTable: React.FC = () => {
   const [sites, setSites] = useState<Site[]>([]);
   const [filteredSites, setFilteredSites] = useState<Site[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,7 +17,7 @@ const SiteTable: React.FC = () => {
 
   useEffect(() => {
     fetchSites();
-    fetchCustomers(); // Fetch customers on component mount
+    fetchCustomers(); 
   }, []);
 
   useEffect(() => {

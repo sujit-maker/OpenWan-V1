@@ -11,8 +11,11 @@ export const loginUser = async (username: string, password: string) => {
   });
 
   if (!response.ok) {
-    throw new Error('Invalid credentials');
+    const errorData = await response.json().catch(() => null);
+    const errorMessage = errorData?.message || 'Invalid credentials';
+    throw new Error(errorMessage);
   }
+  
 
   return response.json();
 };
