@@ -26,7 +26,7 @@ const UserTable: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 4;
+  const usersPerPage = 10;
 
   useEffect(() => {
     fetchUsers();

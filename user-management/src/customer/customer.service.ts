@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -13,15 +17,15 @@ export class CustomerService {
         ...data,
         contactNumber: data.contactNumber.toString(),
       };
-  
+
       if (!data.adminId) {
         delete customerData.adminId;
       }
-  
+
       if (!data.managerId) {
         delete customerData.managerId;
       }
-  
+
       return await this.prisma.customer.create({
         data: customerData,
       });
@@ -30,14 +34,11 @@ export class CustomerService {
       throw new BadRequestException('Failed to create customer');
     }
   }
-  
-
-
 
   async findByAdminId(adminId: number) {
     try {
       const customers = await this.prisma.customer.findMany({
-        where: { adminId: adminId },  // Expect adminId to be an integer
+        where: { adminId: adminId }, // Expect adminId to be an integer
       });
       return customers;
     } catch (error) {
@@ -45,8 +46,18 @@ export class CustomerService {
       throw new BadRequestException('Failed to fetch customers');
     }
   }
-  
-  
+
+  async findByManagerId(managerId: number) {
+    try {
+      const customers = await this.prisma.customer.findMany({
+        where: { managerId: managerId }, // Expect managerId to be an integer
+      });
+      return customers;
+    } catch (error) {
+      console.error('Error fetching customers:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch customers');
+    }
+  }
 
   // Modify the findAll method to filter customers by adminId
   async findAll(adminId?: number) {
@@ -63,7 +74,6 @@ export class CustomerService {
     }
   }
 
-  
   async findOne(id: number) {
     try {
       const customer = await this.prisma.customer.findUnique({ where: { id } });

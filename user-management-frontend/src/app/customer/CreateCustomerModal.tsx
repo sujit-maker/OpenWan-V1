@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
+// Define the User type for the manager data
 interface User {
-  id: string;
-  username: string;
+  id: string; // Assuming the manager's ID is a string
+  username: string; // Assuming the manager's username is a string
 }
 
 interface CreateCustomerModalProps {
@@ -30,6 +31,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
 
   const userType = localStorage.getItem("userType");
   const loggedInAdminId = localStorage.getItem("adminId");
+  const loggedInManagerId = localStorage.getItem("managerId"); // Fetch managerId from localStorage if user is a manager
 
   // Automatically set adminId for ADMIN users and fetch managers
   useEffect(() => {
@@ -38,11 +40,20 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
     }
   }, [userType, loggedInAdminId]);
 
+  // If the user is a MANAGER, pre-fill managerId from localStorage
+  useEffect(() => {
+    if (userType === "MANAGER" && loggedInManagerId) {
+      setManagerId(loggedInManagerId); // Pre-fill managerId for MANAGER userType
+    }
+  }, [userType, loggedInManagerId]);
+
   useEffect(() => {
     // Fetch all admins (if needed for non-ADMIN users)
     const fetchAdmins = async () => {
       try {
-        const adminResponse = await fetch("http://40.0.0.109:8000/users/admins");
+        const adminResponse = await fetch(
+          "http://40.0.0.109:8000/users/admins"
+        );
         const adminData: User[] = await adminResponse.json();
         setAdmins(adminData);
       } catch (error) {
@@ -55,6 +66,23 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       fetchAdmins();
     }
   }, [userType]);
+
+  useEffect(() => {
+    if (userType === "MANAGER" && loggedInManagerId) {
+      const fetchAdminIdForManager = async () => {
+        try {
+          const response = await fetch(`http://40.0.0.109:8000/users/admins/manager?managerId=${loggedInManagerId}`);
+          const data = await response.json();
+          setAdminId(data[0]?.id || ""); // Assuming the API returns an array with the admin data
+        } catch (error) {
+          console.error("Failed to fetch adminId for manager:", error);
+        }
+      };
+
+      fetchAdminIdForManager();
+    }
+  }, [loggedInManagerId, userType]);
+
 
   // Fetch managers associated with a specific adminId
   useEffect(() => {
@@ -78,12 +106,20 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   }, [adminId]); // Trigger fetching filtered managers whenever adminId changes
 
   const handleSubmit = async () => {
-    // Validation
-    if (!customerName || !customerAddress || !gstNumber || !contactName || !contactNumber || !email) {
+    // Validation for required fields
+    if (
+      !customerName ||
+      !customerAddress ||
+      !gstNumber ||
+      !contactName ||
+      !contactNumber ||
+      !email
+    ) {
       alert("All fields are required!");
       return;
     }
 
+    // Prepare the customer data
     const customerData: any = {
       customerName,
       customerAddress,
@@ -91,24 +127,30 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       contactName,
       contactNumber,
       email,
-      adminId: Number(adminId), // Convert adminId to an integer
+      adminId: Number(adminId), // Ensure adminId is a number
+      managerId: Number(managerId),
     };
 
-    // Only include managerId if the user is NOT a MANAGER
-    if (userType !== "MANAGER" && managerId && managerId !== "") {
-      customerData.managerId = Number(managerId); // Convert managerId to an integer
+    // If the user is a MANAGER, automatically include the managerId (do not require the manager to select)
+    if (userType === "MANAGER" && loggedInManagerId) {
+      customerData.managerId = Number(loggedInManagerId); // Use the logged-in manager's ID directly
+      customerData.adminId = Number(adminId); // Include the adminId associated with the manager
+    } else if (userType !== "MANAGER" && managerId && managerId !== "") {
+      // For Admins and other user types, use the selected managerId from the dropdown
+      customerData.managerId = Number(managerId); // Ensure managerId is a number
     }
 
-    // Log the data being sent for debugging
+    // Log the customerData object for debugging purposes
     console.log("Customer Data to be sent:", customerData);
 
     try {
+      // POST request to the backend to create the customer
       const response = await fetch("http://40.0.0.109:8000/customers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(customerData),
+        body: JSON.stringify(customerData), // Send the customerData as JSON
       });
 
       if (!response.ok) {
@@ -117,8 +159,8 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         alert("Failed to create customer: " + errorText);
       } else {
         alert("Customer created successfully!");
-        onCustomerCreated();
-        onClose();
+        onCustomerCreated(); // Callback when customer is created
+        onClose(); // Close the modal
       }
     } catch (error) {
       console.error("Failed to create customer:", error);
@@ -131,11 +173,15 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md sm:w-96 overflow-y-auto max-h-[80vh]">
-        <h2 className="text-lg font-semibold mb-4 text-center">Add New Customer</h2>
+        <h2 className="text-lg font-semibold mb-4 text-center">
+          Add New Customer
+        </h2>
 
         {/* Customer details */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Customer Name</label>
+          <label className="block text-sm font-medium mb-1">
+            Customer Name
+          </label>
           <input
             type="text"
             value={customerName}
@@ -145,7 +191,9 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Customer Address</label>
+          <label className="block text-sm font-medium mb-1">
+            Customer Address
+          </label>
           <textarea
             value={customerAddress}
             onChange={(e) => setCustomerAddress(e.target.value)}
@@ -174,7 +222,9 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Contact Number</label>
+          <label className="block text-sm font-medium mb-1">
+            Contact Number
+          </label>
           <input
             type="text"
             value={contactNumber}
@@ -193,10 +243,14 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
           />
         </div>
 
+       
+
         {/* Admin Dropdown */}
         {userType !== "ADMIN" && userType !== "MANAGER" && (
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Select Admin</label>
+            <label className="block text-sm font-medium mb-1">
+              Select Admin
+            </label>
             <select
               value={adminId}
               onChange={(e) => setAdminId(e.target.value)}
@@ -213,9 +267,11 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         )}
 
         {/* Manager Dropdown (Visible for ADMIN and other userTypes when adminId is set) */}
-        {adminId && (
+        {adminId && userType !== "MANAGER" && (
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Select Manager</label>
+            <label className="block text-sm font-medium mb-1">
+              Select Manager
+            </label>
             <select
               value={managerId}
               onChange={(e) => setManagerId(e.target.value)}

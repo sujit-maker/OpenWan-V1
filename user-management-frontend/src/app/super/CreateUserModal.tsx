@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
+
+
 interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUserCreated: (newManager: { id: number; username: string }) => void;
-  managers: { id: number; username: string }[];
+  onUserCreated: (newUser: { id: number; username: string }) => void;
+  managers: Manager[]; 
 }
+interface Manager {
+  id: number;
+  username: string;
+}
+
 
 const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
@@ -15,13 +22,14 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [usertype, setUsertype] = useState('EXECUTIVE');
+  const [usertype, setUsertype] = useState('ADMIN');
   const [selectedManagerId, setSelectedManagerId] = useState<number | null>(null);
+  const [selectedAdminId, setSelectedAdminId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [managers, setManagers] = useState<{ id: number; username: string }[]>([]);
+  const [admins, setAdmins] = useState<{ id: number; username: string }[]>([]);
 
-  // Fetch managers when modal is opened
   useEffect(() => {
     if (isOpen) {
       const fetchManagers = async () => {
@@ -38,25 +46,48 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
         }
       };
 
+      const fetchAdmins = async () => {
+        try {
+          const response = await fetch('http://40.0.0.109:8000/users/admins');
+          if (response.ok) {
+            const data = await response.json();
+            setAdmins(data);
+          } else {
+            setError('Failed to load admins.');
+          }
+        } catch (err) {
+          setError('An error occurred while fetching admins.');
+        }
+      };
+
       fetchManagers();
+      fetchAdmins();
     }
-  }, [isOpen]); 
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (usertype === 'EXECUTIVE' && selectedManagerId === null) {
-      setError('Please select a valid manager.');
+  
+    // Validation for dropdown selections
+    if (usertype === 'EXECUTIVE' && (!selectedAdminId || !selectedManagerId)) {
+      setError('Please select both an Admin and a Manager for the Executive.');
       return;
     }
-
+  
+    if (usertype === 'MANAGER' && !selectedAdminId) {
+      setError('Please select an Admin for the Manager.');
+      return;
+    }
+  
+    // Construct the payload
     const payload = {
       username,
       password,
       usertype,
+      adminId: usertype === 'EXECUTIVE' || usertype === 'MANAGER' ? selectedAdminId : null,
       managerId: usertype === 'EXECUTIVE' ? selectedManagerId : null,
     };
-
+  
     try {
       const response = await fetch('http://40.0.0.109:8000/users/register', {
         method: 'POST',
@@ -65,19 +96,19 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         const newUser = await response.json();
-        setSuccess('User created successfully!'); 
+        setSuccess('User created successfully!');
         setError(null);
-        onUserCreated(newUser); 
+        onUserCreated(newUser); // Notify parent about the new user
         resetForm();
-        
-        // Clear success message after 2 seconds
-        setTimeout(() => setSuccess(null), 2000);
-
-        // Close the modal after a delay
-        setTimeout(onClose, 2000);
+  
+        // Clear success message and close modal after 2 seconds
+        setTimeout(() => {
+          setSuccess(null);
+          onClose();
+        }, 2000);
       } else {
         const data = await response.json();
         setError(data.message || 'An error occurred while creating the user.');
@@ -89,18 +120,15 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       setSuccess(null);
     }
   };
+  
 
   const resetForm = () => {
     setUsername('');
     setPassword('');
-    setUsertype('EXECUTIVE');
+    setUsertype('ADMIN');
     setSelectedManagerId(null);
+    setSelectedAdminId(null);
     setError(null);
-  };
-
-  const handleManagerSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedManagerId = Number(e.target.value);
-    setSelectedManagerId(selectedManagerId);
   };
 
   return (
@@ -140,36 +168,87 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="usertype" className="block text-gray-700">User Type</label>
-              <select
-                id="usertype"
-                value={usertype}
-                onChange={(e) => setUsertype(e.target.value)}
-                className="w-full border rounded p-2 mt-1"
-              >
-                <option value="ADMIN">Admin</option>
-                <option value="MANAGER">Manager</option>
-                <option value="EXECUTIVE">Executive</option>
-              </select>
-            </div>
-            {usertype === 'EXECUTIVE' && (
-              <div className="mb-4">
-                <label htmlFor="manager" className="block text-gray-700">Select Manager</label>
-                <select
-                  id="manager"
-                  value={selectedManagerId || ''}
-                  onChange={handleManagerSelection}
-                  className="w-full border rounded p-2 mt-1"
-                >
-                  <option value="">--Select Manager--</option>
-                  {managers.map((manager) => (
-                    <option key={manager.id} value={manager.id}>
-                      {manager.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+  <label htmlFor="usertype" className="block text-gray-700">User Type</label>
+  <select
+    id="usertype"
+    value={usertype}
+    onChange={(e) => {
+      setUsertype(e.target.value);
+      // Reset selections when user type changes
+      setSelectedAdminId(null);
+      setSelectedManagerId(null);
+    }}
+    className="w-full border rounded p-2 mt-1"
+  >
+    <option value="ADMIN">Admin</option>
+    <option value="MANAGER">Manager</option>
+    <option value="EXECUTIVE">Executive</option>
+  </select>
+</div>
+
+{usertype === 'EXECUTIVE' && (
+  <>
+    {/* Admin Dropdown */}
+    <div className="mb-4">
+      <label htmlFor="admin" className="block text-gray-700">Select Admin</label>
+      <select
+        id="admin"
+        value={selectedAdminId || ''}
+        onChange={(e) => setSelectedAdminId(Number(e.target.value))}
+        className="w-full border rounded p-2 mt-1"
+      >
+        <option value="">--Select Admin--</option>
+        {admins.map((admin) => (
+          <option key={admin.id} value={admin.id}>
+            {admin.username}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Manager Dropdown */}
+    <div className="mb-4">
+      <label htmlFor="manager" className="block text-gray-700">Select Manager</label>
+      <select
+        id="manager"
+        value={selectedManagerId || ''}
+        onChange={(e) => setSelectedManagerId(Number(e.target.value))}
+        className="w-full border rounded p-2 mt-1"
+      >
+        <option value="">--Select Manager--</option>
+        {managers.map((manager) => (
+          <option key={manager.id} value={manager.id}>
+            {manager.username}
+          </option>
+        ))}
+      </select>
+    </div>
+  </>
+)}
+
+{usertype === 'MANAGER' && (
+  <>
+    {/* Admin Dropdown for Managers */}
+    <div className="mb-4">
+      <label htmlFor="admin" className="block text-gray-700">Select Admin</label>
+      <select
+        id="admin"
+        value={selectedAdminId || ''}
+        onChange={(e) => setSelectedAdminId(Number(e.target.value))}
+        className="w-full border rounded p-2 mt-1"
+      >
+        <option value="">--Select Admin--</option>
+        {admins.map((admin) => (
+          <option key={admin.id} value={admin.id}>
+            {admin.username}
+          </option>
+        ))}
+      </select>
+    </div>
+  </>
+)}
+
+
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"

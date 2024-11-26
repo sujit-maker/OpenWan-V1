@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -13,21 +23,30 @@ export class CustomerController {
   }
 
   @Get()
-  async findAll(@Query('adminId') adminId?: string) {
+  async findAll(@Query('adminId') adminId?: string, @Query('managerId') managerId?: string) {
     try {
       if (adminId) {
-        const adminIdInt = parseInt(adminId, 10);  // Convert to integer
+        const adminIdInt = parseInt(adminId, 10); // Convert to integer
         if (isNaN(adminIdInt)) {
           throw new BadRequestException('adminId must be a valid number');
         }
-        return await this.customerService.findByAdminId(adminIdInt);  // Pass as integer
+        return await this.customerService.findByAdminId(adminIdInt); // Fetch customers for a specific admin
       }
-      return await this.customerService.findAll();  // No filter
+
+      if (managerId) {
+        const managerIdInt = parseInt(managerId, 10); // Convert to integer
+        if (isNaN(managerIdInt)) {
+          throw new BadRequestException('managerId must be a valid number');
+        }
+        return await this.customerService.findByManagerId(managerIdInt); // Fetch customers for a specific manager
+      }
+
+      return await this.customerService.findAll(); // No filters, fetch all customers
     } catch (error) {
       throw new BadRequestException('Failed to fetch customers');
     }
   }
-  
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -35,7 +54,10 @@ export class CustomerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+  ) {
     return this.customerService.update(+id, updateCustomerDto);
   }
 

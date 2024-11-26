@@ -96,6 +96,21 @@ export class UserController {
     }
   }
 
+  // Fetch admins based on managerId
+  @Get('admins/manager')
+  async findAdminsByManager(@Query('managerId') managerId: string) {
+    const id = parseInt(managerId, 10);
+    if (isNaN(id)) {
+      throw new BadRequestException('managerId must be a number');
+    }
+    try {
+      return await this.userService.findAdminsByManagerId(id);
+    } catch (error) {
+      console.error('Error in findAdminsByManager controller:', error);
+      throw new InternalServerErrorException('Failed to fetch admins by manager ID');
+    }
+  }
+
   @Get('managers/admin')
   async findManagersByAdmin(@Query('adminId') adminId: string) {
     const id = parseInt(adminId, 10);

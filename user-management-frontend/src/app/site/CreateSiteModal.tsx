@@ -6,17 +6,16 @@ interface CreateSiteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSiteCreated: (site: Site) => void;
-  fetchSites: () => void; // Add this prop
+  fetchSites: () => void;
 }
 
-// Define the User type for the manager data
 interface User {
-  id: string;  // Assuming the manager's ID is a string
-  username: string;  // Assuming the manager's username is a string
+  id: string;
+  username: string;
 }
 
 const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSiteCreated, fetchSites }) => {
-  const { currentUserType, adminId } = useAuth(); // Get currentUserType and adminId from the hook
+  const { currentUserType, adminId } = useAuth();
   const [siteName, setSiteName] = useState('');
   const [siteAddress, setSiteAddress] = useState('');
   const [contactName, setContactName] = useState('');
@@ -24,10 +23,10 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
   const [contactEmail, setContactEmail] = useState('');
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [managers, setManagers] = useState<User[]>([]); // Store managers with User type
-  const [managerId, setManagerId] = useState<string>(''); // Store selected managerId
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error message state
+  const [managers, setManagers] = useState<User[]>([]);
+  const [managerId, setManagerId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,15 +40,26 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
     }
   }, [currentUserType, adminId]);
 
-  const fetchCustomers = async () => {
-    setIsLoading(true); // Set loading to true while fetching customers
-    setError(null); // Clear any previous errors
+  useEffect(() => {
+    if (managerId) {
+      // Fetch customers for the selected manager
+      fetchCustomers(managerId);
+    } else {
+      setCustomers([]); // Clear customers if no manager is selected
+    }
+  }, [managerId]);
+
+  const fetchCustomers = async (managerId?: string) => {
+    setIsLoading(true);
+    setError(null);
 
     try {
       let url = 'http://40.0.0.109:8000/customers';
-      
-      // If the logged-in user is an ADMIN, fetch customers associated with adminId
-      if (currentUserType === 'ADMIN' && adminId) {
+
+      // If a managerId is selected, fetch customers associated with that manager
+      if (managerId) {
+        url = `http://40.0.0.109:8000/customers?managerId=${managerId}`;
+      } else if (currentUserType === 'ADMIN' && adminId) {
         url = `http://40.0.0.109:8000/customers?adminId=${adminId}`;
       }
 
@@ -60,21 +70,21 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
       console.error('Error fetching customers:', error);
       setError('Failed to fetch customers');
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 
   const fetchManagers = async () => {
-    setIsLoading(true); // Set loading to true while fetching managers
+    setIsLoading(true);
     try {
       const response = await fetch(`http://40.0.0.109:8000/users/managers/admin?adminId=${adminId}`);
-      const data: User[] = await response.json();  // Ensure you are typing the response correctly
+      const data: User[] = await response.json();
       setManagers(data);
     } catch (error) {
       console.error('Error fetching managers:', error);
       setError('Failed to fetch managers');
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 
@@ -91,17 +101,13 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
       contactName,
       contactNumber,
       contactEmail,
-      customerId: Number(customerId), // Convert customerId to an integer
-      adminId: Number(adminId), // Convert adminId to an integer
+      customerId: Number(customerId),
+      adminId: Number(adminId),
     };
   
-    // Only include managerId if the user is NOT a MANAGER
     if (currentUserType !== "MANAGER" && managerId && managerId !== "") {
-      siteData.managerId = Number(managerId); // Convert managerId to an integer
+      siteData.managerId = Number(managerId);
     }
-  
-    // Log the data being sent for debugging
-    console.log("Site Data to be sent:", siteData);
   
     try {
       const response = await fetch("http://40.0.0.109:8000/site", {
@@ -114,32 +120,29 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
   
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error posting data:", errorText);
         alert("Failed to create site: " + errorText);
       } else {
-        const newSite: Site = await response.json(); // Assuming the API returns the created site
+        const newSite: Site = await response.json();
         alert("Site created successfully!");
-        onSiteCreated(newSite); // Pass the created site to the parent component
-        fetchSites(); // Refetch the list of sites
-        resetForm(); // Reset the form fields
-        onClose(); // Close the modal
+        onSiteCreated(newSite);
+        fetchSites();
+        resetForm();
+        onClose();
       }
     } catch (error) {
       console.error("Failed to create site:", error);
       alert("An error occurred while posting the data.");
     }
   };
-  
 
   const resetForm = () => {
-    // Clear all form fields
     setSiteName('');
     setSiteAddress('');
     setContactName('');
     setContactNumber('');
     setContactEmail('');
     setCustomerId(null);
-    setManagerId(''); // Reset managerId
+    setManagerId('');
   };
 
   if (!isOpen) return null;
@@ -149,7 +152,6 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
         <h2 className="text-2xl font-semibold mb-6">Create Site</h2>
 
-        {/* Display error message if any */}
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
         <div className="mb-4">
@@ -162,23 +164,6 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Customer</label>
-          <select
-            value={customerId || ''}
-            onChange={(e) => setCustomerId(Number(e.target.value))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select Customer</option>
-            {customers.map((customer) => (
-              <option key={customer.id} value={customer.id}>
-                {customer.customerName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Manager Dropdown for ADMIN users */}
         {currentUserType === 'ADMIN' && adminId && (
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Select Manager</label>
@@ -191,6 +176,25 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
               {managers.map((manager) => (
                 <option key={manager.id} value={manager.id}>
                   {manager.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Show customer dropdown only if a manager is selected */}
+        {managerId && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Customer</label>
+            <select
+              value={customerId || ''}
+              onChange={(e) => setCustomerId(Number(e.target.value))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Customer</option>
+              {customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customer.customerName}
                 </option>
               ))}
             </select>
@@ -236,16 +240,16 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({ isOpen, onClose, onSi
           />
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600"
+            className="text-gray-500 hover:text-gray-700 font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none"
             disabled={isLoading}
           >
             {isLoading ? 'Creating...' : 'Create Site'}

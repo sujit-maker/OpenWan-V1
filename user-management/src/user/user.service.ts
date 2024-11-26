@@ -122,6 +122,42 @@ export class UserService {
     });
   }
 
+  // Fetch admins associated with a managerId
+  async findAdminsByManagerId(managerId: number) {
+    // First, get the manager(s) associated with the given managerId
+    const managers = await this.prisma.user.findMany({
+      where: {
+        id: managerId,
+        usertype: UserType.MANAGER,
+      },
+      select: {
+        id: true,
+        adminId: true, // Fetch adminId associated with the manager
+      },
+    });
+
+    if (managers.length === 0) {
+      throw new NotFoundException(`No manager found with ID ${managerId}`);
+    }
+
+    // Extract the unique adminId(s) from the manager(s)
+    const adminIds = managers.map((manager) => manager.adminId);
+
+    // Fetch the admins who are associated with the adminId(s)
+    const admins = await this.prisma.user.findMany({
+      where: {
+        id: { in: adminIds }, // Fetch users with adminId in the list
+        usertype: UserType.ADMIN,
+      },
+      select: {
+        id: true,
+        username: true,
+      },
+    });
+
+    return admins;
+  }
+
   async findManagersByAdminId(adminId: number) {
     return this.prisma.user.findMany({
       where: {
