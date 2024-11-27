@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsInt, IsIP } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsIP, IsOptional } from 'class-validator';
 
 export class CreateDeviceDto {
   @IsNotEmpty()
@@ -32,4 +32,12 @@ export class CreateDeviceDto {
   @IsNotEmpty()
   @IsString()
   devicePassword: string;
+  
+  @IsOptional()
+  @IsInt()
+  adminId?: number; // Optional field for admin
+
+  @IsOptional()
+  @IsInt()
+  managerId?: number; // Optional field for manager
 }

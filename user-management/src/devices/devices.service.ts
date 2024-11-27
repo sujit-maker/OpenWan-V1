@@ -27,6 +27,8 @@ export class DevicesService {
         portCount: createDeviceDto.portCount,
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
+        adminId : createDeviceDto.adminId,
+        managerId : createDeviceDto.managerId
       },
     });
   }

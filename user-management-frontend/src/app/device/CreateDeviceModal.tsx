@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Site } from './types'; 
+import { useAuth } from '../hooks/useAuth';
 
 interface CreateDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDeviceCreated: () => void;
 }
+
+interface User {
+  id: string;
+  username: string;
+}
+
 
 const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   isOpen,
@@ -26,20 +33,121 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   const [sites, setSites] = useState<Site[]>([]);
   const [siteId, setSiteId] = useState<number | null>(null);
 
+  const { currentUserType, adminId } = useAuth();
+  const [managers, setManagers] = useState<User[]>([]);
+  const [admins, setAdmins] = useState<User[]>([]);
+  const [selectedAdminId, setSelectedAdminId] = useState<string>(""); // Starts empty
+  const [managerId, setManagerId] = useState(""); // Store manager ID
+
 
   useEffect(() => {
     if (isOpen) {
-      fetchSites(); 
+      fetchSites(managerId); 
     }
   }, [isOpen]);
 
-  const fetchSites = async () => {
+   // Fetch sites when the modal is open
+   useEffect(() => {
+    if (isOpen) {
+      fetchSites(managerId); // Fetch sites when modal is open
+    }
+  }, [isOpen]);
+
+  // Fetch managers based on selected adminId (for SUPERADMIN)
+  useEffect(() => {
+    if (currentUserType === "SUPERADMIN" && selectedAdminId) {
+      fetchManagers(selectedAdminId); // Fetch managers for selected adminId
+    }
+  }, [currentUserType, selectedAdminId]);
+
+  useEffect(() => {
+    if (currentUserType === "SUPERADMIN" && selectedAdminId) {
+      fetchManagers(selectedAdminId); // Pass selectedAdminId for SUPERADMIN
+    } else if (currentUserType === "ADMIN" && adminId) {
+      fetchManagers(adminId); // Pass adminId for ADMIN
+    }
+  }, [currentUserType, selectedAdminId, adminId]);
+
+  const fetchAdmins = async () => {
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/site');
-      const data: Site[] = await response.json();
-      setSites(data);
+      const response = await fetch("http://localhost:8000/users/admins");
+      const data: User[] = await response.json();
+      console.log("Fetched admins:", data); // Debug logging to inspect the fetched data
+      setAdmins(data);
+    } catch (error) {
+      console.error("Error fetching admins:", error);
+      setError("Failed to fetch admins");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentUserType === "SUPERADMIN") {
+      fetchAdmins(); // Fetch admins for SUPERADMIN user type
+    } else if (currentUserType === "ADMIN" && adminId != null) {
+      fetchManagers(selectedAdminId); // Directly fetch managers for ADMIN
+    }
+  }, [currentUserType, adminId]);
+
+  useEffect(() => {
+    if (managerId) {
+      fetchSites(managerId); // Fetch sites based on selected manager
+    }
+  }, [managerId]);
+
+  // Effect to retrieve managerId when the user is a MANAGER
+  useEffect(() => {
+    if (currentUserType === "MANAGER") {
+      // Retrieve managerId from localStorage
+      const loggedInManagerId = localStorage.getItem("managerId");
+
+      // If the managerId exists, set it in the state
+      if (loggedInManagerId) {
+        setManagerId(loggedInManagerId); // Update state with the managerId
+      }
+    }
+  }, [currentUserType]); // Runs when the currentUserType changes
+
+  // Effect to fetch sites whenever the managerId is set
+  useEffect(() => {
+    if (managerId) {
+      fetchSites(managerId); // Fetch sites when managerId is set
+    } else {
+      setSites([]); // Clear sites if managerId is not set
+    }
+  }, [managerId]); // Runs when managerId is updated
+
+
+  const fetchSites = async (managerId: string) => {
+    try {
+      // Use the managerId in the query string to fetch sites
+      const response = await fetch(`http://localhost:8000/site?managerId=${managerId}`);
+      if (response.ok) {
+        const data: Site[] = await response.json();
+        setSites(data); // Update the state with the fetched sites
+      } else {
+        console.error('Error fetching sites:', response.statusText);
+      }
     } catch (error) {
       console.error('Error fetching sites:', error);
+    }
+  };
+
+  const fetchManagers = async (adminId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8000/users/managers/admin?adminId=${adminId}`
+      );
+      const data: User[] = await response.json();
+      setManagers(Array.isArray(data) ? data : []); // Ensure it's an array
+    } catch (error) {
+      console.error("Error fetching managers:", error);
+      setError("Failed to fetch managers");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,6 +164,11 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       portCount,
       deviceUsername,
       devicePassword,
+      adminId:
+        currentUserType === "SUPERADMIN"
+          ? Number(selectedAdminId)
+          : Number(adminId),
+      managerId: managerId ? Number(managerId) : null,
     };
 
     try {
@@ -72,7 +185,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       if (response.ok) {
         // Create the success message with the device URL
         const deviceUrl = `/devices/${data.deviceId}`;
-        alert("Customer created successfully!");
+        alert("Site created successfully!");
         setError(null);
         onDeviceCreated();
         resetForm();
@@ -136,23 +249,73 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
               className="w-full border rounded p-2 mt-1"
             />
           </div>
-          
+
+          {currentUserType === "SUPERADMIN" && (
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Sites</label>
+            <label className="block text-sm font-medium mb-1">
+              Select Admin
+            </label>
             <select
-              value={siteId || ''}
+              value={selectedAdminId}
+              onChange={(e) => {
+                const newAdminId = e.target.value;
+                setSelectedAdminId(e.target.value);
+                setManagerId(""); // Reset managerId when admin is changed
+                fetchManagers(newAdminId); // Fetch managers for the selected admin
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Admin</option>
+              {admins.map((admin) => (
+                <option key={admin.id} value={admin.id}>
+                  {admin.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+{(currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Select Manager
+            </label>
+            <select
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Manager</option>
+              {managers.map((manager) => (
+                <option key={manager.id} value={manager.id}>
+                  {manager.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {(currentUserType === "MANAGER" || managerId) && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Select Site
+            </label>
+            <select
+              value={siteId || ""}
               onChange={(e) => setSiteId(Number(e.target.value))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select Sites</option>
-              {sites.map(site => (
+              <option value="">Select Site</option>
+              {sites.map((site) => (
                 <option key={site.id} value={site.id}>
                   {site.siteName}
                 </option>
               ))}
             </select>
           </div>
-          
+        )}
+
+         
           <div className="mb-4">
             <label htmlFor="deviceType" className="block text-gray-700">Device Type</label>
             <input

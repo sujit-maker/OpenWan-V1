@@ -32,6 +32,10 @@ model User {
   // Relations to Site model
   managedSites Site[] @relation("SiteManager")
   adminSites   Site[] @relation("SiteAdmin")
+
+  // Relations to Site model
+  managedDevices Device[] @relation("DeviceManager")
+  adminDevices   Device[] @relation("DeviceAdmin")
 }
 
 enum UserType {
@@ -108,6 +112,13 @@ model Device {
   portCount      String
   deviceUsername String
   devicePassword String
+
+  adminId   Int? // Foreign key to the User model for the admin
+  managerId Int? // Foreign key to the User model for the manager
+
+  // Relations to the User model for admin and manager
+  managedDevices User? @relation("DeviceAdmin", fields: [adminId], references: [id])
+  adminDevices   User? @relation("DeviceManager", fields: [managerId], references: [id])
 }
 
 model Task {

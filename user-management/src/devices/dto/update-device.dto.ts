@@ -1,6 +1,6 @@
 // src/devices/dto/update-device.dto.ts
 
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDeviceDto {
   @IsOptional()
@@ -33,4 +33,12 @@ export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
   devicePassword?: string;
+
+  @IsOptional()
+  @IsInt()
+  adminId?: number; // Optional field for admin
+
+  @IsOptional()
+  @IsInt()
+  managerId?: number; // Optional field for manager
 }

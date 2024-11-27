@@ -5,83 +5,95 @@ import CreateCustomerModal from "./CreateCustomerModal";
 import EditCustomerModal from "./EditCustomerModal";
 import Header from "../components/Header";
 import { Customer } from "./types";
+import { useAuth } from "../hooks/useAuth";
 
 const CustomerTable: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [users, setUsers] = useState<{ [key: number]: string }>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUserType, userId, managerId, adminId } = useAuth();
+
+  // Function to fetch customers
+  const fetchCustomers = async () => {
+    if (!userId || !currentUserType) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setLoading(true); // Set loading before making the API call
+    
+    try {
+      let url = '';
+      if (currentUserType === 'ADMIN' && adminId) {
+        url = `http://localhost:8000/customers?adminId=${adminId}`;
+      } else if (currentUserType === 'MANAGER' && managerId) {
+        url = `http://localhost:8000/customers?managerId=${managerId}`;
+      } else if (currentUserType === 'SUPERADMIN') {
+        url = 'http://localhost:8000/customers'; // Fetch all customers for SUPERADMIN
+      }
+
+      // Check if url is empty (if no condition matches)
+      if (!url) {
+        throw new Error('Invalid user type or missing user ID');
+      }
+
+      const response = await fetch(url); // Fetch data from the API
+      if (!response.ok) {
+        throw new Error('Failed to fetch customers');
+      }
+
+      const data: Customer[] = await response.json();
+      setCustomers(data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setLoading(false); // Stop loading after fetching
+    }
+  };
+
+  // Ensure fetchCustomers runs only when currentUserType and userId are available
+  useEffect(() => {
+    if (currentUserType && userId) {
+      fetchCustomers();
+    }
+  }, [currentUserType, userId, adminId, managerId]); // Re-fetch when these values change
 
   useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  useEffect(() => {
+    // Filter customers based on the search query
     setFilteredCustomers(
       customers.filter(
         (customer) =>
-          customer.customerName
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          customer.customerAddress
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
+          customer.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          customer.customerAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
           customer.email.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
   }, [searchQuery, customers]);
 
-  const fetchCustomers = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/customers");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data: Customer[] = await response.json();
-      setCustomers(data);
-
-      // Fetch user data for admin and manager
-      data.forEach((customer) => {
-        fetchUser(customer.adminId);
-        fetchUser(customer.managerId);
-      });
-    } catch (error) {
-      console.error("Failed to fetch customers:", error);
-    }
-  };
-
-  // Fetch user details by ID
-  const fetchUser = async (userId: number) => {
-    if (users[userId]) return; // Avoid fetching the same user multiple times
-    try {
-      const response = await fetch(`http://localhost:8000/users/${userId}`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const userData = await response.json();
-      setUsers((prevUsers) => ({ ...prevUsers, [userId]: userData.username }));
-    } catch (error) {
-      console.error(`Failed to fetch user with ID ${userId}:`, error);
-    }
+  // Handle customer creation
+  const handleCustomerCreated = () => {
+    fetchCustomers();  // Now calling fetchCustomers here after creation
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this customer?")) {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
       try {
         const response = await fetch(`http://localhost:8000/customers/${id}`, {
-          method: "DELETE",
+          method: 'DELETE',
         });
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
-        fetchCustomers();
+        setCustomers((prev) => prev.filter((customer) => customer.id !== id)); // Update state locally after deletion
       } catch (error) {
-        console.error("Failed to delete customer:", error);
+        console.error('Failed to delete customer:', error);
       }
     }
   };
@@ -91,10 +103,6 @@ const CustomerTable: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleCustomerCreated = () => {
-    fetchCustomers();
-  };
-
   const handleCustomerUpdated = (updatedCustomer: Customer) => {
     setCustomers((prev) =>
       prev.map((customer) =>
@@ -102,6 +110,9 @@ const CustomerTable: React.FC = () => {
       )
     );
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -136,8 +147,6 @@ const CustomerTable: React.FC = () => {
             <thead className="bg-gray-400">
               <tr>
                 <th className="border p-1">Customer</th>
-                <th className="border p-1">Admin Name</th>
-                <th className="border p-1">Manager Name</th>
                 <th className="border p-1">Address</th>
                 <th className="border p-1">GST NO.</th>
                 <th className="border p-1">Contact Name</th>
@@ -151,12 +160,6 @@ const CustomerTable: React.FC = () => {
                 <tr key={customer.id}>
                   <td className="border p-3 text-center">
                     {customer.customerName}
-                  </td>
-                  <td className="border p-3 text-center">
-                    {users[customer.adminId] ? users[customer.adminId] : "N/A"}
-                  </td>{" "}
-                  <td className="border p-3 text-center">
-                    {users[customer.managerId] ? users[customer.managerId] : "N/A"}
                   </td>
                   <td className="border p-3 text-center">
                     {customer.customerAddress}
