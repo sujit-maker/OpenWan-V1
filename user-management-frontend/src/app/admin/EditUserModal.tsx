@@ -40,7 +40,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     const updatedUser = { ...user, username, usertype, managerId, password };
 
     try {
-      const response = await fetch(`http://40.0.0.109:8000/users/${user.id}`, {
+      const response = await fetch(`http://localhost:8000/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedUser),

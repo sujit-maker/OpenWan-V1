@@ -11,29 +11,7 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 export class CustomerService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateCustomerDto) {
-    try {
-      const customerData = {
-        ...data,
-        contactNumber: data.contactNumber.toString(),
-      };
 
-      if (!data.adminId) {
-        delete customerData.adminId;
-      }
-
-      if (!data.managerId) {
-        delete customerData.managerId;
-      }
-
-      return await this.prisma.customer.create({
-        data: customerData,
-      });
-    } catch (error) {
-      console.error('Error creating customer:', error);
-      throw new BadRequestException('Failed to create customer');
-    }
-  }
 
   async findByAdminId(adminId: number) {
     try {
@@ -58,6 +36,32 @@ export class CustomerService {
       throw new BadRequestException('Failed to fetch customers');
     }
   }
+
+  async create(data: CreateCustomerDto) {
+    try {
+      const customerData = {
+        ...data,
+        contactNumber: data.contactNumber.toString(),
+      };
+
+      if (!data.adminId) {
+        delete customerData.adminId;
+      }
+
+      if (!data.managerId) {
+        delete customerData.managerId;
+      }
+
+      return await this.prisma.customer.create({
+        data: customerData,
+      });
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      throw new BadRequestException('Failed to create customer');
+    }
+  }
+
+ 
 
   // Modify the findAll method to filter customers by adminId
   async findAll(adminId?: number) {

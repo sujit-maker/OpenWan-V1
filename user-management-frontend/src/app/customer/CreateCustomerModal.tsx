@@ -52,7 +52,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
     const fetchAdmins = async () => {
       try {
         const adminResponse = await fetch(
-          "http://40.0.0.109:8000/users/admins"
+          "http://localhost:8000/users/admins"
         );
         const adminData: User[] = await adminResponse.json();
         setAdmins(adminData);
@@ -71,7 +71,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
     if (userType === "MANAGER" && loggedInManagerId) {
       const fetchAdminIdForManager = async () => {
         try {
-          const response = await fetch(`http://40.0.0.109:8000/users/admins/manager?managerId=${loggedInManagerId}`);
+          const response = await fetch(`http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`);
           const data = await response.json();
           setAdminId(data[0]?.id || ""); // Assuming the API returns an array with the admin data
         } catch (error) {
@@ -93,7 +93,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       }
       try {
         const response = await fetch(
-          `http://40.0.0.109:8000/users/managers/admin?adminId=${adminId}`
+          `http://localhost:8000/users/managers/admin?adminId=${adminId}`
         );
         const filteredData: User[] = await response.json();
         setManagers(filteredData); // Update managers based on adminId
@@ -145,7 +145,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
 
     try {
       // POST request to the backend to create the customer
-      const response = await fetch("http://40.0.0.109:8000/customers", {
+      const response = await fetch("http://localhost:8000/customers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,6 +189,48 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
           />
         </div>
+
+          {/* Admin Dropdown */}
+          {userType !== "ADMIN" && userType !== "MANAGER" && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Select Admin
+            </label>
+            <select
+              value={adminId}
+              onChange={(e) => setAdminId(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="">--Select Admin--</option>
+              {admins.map((admin) => (
+                <option key={admin.id} value={admin.id}>
+                  {admin.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Manager Dropdown (Visible for ADMIN and other userTypes when adminId is set) */}
+        {adminId && userType !== "MANAGER" && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Select Manager
+            </label>
+            <select
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="">--Select Manager--</option>
+              {managers.map((manager) => (
+                <option key={manager.id} value={manager.id}>
+                  {manager.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
@@ -245,48 +287,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
 
        
 
-        {/* Admin Dropdown */}
-        {userType !== "ADMIN" && userType !== "MANAGER" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Admin
-            </label>
-            <select
-              value={adminId}
-              onChange={(e) => setAdminId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="">--Select Admin--</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id}>
-                  {admin.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Manager Dropdown (Visible for ADMIN and other userTypes when adminId is set) */}
-        {adminId && userType !== "MANAGER" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Manager
-            </label>
-            <select
-              value={managerId}
-              onChange={(e) => setManagerId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="">--Select Manager--</option>
-              {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
-                  {manager.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
+      
         <div className="flex justify-between mt-6">
           <button
             onClick={onClose}

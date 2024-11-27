@@ -16,7 +16,7 @@ const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ customer, onCusto
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://40.0.0.109:8000/customers/${updatedCustomer.id}`, { 
+      const response = await fetch(`http://localhost:8000/customers/${updatedCustomer.id}`, { 
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedCustomer),

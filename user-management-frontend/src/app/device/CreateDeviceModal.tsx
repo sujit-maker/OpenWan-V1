@@ -35,7 +35,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
   const fetchSites = async () => {
     try {
-      const response = await fetch('http://40.0.0.109:8000/site');
+      const response = await fetch('http://localhost:8000/site');
       const data: Site[] = await response.json();
       setSites(data);
     } catch (error) {
@@ -60,7 +60,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
     try {
       setIsLoading(true);
-      const response = await fetch('http://40.0.0.109:8000/devices', {
+      const response = await fetch('http://localhost:8000/devices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

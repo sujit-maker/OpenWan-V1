@@ -56,7 +56,7 @@ const UserTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://40.0.0.109:8000/users/executives?managerId=${managerId}`
+        `http://localhost:8000/users/executives?managerId=${managerId}`
       );
 
       if (!response.ok) {
@@ -76,7 +76,7 @@ const UserTable: React.FC = () => {
 
   const fetchManagers = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/users/managers");
+      const response = await fetch("http://localhost:8000/users/managers");
       if (!response.ok) {
         throw new Error("Failed to fetch managers");
       }
@@ -94,7 +94,7 @@ const UserTable: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://40.0.0.109:8000/users/${id}`, {
+      const response = await fetch(`http://localhost:8000/users/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {

@@ -37,7 +37,7 @@ const DeviceTable: React.FC = () => {
 
   const fetchDevices = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/devices");
+      const response = await fetch("http://localhost:8000/devices");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -50,7 +50,7 @@ const DeviceTable: React.FC = () => {
 
   const fetchSites = async () => {
     try {
-      const response = await fetch("http://40.0.0.109:8000/site");
+      const response = await fetch("http://localhost:8000/site");
       if (!response.ok) {
         throw new Error("Failed to fetch sites");
       }
@@ -65,7 +65,7 @@ const DeviceTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
       try {
-        const response = await fetch(`http://40.0.0.109:8000/devices/${id}`, {
+        const response = await fetch(`http://localhost:8000/devices/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {

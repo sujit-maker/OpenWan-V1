@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
         // If superadmin is logged in, fetch all counts
         if (superadminId) {
           // Fetch all counts for superadmin
-          const allCountsResponse = await fetch(`http://40.0.0.109:8000/users/counts`);
+          const allCountsResponse = await fetch(`http://localhost:8000/users/counts`);
           const allCountsData = await allCountsResponse.json();
           
           if (allCountsData && 
@@ -33,7 +33,7 @@ const Dashboard: React.FC = () => {
 
         // Fetch managers count if managerId is present
         if (managerId) {
-          const response = await fetch(`http://40.0.0.109:8000/users/count/manager/${managerId}`);
+          const response = await fetch(`http://localhost:8000/users/count/manager/${managerId}`);
           const data = await response.json();
           if (typeof data === 'number') {
             setUserCount(data);
@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
         // Fetch admin count and executive count if adminId is present
         if (adminId) {
           // Fetch managers associated with adminId
-          const adminResponse = await fetch(`http://40.0.0.109:8000/users/count/admin/${adminId}`);
+          const adminResponse = await fetch(`http://localhost:8000/users/count/admin/${adminId}`);
           const adminData = await adminResponse.json();
           if (typeof adminData === 'number') {
             setAdminUserCount(adminData);
@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
           }
 
           // Fetch executives associated with adminId
-          const executiveResponse = await fetch(`http://40.0.0.109:8000/users/count/executives/admin/${adminId}`);
+          const executiveResponse = await fetch(`http://localhost:8000/users/count/executives/admin/${adminId}`);
           const executiveData = await executiveResponse.json();
           if (typeof executiveData === 'number') {
             setExecutiveCount(executiveData);

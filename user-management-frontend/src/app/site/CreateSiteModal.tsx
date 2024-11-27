@@ -30,16 +30,21 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [managers, setManagers] = useState<User[]>([]);
-  const [managerId, setManagerId] = useState<string>(""); // Starts empty
   const [admins, setAdmins] = useState<User[]>([]);
   const [selectedAdminId, setSelectedAdminId] = useState<string>(""); // Starts empty
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [managerId, setManagerId] = useState(""); // Store manager ID
+
+
+  const loggedInManagerId = localStorage.getItem("managerId"); // Fetch managerId from localStorage if user is a manager
+
+
   // Fetch customers when the modal is open
   useEffect(() => {
     if (isOpen) {
-      fetchCustomers(); // Fetch customers when modal is open
+      fetchCustomers(managerId); // Fetch customers when modal is open
     }
   }, [isOpen]);
 
@@ -61,7 +66,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   const fetchAdmins = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://40.0.0.109:8000/users/admins");
+      const response = await fetch("http://localhost:8000/users/admins");
       const data: User[] = await response.json();
       console.log("Fetched admins:", data); // Debug logging to inspect the fetched data
       setAdmins(data);
@@ -87,19 +92,47 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     }
   }, [managerId]);
 
-  const fetchCustomers = async (managerId?: string) => {
+
+
+  // Effect to retrieve managerId when the user is a MANAGER
+  useEffect(() => {
+    if (currentUserType === "MANAGER") {
+      // Retrieve managerId from localStorage
+      const loggedInManagerId = localStorage.getItem("managerId");
+
+      // If the managerId exists, set it in the state
+      if (loggedInManagerId) {
+        setManagerId(loggedInManagerId);  // Update state with the managerId
+      }
+    }
+  }, [currentUserType]); // Runs when the currentUserType changes
+
+  // Effect to fetch customers whenever the managerId is set
+  useEffect(() => {
+    if (managerId) {
+      fetchCustomers(managerId);  // Fetch customers when managerId is set
+    } else {
+      setCustomers([]);  // Clear customers if managerId is not set
+    }
+  }, [managerId]); // Runs when managerId is updated
+
+  // Function to fetch customers based on managerId
+  const fetchCustomers = async (managerId: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      let url = "http://40.0.0.109:8000/customers";
-      if (managerId) {
-        url = `http://40.0.0.109:8000/customers?managerId=${managerId}`;
+      // Construct the URL with the managerId query parameter
+      const url = `http://localhost:8000/customers?managerId=${managerId}`;
+
+      // Fetch customers from the API
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
       }
 
-      const response = await fetch(url);
       const data: Customer[] = await response.json();
-      setCustomers(data);
+      setCustomers(data);  // Set the customers in state
     } catch (error) {
       console.error("Error fetching customers:", error);
       setError("Failed to fetch customers");
@@ -107,6 +140,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
       setIsLoading(false);
     }
   };
+
 
   // Trigger customer fetch when managerId changes
   useEffect(() => {
@@ -121,7 +155,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://40.0.0.109:8000/users/managers/admin?adminId=${adminId}`
+        `http://localhost:8000/users/managers/admin?adminId=${adminId}`
       );
       const data: User[] = await response.json();
       setManagers(Array.isArray(data) ? data : []); // Ensure it's an array
@@ -153,8 +187,8 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
       contactNumber,
       contactEmail,
       customerId: Number(customerId),
-      adminId: Number(adminId),
-      managerId: Number(managerId),
+      adminId: currentUserType === "SUPERADMIN" ? Number(selectedAdminId) : Number(adminId),
+      managerId: managerId ? Number(managerId) : null,
     };
 
     if (currentUserType !== "MANAGER" && managerId && managerId !== "") {
@@ -162,7 +196,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     }
 
     try {
-      const response = await fetch("http://40.0.0.109:8000/site", {
+      const response = await fetch("http://localhost:8000/site", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

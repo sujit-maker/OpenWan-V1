@@ -7,6 +7,31 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 export class SiteService {
   constructor(private prisma: PrismaService) {}
 
+
+  async findByAdminId(adminId: number) {
+    try {
+      const sites = await this.prisma.site.findMany({
+        where: { adminId: adminId }, // Expect adminId to be an integer
+      });
+      return sites;
+    } catch (error) {
+      console.error('Error fetching sites:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch sites');
+    }
+  }
+
+  async findByManagerId(managerId: number) {
+    try {
+      const sites = await this.prisma.site.findMany({
+        where: { managerId: managerId }, // Expect managerId to be an integer
+      });
+      return sites;
+    } catch (error) {
+      console.error('Error fetching sites:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch sites');
+    }
+  }
+
   // Create a new Site
   async create(createSiteDto: CreateSiteDto) {
     const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail, adminId, managerId } = createSiteDto;

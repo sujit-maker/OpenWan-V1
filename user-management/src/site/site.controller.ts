@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, Query } from '@nestjs/common';
 import { SiteService } from './site.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { UpdateSiteDto } from './dto/update-site.dto';
@@ -13,9 +13,30 @@ export class SiteController {
   }
 
   @Get()
-  findAll() {
-    return this.siteService.findAll();
+  async findAll(@Query('adminId') adminId?: string, @Query('managerId') managerId?: string) {
+    try {
+      if (adminId) {
+        const adminIdInt = parseInt(adminId, 10); // Convert to integer
+        if (isNaN(adminIdInt)) {
+          throw new BadRequestException('adminId must be a valid number');
+        }
+        return await this.siteService.findByAdminId(adminIdInt); // Fetch sites for a specific admin
+      }
+
+      if (managerId) {
+        const managerIdInt = parseInt(managerId, 10); // Convert to integer
+        if (isNaN(managerIdInt)) {
+          throw new BadRequestException('managerId must be a valid number');
+        }
+        return await this.siteService.findByManagerId(managerIdInt); // Fetch sites for a specific manager
+      }
+
+      return await this.siteService.findAll(); // No filters, fetch all sites
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch sites');
+    }
   }
+  
 
   @Get(':id')
   findOne(@Param('id') id: string) {
