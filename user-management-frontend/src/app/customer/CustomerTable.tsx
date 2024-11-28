@@ -12,45 +12,51 @@ const CustomerTable: React.FC = () => {
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { currentUserType, userId, managerId, adminId } = useAuth();
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Number of customers per page
+
   // Function to fetch customers
   const fetchCustomers = async () => {
     if (!userId || !currentUserType) {
-      setError('User not authenticated');
+      setError("User not authenticated");
       return;
     }
 
     setLoading(true); // Set loading before making the API call
-    
+
     try {
-      let url = '';
-      if (currentUserType === 'ADMIN' && adminId) {
+      let url = "";
+      if (currentUserType === "ADMIN" && adminId) {
         url = `http://localhost:8000/customers?adminId=${adminId}`;
-      } else if (currentUserType === 'MANAGER' && managerId) {
+      } else if (currentUserType === "MANAGER" && managerId) {
         url = `http://localhost:8000/customers?managerId=${managerId}`;
-      } else if (currentUserType === 'SUPERADMIN') {
-        url = 'http://localhost:8000/customers'; // Fetch all customers for SUPERADMIN
+      } else if (currentUserType === "SUPERADMIN") {
+        url = "http://localhost:8000/customers"; // Fetch all customers for SUPERADMIN
       }
 
       // Check if url is empty (if no condition matches)
       if (!url) {
-        throw new Error('Invalid user type or missing user ID');
+        throw new Error("Invalid user type or missing user ID");
       }
 
       const response = await fetch(url); // Fetch data from the API
       if (!response.ok) {
-        throw new Error('Failed to fetch customers');
+        throw new Error("Failed to fetch customers");
       }
 
       const data: Customer[] = await response.json();
       setCustomers(data);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Unknown error');
+      setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setLoading(false); // Stop loading after fetching
     }
@@ -68,8 +74,12 @@ const CustomerTable: React.FC = () => {
     setFilteredCustomers(
       customers.filter(
         (customer) =>
-          customer.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.customerAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          customer.customerName
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          customer.customerAddress
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
           customer.email.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
@@ -77,21 +87,21 @@ const CustomerTable: React.FC = () => {
 
   // Handle customer creation
   const handleCustomerCreated = () => {
-    fetchCustomers();  // Now calling fetchCustomers here after creation
+    fetchCustomers(); // Now calling fetchCustomers here after creation
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
         const response = await fetch(`http://localhost:8000/customers/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         setCustomers((prev) => prev.filter((customer) => customer.id !== id)); // Update state locally after deletion
       } catch (error) {
-        console.error('Failed to delete customer:', error);
+        console.error("Failed to delete customer:", error);
       }
     }
   };
@@ -108,6 +118,18 @@ const CustomerTable: React.FC = () => {
       )
     );
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredCustomers.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -154,7 +176,7 @@ const CustomerTable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.map((customer) => (
+              {currentItems.map((customer) => (
                 <tr key={customer.id}>
                   <td className="border p-3 text-center">
                     {customer.customerName}
@@ -191,6 +213,26 @@ const CustomerTable: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination controls */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Prev
+          </button>
+          <span className="px-4 py-2">{currentPage}</span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Next
+          </button>
+        </div>
+
         {isCreateModalOpen && (
           <CreateCustomerModal
             isOpen={isCreateModalOpen}

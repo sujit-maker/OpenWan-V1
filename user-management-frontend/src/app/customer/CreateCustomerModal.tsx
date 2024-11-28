@@ -141,7 +141,6 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       customerData.managerId = Number(managerId); // Ensure managerId is a number
     }
 
-   
 
     try {
       // POST request to the backend to create the customer
@@ -150,7 +149,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(customerData), // Send the customerData as JSON
+        body: JSON.stringify(customerData), 
       });
 
       if (!response.ok) {

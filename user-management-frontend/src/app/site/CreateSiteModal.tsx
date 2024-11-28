@@ -21,7 +21,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   onSiteCreated,
   fetchSites,
 }) => {
-  const { currentUserType, adminId } = useAuth();
+  const { currentUserType } = useAuth();
   const [siteName, setSiteName] = useState("");
   const [siteAddress, setSiteAddress] = useState("");
   const [contactName, setContactName] = useState("");
@@ -34,12 +34,28 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   const [selectedAdminId, setSelectedAdminId] = useState<string>(""); // Starts empty
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [adminId, setAdminId] = useState(""); // Store admin ID
   const [managerId, setManagerId] = useState(""); // Store manager ID
 
-
+  const loggedInAdminId = localStorage.getItem("adminId");
   const loggedInManagerId = localStorage.getItem("managerId"); // Fetch managerId from localStorage if user is a manager
+  const userType = localStorage.getItem("userType");
 
+
+   // Automatically set adminId for ADMIN users and fetch managers
+  useEffect(() => {
+    if (userType === "ADMIN" && loggedInAdminId) {
+      setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
+
+    }
+  }, [userType, loggedInAdminId]);
+
+    // If the user is a MANAGER, pre-fill managerId from localStorage
+    useEffect(() => {
+      if (userType === "MANAGER" && loggedInManagerId) {
+        setManagerId(loggedInManagerId); // Pre-fill managerId for MANAGER userType
+      }
+    }, [userType, loggedInManagerId]);
 
   // Fetch customers when the modal is open
   useEffect(() => {
@@ -48,23 +64,42 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     }
   }, [isOpen]);
 
-  // Fetch managers based on selected adminId (for SUPERADMIN)
   useEffect(() => {
     if (currentUserType === "SUPERADMIN" && selectedAdminId) {
-      fetchManagers(selectedAdminId); // Fetch managers for selected adminId
+      fetchManagers(selectedAdminId);
     }
   }, [currentUserType, selectedAdminId]);
-
+  
   useEffect(() => {
     if (currentUserType === "SUPERADMIN" && selectedAdminId) {
-      fetchManagers(selectedAdminId); // Pass selectedAdminId for SUPERADMIN
+      fetchManagers(selectedAdminId);
     } else if (currentUserType === "ADMIN" && adminId) {
-      fetchManagers(adminId); // Pass adminId for ADMIN
-      console.log("Admin ID value:", adminId);
-console.log("Admin ID type:", typeof adminId);
-
+      fetchManagers(adminId);
     }
   }, [currentUserType, selectedAdminId, adminId]);
+
+
+
+  useEffect(() => {
+    if (userType === "MANAGER" && loggedInManagerId) {
+      const fetchAdminIdForManager = async () => {
+        try {
+          // Fetch adminId associated with the logged-in manager
+          const response = await fetch(
+            `http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`
+          );
+          const data = await response.json();
+          setAdminId(data[0]?.id || ""); // Set adminId from the API response
+        } catch (error) {
+          console.error("Failed to fetch adminId for manager:", error);
+        }
+      };
+  
+      fetchAdminIdForManager();
+    }
+  }, [loggedInManagerId, userType]);
+  
+  
 
   const fetchAdmins = async () => {
     setIsLoading(true);
@@ -206,9 +241,23 @@ console.log("Admin ID type:", typeof adminId);
       contactNumber,
       contactEmail,
       customerId: Number(customerId),
-      adminId: currentUserType === "SUPERADMIN" ? Number(selectedAdminId) : Number(adminId),
-      managerId: managerId ? Number(managerId) : null,
+      adminId : currentUserType === "SUPERADMIN" ? Number(selectedAdminId) : Number(adminId),
+      managerId : userType === "MANAGER" && loggedInManagerId
+  ? Number(loggedInManagerId)
+  : Number(managerId)
+
     };
+
+    
+    // If the user is a MANAGER, automatically include the managerId (do not require the manager to select)
+    if (userType === "MANAGER" && loggedInManagerId) {
+      siteData.managerId = Number(loggedInManagerId); // Use the logged-in manager's ID directly
+      siteData.adminId = Number(adminId); // Include the adminId associated with the manager
+    } else if (userType !== "MANAGER" && managerId && managerId !== "") {
+      // For Admins and other user types, use the selected managerId from the dropdown
+      siteData.managerId = Number(managerId); // Ensure managerId is a number
+    }
+
 
     if (currentUserType !== "MANAGER" && managerId && managerId !== "") {
       siteData.managerId = Number(managerId);
@@ -260,146 +309,142 @@ console.log("Admin ID type:", typeof adminId);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
-        <h2 className="text-2xl font-semibold mb-6">Create Site</h2>
+  <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto">
+    <h2 className="text-2xl font-semibold mb-6">Create Site</h2>
 
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+    {error && <div className="text-red-500 mb-4">{error}</div>}
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Site Name</label>
-          <input
-            type="text"
-            value={siteName}
-            onChange={(e) => setSiteName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {currentUserType === "SUPERADMIN" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Admin
-            </label>
-            <select
-              value={selectedAdminId}
-              onChange={(e) => {
-                const newAdminId = e.target.value;
-                setSelectedAdminId(e.target.value);
-                setManagerId(""); // Reset managerId when admin is changed
-                fetchManagers(newAdminId); // Fetch managers for the selected admin
-              }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Admin</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id}>
-                  {admin.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {(currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Manager
-            </label>
-            <select
-              value={managerId}
-              onChange={(e) => setManagerId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Manager</option>
-              {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
-                  {manager.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {(currentUserType === "MANAGER" || managerId) && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Customer
-            </label>
-            <select
-              value={customerId || ""}
-              onChange={(e) => setCustomerId(Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Customer</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.customerName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Site Address</label>
-          <textarea
-            value={siteAddress}
-            onChange={(e) => setSiteAddress(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Contact Name</label>
-          <input
-            type="text"
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Contact Number
-          </label>
-          <input
-            type="text"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Contact Email
-          </label>
-          <input
-            type="email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-white px-4 py-2 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
-          >
-            {isLoading ? <Spinner /> : "Create"}
-          </button>
-        </div>
-      </div>
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-1">Site Name</label>
+      <input
+        type="text"
+        value={siteName}
+        onChange={(e) => setSiteName(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
+
+    {currentUserType === "SUPERADMIN" && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Select Admin</label>
+        <select
+          value={selectedAdminId}
+          onChange={(e) => {
+            const newAdminId = e.target.value;
+            setSelectedAdminId(newAdminId);
+            setManagerId(""); // Reset managerId when admin is changed
+            fetchManagers(newAdminId); // Fetch managers for the selected admin
+          }}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Admin</option>
+          {admins.map((admin) => (
+            <option key={admin.id} value={admin.id}>
+              {admin.username}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    {/* Manager dropdown shown only when an Admin is selected */}
+    {selectedAdminId && (currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Select Manager</label>
+        <select
+          value={managerId}
+          onChange={(e) => setManagerId(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Manager</option>
+          {managers.map((manager) => (
+            <option key={manager.id} value={manager.id}>
+              {manager.username}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    {(currentUserType === "MANAGER" || managerId) && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Select Customer</label>
+        <select
+          value={customerId || ""}
+          onChange={(e) => setCustomerId(Number(e.target.value))}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Customer</option>
+          {customers.map((customer) => (
+            <option key={customer.id} value={customer.id}>
+              {customer.customerName}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-1">Site Address</label>
+      <textarea
+        value={siteAddress}
+        onChange={(e) => setSiteAddress(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-1">Contact Name</label>
+      <input
+        type="text"
+        value={contactName}
+        onChange={(e) => setContactName(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-1">
+        Contact Number
+      </label>
+      <input
+        type="text"
+        value={contactNumber}
+        onChange={(e) => setContactNumber(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-1">
+        Contact Email
+      </label>
+      <input
+        type="email"
+        value={contactEmail}
+        onChange={(e) => setContactEmail(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div className="flex justify-end space-x-4">
+      <button
+        onClick={onClose}
+        className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSubmit}
+        disabled={isLoading}
+        className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
+      >
+        {isLoading ? <Spinner /> : "Create"}
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 };
 

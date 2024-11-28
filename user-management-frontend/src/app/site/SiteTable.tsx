@@ -19,6 +19,10 @@ const SiteTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentUserType, userId, managerId, adminId } = useAuth();
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Number of customers per page
+
   // Function to fetch sites based on user type
   const fetchSites = async () => {
     if (!userId || !currentUserType) {
@@ -121,6 +125,19 @@ const SiteTable: React.FC = () => {
     }
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredSites.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSites.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber: number) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -166,13 +183,12 @@ const SiteTable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredSites.map((site) => (
+              {currentItems.map((site) => (
                 <tr key={site.id}>
                   <td className="border p-2 text-center">{site.siteName}</td>
                   <td className="border p-2 text-center">
                     {site.customer ? site.customer.customerName : "N/A"}
                   </td>
-
                   <td className="border p-2 text-center">{site.siteAddress}</td>
                   <td className="border p-2 text-center">{site.contactName}</td>
                   <td className="border p-2 text-center">
@@ -199,6 +215,25 @@ const SiteTable: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination controls */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Prev
+          </button>
+          <span className="px-4 py-2">{currentPage}</span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Next
+          </button>
         </div>
 
         <CreateSiteModal

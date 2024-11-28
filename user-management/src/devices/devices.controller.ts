@@ -25,7 +25,7 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
         if (isNaN(adminIdInt)) {
           throw new BadRequestException('adminId must be a valid number');
         }
-        return await this.devicesService.findByAdminId(adminIdInt); // Fetch sites for a specific admin
+        return await this.devicesService.findByAdminId(adminIdInt); // Fetch devices for a specific admin
       }
 
       if (managerId) {
@@ -33,12 +33,12 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
         if (isNaN(managerIdInt)) {
           throw new BadRequestException('managerId must be a valid number');
         }
-        return await this.devicesService.findByManagerId(managerIdInt); // Fetch sites for a specific manager
+        return await this.devicesService.findByManagerId(managerIdInt); // Fetch devices for a specific manager
       }
 
-      return await this.devicesService.findAll(); // No filters, fetch all sites
+      return await this.devicesService.findAll(); // No filters, fetch all devices
     } catch (error) {
-      throw new BadRequestException('Failed to fetch sites');
+      throw new BadRequestException('Failed to fetch devices');
     }
   }
 

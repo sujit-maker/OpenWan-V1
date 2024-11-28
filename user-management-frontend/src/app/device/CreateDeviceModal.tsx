@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Site } from './types'; 
-import { useAuth } from '../hooks/useAuth';
+import React, { useEffect, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Site } from "./types";
+import { useAuth } from "../hooks/useAuth";
 
 interface CreateDeviceModalProps {
   isOpen: boolean;
@@ -14,40 +14,49 @@ interface User {
   username: string;
 }
 
-
 const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   isOpen,
   onClose,
   onDeviceCreated,
 }) => {
-  const [deviceName, setDeviceName] = useState('');
-  const [deviceType, setDeviceType] = useState('');
-  const [deviceIp, setDeviceIp] = useState('');
-  const [devicePort, setDevicePort] = useState('');
-  const [portCount, setPortCount] = useState ('');
-  const [deviceUsername, setDeviceUsername] = useState('');
-  const [devicePassword, setDevicePassword] = useState('');
+  const [deviceName, setDeviceName] = useState("");
+  const [deviceType, setDeviceType] = useState("");
+  const [deviceIp, setDeviceIp] = useState("");
+  const [devicePort, setDevicePort] = useState("");
+  const [portCount, setPortCount] = useState("");
+  const [deviceUsername, setDeviceUsername] = useState("");
+  const [devicePassword, setDevicePassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [sites, setSites] = useState<Site[]>([]);
   const [siteId, setSiteId] = useState<number | null>(null);
 
-  const { currentUserType, adminId } = useAuth();
+  const { currentUserType } = useAuth();
   const [managers, setManagers] = useState<User[]>([]);
   const [admins, setAdmins] = useState<User[]>([]);
   const [selectedAdminId, setSelectedAdminId] = useState<string>(""); // Starts empty
   const [managerId, setManagerId] = useState(""); // Store manager ID
+  const [adminId, setAdminId] = useState("");
 
+  const loggedInAdminId = localStorage.getItem("adminId");
+  const loggedInManagerId = localStorage.getItem("managerId"); // Fetch managerId from localStorage if user is a manager
+
+  // Automatically set adminId for ADMIN users and fetch managers
+  useEffect(() => {
+    if (currentUserType === "ADMIN" && loggedInAdminId) {
+      setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
+    }
+  }, [currentUserType, loggedInAdminId]);
 
   useEffect(() => {
     if (isOpen) {
-      fetchSites(managerId); 
+      fetchSites(managerId);
     }
   }, [isOpen]);
 
-   // Fetch sites when the modal is open
-   useEffect(() => {
+  // Fetch sites when the modal is open
+  useEffect(() => {
     if (isOpen) {
       fetchSites(managerId); // Fetch sites when modal is open
     }
@@ -67,6 +76,25 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       fetchManagers(adminId); // Pass adminId for ADMIN
     }
   }, [currentUserType, selectedAdminId, adminId]);
+
+  useEffect(() => {
+    if (currentUserType === "MANAGER" && loggedInManagerId) {
+      const fetchAdminIdForManager = async () => {
+        try {
+          // Fetch adminId associated with the logged-in manager
+          const response = await fetch(
+            `http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`
+          );
+          const data = await response.json();
+          setAdminId(data[0]?.id || ""); // Set adminId from the API response
+        } catch (error) {
+          console.error("Failed to fetch adminId for manager:", error);
+        }
+      };
+
+      fetchAdminIdForManager();
+    }
+  }, [loggedInManagerId, currentUserType]);
 
   const fetchAdmins = async () => {
     setIsLoading(true);
@@ -119,19 +147,20 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
     }
   }, [managerId]); // Runs when managerId is updated
 
-
   const fetchSites = async (managerId: string) => {
     try {
       // Use the managerId in the query string to fetch sites
-      const response = await fetch(`http://localhost:8000/site?managerId=${managerId}`);
+      const response = await fetch(
+        `http://localhost:8000/site?managerId=${managerId}`
+      );
       if (response.ok) {
         const data: Site[] = await response.json();
         setSites(data); // Update the state with the fetched sites
       } else {
-        console.error('Error fetching sites:', response.statusText);
+        console.error("Error fetching sites:", response.statusText);
       }
     } catch (error) {
-      console.error('Error fetching sites:', error);
+      console.error("Error fetching sites:", error);
     }
   };
 
@@ -150,7 +179,6 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       setIsLoading(false);
     }
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,10 +201,10 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:8000/devices', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/devices", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -189,14 +217,16 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
         setError(null);
         onDeviceCreated();
         resetForm();
-       
-        setTimeout(onClose, 2000); 
+
+        setTimeout(onClose, 2000);
       } else {
-        setError(data.message || 'An error occurred while creating the device.');
+        setError(
+          data.message || "An error occurred while creating the device."
+        );
         setSuccess(null);
       }
     } catch (err) {
-      setError('An unexpected error occurred.');
+      setError("An unexpected error occurred.");
       setSuccess(null);
     } finally {
       setIsLoading(false);
@@ -204,211 +234,239 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   };
 
   const resetForm = () => {
-    setDeviceName('');
-    setDeviceType('');
-    setDeviceIp('');
-    setDevicePort('');
-    setPortCount ('');
-    setDeviceUsername('');
-    setDevicePassword('');
+    setDeviceName("");
+    setDeviceType("");
+    setDeviceIp("");
+    setDevicePort("");
+    setPortCount("");
+    setDeviceUsername("");
+    setDevicePassword("");
   };
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
-    <Dialog
-      as="div"
-      onClose={onClose}
-      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
-      aria-labelledby="create-device-title"
-    >
-      <Dialog.Panel className="max-w-sm w-full max-h-[90vh] bg-white rounded-lg shadow-lg p-6 overflow-y-auto">
-        <Dialog.Title id="create-device-title" className="text-xl font-semibold mb-4">
-          Add New Device
-        </Dialog.Title>
-        
-        {error && (
-          <div className="bg-red-100 text-red-700 p-2 rounded mb-4" role="alert">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-100 text-green-700 p-2 rounded mb-4" role="alert">
-            {success}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="deviceName" className="block text-gray-700">Device Name</label>
-            <input
-              id="deviceName"
-              type="text"
-              value={deviceName}
-              onChange={(e) => setDeviceName(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
+      <Dialog
+        as="div"
+        onClose={onClose}
+        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
+        aria-labelledby="create-device-title"
+      >
+        <Dialog.Panel className="max-w-sm w-full max-h-[90vh] bg-white rounded-lg shadow-lg p-6 overflow-y-auto">
+          <Dialog.Title
+            id="create-device-title"
+            className="text-xl font-semibold mb-4"
+          >
+            Add New Device
+          </Dialog.Title>
 
-          {currentUserType === "SUPERADMIN" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Admin
-            </label>
-            <select
-              value={selectedAdminId}
-              onChange={(e) => {
-                const newAdminId = e.target.value;
-                setSelectedAdminId(e.target.value);
-                setManagerId(""); // Reset managerId when admin is changed
-                fetchManagers(newAdminId); // Fetch managers for the selected admin
-              }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {error && (
+            <div
+              className="bg-red-100 text-red-700 p-2 rounded mb-4"
+              role="alert"
             >
-              <option value="">Select Admin</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id}>
-                  {admin.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+              {error}
+            </div>
+          )}
+          {success && (
+            <div
+              className="bg-green-100 text-green-700 p-2 rounded mb-4"
+              role="alert"
+            >
+              {success}
+            </div>
+          )}
 
-{(currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Manager
-            </label>
-            <select
-              value={managerId}
-              onChange={(e) => setManagerId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Manager</option>
-              {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
-                  {manager.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="deviceName" className="block text-gray-700">
+                Device Name
+              </label>
+              <input
+                id="deviceName"
+                type="text"
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
 
-        {(currentUserType === "MANAGER" || managerId) && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Site
-            </label>
-            <select
-              value={siteId || ""}
-              onChange={(e) => setSiteId(Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Site</option>
-              {sites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.siteName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+            {currentUserType === "SUPERADMIN" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Select Admin
+                </label>
+                <select
+                  value={selectedAdminId}
+                  onChange={(e) => {
+                    const newAdminId = e.target.value;
+                    setSelectedAdminId(newAdminId);
+                    setManagerId(""); // Reset managerId when admin is changed
+                    fetchManagers(newAdminId); // Fetch managers for the selected admin
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Admin</option>
+                  {admins.map((admin) => (
+                    <option key={admin.id} value={admin.id}>
+                      {admin.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-         
-          <div className="mb-4">
-            <label htmlFor="deviceType" className="block text-gray-700">Device Type</label>
-            <input
-              id="deviceType"
-              type="text"
-              value={deviceType}
-              onChange={(e) => setDeviceType(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="deviceIp" className="block text-gray-700">Device IP</label>
-            <input
-              id="deviceIp"
-              type="text"
-              value={deviceIp}
-              onChange={(e) => setDeviceIp(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="devicePort" className="block text-gray-700">Device Port</label>
-            <input
-              id="devicePort"
-              type="text"
-              value={devicePort}
-              onChange={(e) => setDevicePort(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="portCount" className="block text-gray-700">Number Of Wan</label>
-            <input
-              id="portCount"
-              type="text"
-              value={portCount}
-              onChange={(e) => setPortCount(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="deviceUsername" className="block text-gray-700">Device Username</label>
-            <input
-              id="deviceUsername"
-              type="text"
-              value={deviceUsername}
-              onChange={(e) => setDeviceUsername(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="devicePassword" className="block text-gray-700">Device Password</label>
-            <input
-              id="devicePassword"
-              type="password"
-              value={devicePassword}
-              onChange={(e) => setDevicePassword(e.target.value)}
-              required
-              className="w-full border rounded p-2 mt-1"
-            />
-          </div>
-          
-          <div className="flex justify-end mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mr-2 bg-gray-300 text-black rounded px-4 py-2"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={`bg-blue-500 text-white rounded px-4 py-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating...' : 'Add Device'}
-            </button>
-          </div>
-        </form>
-      </Dialog.Panel>
-    </Dialog>
-  </Transition>
-    );
+            {/* Manager dropdown displayed only when an Admin is selected */}
+            {selectedAdminId &&
+              (currentUserType === "ADMIN" ||
+                currentUserType === "SUPERADMIN") && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Select Manager
+                  </label>
+                  <select
+                    value={managerId}
+                    onChange={(e) => setManagerId(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Manager</option>
+                    {managers.map((manager) => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+            {/* Site dropdown shown only when Manager is selected */}
+            {(currentUserType === "MANAGER" || managerId) && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Select Site
+                </label>
+                <select
+                  value={siteId || ""}
+                  onChange={(e) => setSiteId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Site</option>
+                  {sites.map((site) => (
+                    <option key={site.id} value={site.id}>
+                      {site.siteName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label htmlFor="deviceType" className="block text-gray-700">
+                Device Type
+              </label>
+              <input
+                id="deviceType"
+                type="text"
+                value={deviceType}
+                onChange={(e) => setDeviceType(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="deviceIp" className="block text-gray-700">
+                Device IP
+              </label>
+              <input
+                id="deviceIp"
+                type="text"
+                value={deviceIp}
+                onChange={(e) => setDeviceIp(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="devicePort" className="block text-gray-700">
+                Device Port
+              </label>
+              <input
+                id="devicePort"
+                type="text"
+                value={devicePort}
+                onChange={(e) => setDevicePort(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="portCount" className="block text-gray-700">
+                Number Of Wan
+              </label>
+              <input
+                id="portCount"
+                type="text"
+                value={portCount}
+                onChange={(e) => setPortCount(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="deviceUsername" className="block text-gray-700">
+                Device Username
+              </label>
+              <input
+                id="deviceUsername"
+                type="text"
+                value={deviceUsername}
+                onChange={(e) => setDeviceUsername(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="devicePassword" className="block text-gray-700">
+                Device Password
+              </label>
+              <input
+                id="devicePassword"
+                type="password"
+                value={devicePassword}
+                onChange={(e) => setDevicePassword(e.target.value)}
+                required
+                className="w-full border rounded p-2 mt-1"
+              />
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="mr-2 bg-gray-300 text-black rounded px-4 py-2"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`bg-blue-500 text-white rounded px-4 py-2 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating..." : "Add Device"}
+              </button>
+            </div>
+          </form>
+        </Dialog.Panel>
+      </Dialog>
+    </Transition>
+  );
 };
 
 export default CreateDeviceModal;

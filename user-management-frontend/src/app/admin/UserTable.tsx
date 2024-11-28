@@ -31,7 +31,7 @@ const UserTable: React.FC = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(20);
+  const [usersPerPage] = useState(10);
 
   useEffect(() => {
     if (adminId) {

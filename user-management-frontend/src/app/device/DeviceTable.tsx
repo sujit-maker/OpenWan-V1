@@ -20,56 +20,58 @@ const DeviceTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { currentUserType, userId, managerId, adminId } = useAuth();
-
-
   const router = useRouter();
 
-// Function to fetch sites based on user type
-const fetchDevices = async () => {
-  if (!userId || !currentUserType) {
-    setError("User not authenticated");
-    return;
-  }
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Number of customers per page
 
-  setLoading(true);
-
-  try {
-    let url = "";
-    if (currentUserType === "ADMIN" && adminId) {
-      url = `http://localhost:8000/devices?adminId=${adminId}`;
-    } else if (currentUserType === "MANAGER" && managerId) {
-      url = `http://localhost:8000/devices?managerId=${managerId}`;
-    } else if (currentUserType === "SUPERADMIN") {
-      url = "http://localhost:8000/devices"; 
+  // Function to fetch sites based on user type
+  const fetchDevices = async () => {
+    if (!userId || !currentUserType) {
+      setError("User not authenticated");
+      return;
     }
 
-    if (!url) {
-      throw new Error("Invalid user type or missing user ID");
+    setLoading(true);
+
+    try {
+      let url = "";
+      if (currentUserType === "ADMIN" && adminId) {
+        url = `http://localhost:8000/devices?adminId=${adminId}`;
+      } else if (currentUserType === "MANAGER" && managerId) {
+        url = `http://localhost:8000/devices?managerId=${managerId}`;
+      } else if (currentUserType === "SUPERADMIN") {
+        url = "http://localhost:8000/devices";
+      }
+
+      if (!url) {
+        throw new Error("Invalid user type or missing user ID");
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch devices");
+      }
+
+      const data: Device[] = await response.json();
+      setDevices(data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Unknown error");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Failed to fetch devices");
+  useEffect(() => {
+    fetchSites(); // Fetch customers when the component mounts
+  }, []);
+
+  useEffect(() => {
+    if (currentUserType && userId) {
+      fetchDevices(); // Fetch sites when user type and userId are available
     }
-
-    const data: Device[] = await response.json();
-    setDevices(data);
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Unknown error");
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  fetchSites(); // Fetch customers when the component mounts
-}, []);
-
-useEffect(() => {
-  if (currentUserType && userId) {
-    fetchDevices(); // Fetch sites when user type and userId are available
-  }
-}, [currentUserType, userId, adminId, managerId]);
+  }, [currentUserType, userId, adminId, managerId]);
 
   useEffect(() => {
     setFilteredDevices(
@@ -81,7 +83,6 @@ useEffect(() => {
       )
     );
   }, [searchQuery, devices]);
-
 
   const fetchSites = async () => {
     try {
@@ -95,7 +96,6 @@ useEffect(() => {
       console.error("Error fetching sites:", error);
     }
   };
-  
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
@@ -134,6 +134,15 @@ useEffect(() => {
     );
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <>
       <Header />
@@ -141,7 +150,9 @@ useEffect(() => {
       <div
         className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
-      >     <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+      >
+        {" "}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
@@ -163,7 +174,6 @@ useEffect(() => {
             />
           </div>
         </div>
-
         {/* Responsive table wrapper */}
         <div className="overflow-x-auto w-full px-8 lg:px-8 ml-8">
           <table className="min-w-full bg-white shadow-lg rounded-lg">
@@ -178,44 +188,71 @@ useEffect(() => {
               </tr>
             </thead>
             <tbody>
-  {filteredDevices.map((device) => {
-    const site = sites.find((site) => site.id === device.siteId); // Find the site by ID
-    return (
-      <tr key={device.id}>
-        <td className="border p-2 text-center">{device.deviceId}</td>
-        <td className="border p-2 text-center">{device.deviceName}</td>
-        <td className="border p-2 text-center">{site ? site.siteName : "N/A"}</td> {/* Display siteName */}
-        <td className="border p-2 text-center">{device.deviceType}</td>
-        <td className="border p-2 text-center">{device.portCount}</td>
-        <td className="border p-2 text-center">
-          <button
-            onClick={() => handleConnect(device)}
-            className="text-yellow-500 hover:text-yellow-700 mr-3"
-            title="Connect"
-          >
-            <FaLink />
-          </button>
-          <button
-            onClick={() => handleEdit(device)}
-            className="text-blue-500 hover:text-blue-700 mr-3"
-          >
-            <FaEdit />
-          </button>
-          <button
-            onClick={() => handleDelete(device.id)}
-            className="text-red-500 hover:text-red-700 mr-3"
-          >
-            <FaTrash />
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+              {currentItems.map((device) => {
+                const site = sites.find((site) => site.id === device.siteId); // Find the site by ID
+                return (
+                  <tr key={device.id}>
+                    <td className="border p-2 text-center">
+                      {device.deviceId}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {device.deviceName}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {site ? site.siteName : "N/A"}
+                    </td>{" "}
+                    {/* Display siteName */}
+                    <td className="border p-2 text-center">
+                      {device.deviceType}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {device.portCount}
+                    </td>
+                    <td className="border p-2 text-center">
+                      <button
+                        onClick={() => handleConnect(device)}
+                        className="text-yellow-500 hover:text-yellow-700 mr-3"
+                        title="Connect"
+                      >
+                        <FaLink />
+                      </button>
+                      <button
+                        onClick={() => handleEdit(device)}
+                        className="text-blue-500 hover:text-blue-700 mr-3"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(device.id)}
+                        className="text-red-500 hover:text-red-700 mr-3"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
-
+        {/* Pagination controls */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Prev
+          </button>
+          <span className="px-4 py-2">{currentPage}</span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Next
+          </button>
+        </div>
         {isCreateModalOpen && (
           <CreateDeviceModal
             isOpen={isCreateModalOpen}
@@ -228,7 +265,6 @@ useEffect(() => {
             device={selectedDevice}
             onDeviceUpdated={handleDeviceUpdated}
             closeModal={() => setIsEditModalOpen(false)}
-
           />
         )}
       </div>

@@ -11,7 +11,14 @@ export class SiteService {
   async findByAdminId(adminId: number) {
     try {
       const sites = await this.prisma.site.findMany({
-        where: { adminId: adminId }, // Expect adminId to be an integer
+        where: { adminId: adminId },
+        include: {
+          customer: {
+            select: {
+              customerName: true, // Include customer name
+            },
+          },
+        },
       });
       return sites;
     } catch (error) {
@@ -19,11 +26,18 @@ export class SiteService {
       throw new BadRequestException('Failed to fetch sites');
     }
   }
-
+  
   async findByManagerId(managerId: number) {
     try {
       const sites = await this.prisma.site.findMany({
-        where: { managerId: managerId }, // Expect managerId to be an integer
+        where: { managerId: managerId },
+        include: {
+          customer: {
+            select: {
+              customerName: true, // Include customer name
+            },
+          },
+        },
       });
       return sites;
     } catch (error) {
@@ -31,6 +45,7 @@ export class SiteService {
       throw new BadRequestException('Failed to fetch sites');
     }
   }
+  
 
   // Create a new Site
   async create(createSiteDto: CreateSiteDto) {
