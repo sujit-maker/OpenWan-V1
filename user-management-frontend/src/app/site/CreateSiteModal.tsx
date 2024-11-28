@@ -348,23 +348,25 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     )}
 
     {/* Manager dropdown shown only when an Admin is selected */}
-    {selectedAdminId && (currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Select Manager</label>
-        <select
-          value={managerId}
-          onChange={(e) => setManagerId(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Select Manager</option>
-          {managers.map((manager) => (
-            <option key={manager.id} value={manager.id}>
-              {manager.username}
-            </option>
-          ))}
-        </select>
-      </div>
-    )}
+    {adminId && userType !== "MANAGER" && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Select Manager
+            </label>
+            <select
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="">--Select Manager--</option>
+              {managers.map((manager) => (
+                <option key={manager.id} value={manager.id}>
+                  {manager.username}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
     {(currentUserType === "MANAGER" || managerId) && (
       <div className="mb-4">

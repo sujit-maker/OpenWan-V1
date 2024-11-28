@@ -49,11 +49,6 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
     }
   }, [currentUserType, loggedInAdminId]);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchSites(managerId);
-    }
-  }, [isOpen]);
 
   // Fetch sites when the modal is open
   useEffect(() => {
@@ -71,11 +66,14 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
   useEffect(() => {
     if (currentUserType === "SUPERADMIN" && selectedAdminId) {
-      fetchManagers(selectedAdminId); // Pass selectedAdminId for SUPERADMIN
+      // Only fetch managers if selectedAdminId is not empty
+      fetchManagers(selectedAdminId);
     } else if (currentUserType === "ADMIN" && adminId) {
-      fetchManagers(adminId); // Pass adminId for ADMIN
+      // Ensure adminId is set before calling fetchManagers
+      fetchManagers(adminId);
     }
   }, [currentUserType, selectedAdminId, adminId]);
+  
 
   useEffect(() => {
     if (currentUserType === "MANAGER" && loggedInManagerId) {
@@ -165,6 +163,11 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   };
 
   const fetchManagers = async (adminId: string) => {
+    if (!adminId) {
+      console.error("adminId is missing, cannot fetch managers.");
+      return; // Do not proceed if adminId is missing
+    }
+  
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -179,6 +182,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       setIsLoading(false);
     }
   };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,18 +215,14 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
       const data = await response.json();
       if (response.ok) {
-        // Create the success message with the device URL
-        const deviceUrl = `/devices/${data.deviceId}`;
+        setSuccess("Device created successfully!");
         alert("Site created successfully!");
         setError(null);
         onDeviceCreated();
         resetForm();
-
         setTimeout(onClose, 2000);
       } else {
-        setError(
-          data.message || "An error occurred while creating the device."
-        );
+        setError(data.message || "An error occurred while creating the device.");
         setSuccess(null);
       }
     } catch (err) {
@@ -317,27 +317,26 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
             )}
 
             {/* Manager dropdown displayed only when an Admin is selected */}
-            {selectedAdminId &&
-              (currentUserType === "ADMIN" ||
-                currentUserType === "SUPERADMIN") && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Select Manager
-                  </label>
-                  <select
-                    value={managerId}
-                    onChange={(e) => setManagerId(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Manager</option>
-                    {managers.map((manager) => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.username}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            {(currentUserType === "ADMIN" ||
+              currentUserType === "SUPERADMIN") && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Select Manager
+                </label>
+                <select
+                  value={managerId || ""} // Ensure default empty state or preselected manager
+                  onChange={(e) => setManagerId(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Manager</option>
+                  {managers.map((manager) => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Site dropdown shown only when Manager is selected */}
             {(currentUserType === "MANAGER" || managerId) && (

@@ -183,7 +183,7 @@ const DeviceTable: React.FC = () => {
                 <th className="border p-2 text-center">Device Name</th>
                 <th className="border p-2 text-center">Site Name</th>
                 <th className="border p-2 text-center">Device Type</th>
-                <th className="border p-2 text-center">Port Count</th>
+                <th className="border p-2 text-center">No.of Wan Port</th>
                 <th className="border p-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -201,7 +201,6 @@ const DeviceTable: React.FC = () => {
                     <td className="border p-2 text-center">
                       {site ? site.siteName : "N/A"}
                     </td>{" "}
-                    {/* Display siteName */}
                     <td className="border p-2 text-center">
                       {device.deviceType}
                     </td>

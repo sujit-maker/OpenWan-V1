@@ -111,6 +111,7 @@ const SiteTable: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this Site?")){
     try {
       const response = await fetch(`http://localhost:8000/site/${id}`, {
         method: "DELETE",
@@ -123,6 +124,7 @@ const SiteTable: React.FC = () => {
     } catch (error) {
       console.error("Error deleting site:", error);
     }
+  }
   };
 
   // Pagination logic
