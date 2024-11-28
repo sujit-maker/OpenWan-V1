@@ -4,60 +4,98 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import CreateSiteModal from "./CreateSiteModal";
 import EditSiteModal from "./EditSiteModal";
-import { Customer, Site } from "./types"; 
+import { Customer, Site } from "./types";
 import Header from "../components/Header";
+import { useAuth } from "../hooks/useAuth";
 
-  const SiteTable: React.FC = () => {
+const SiteTable: React.FC = () => {
   const [sites, setSites] = useState<Site[]>([]);
   const [filteredSites, setFilteredSites] = useState<Site[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<Site | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUserType, userId, managerId, adminId } = useAuth();
 
-  useEffect(() => {
-    fetchSites();
-    fetchCustomers(); 
-  }, []);
-
-  useEffect(() => {
-    // Filter sites based on the search query
-    setFilteredSites(
-      sites.filter((site) =>
-        site.siteName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery, sites]);
-
+  // Function to fetch sites based on user type
   const fetchSites = async () => {
+    if (!userId || !currentUserType) {
+      setError("User not authenticated");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8000/site");
+      let url = "";
+      if (currentUserType === "ADMIN" && adminId) {
+        url = `http://localhost:8000/site?adminId=${adminId}`;
+      } else if (currentUserType === "MANAGER" && managerId) {
+        url = `http://localhost:8000/site?managerId=${managerId}`;
+      } else if (currentUserType === "SUPERADMIN") {
+        url = "http://localhost:8000/site"; // Fetch all sites for SUPERADMIN
+      }
+
+      if (!url) {
+        throw new Error("Invalid user type or missing user ID");
+      }
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch sites");
       }
+
       const data: Site[] = await response.json();
       setSites(data);
     } catch (error) {
-      console.error("Error fetching sites:", error);
+      setError(error instanceof Error ? error.message : "Unknown error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchCustomers(); // Fetch customers when the component mounts
+  }, []);
+
+  // Function to fetch customers (separate from sites)
   const fetchCustomers = async () => {
     try {
       const response = await fetch("http://localhost:8000/customers");
       if (!response.ok) {
+        console.error(`Failed to fetch customers. Status: ${response.status}`);
         throw new Error("Failed to fetch customers");
       }
       const data: Customer[] = await response.json();
+      console.log("Fetched customers:", data); // Log the data
       setCustomers(data);
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
   };
 
+  useEffect(() => {
+    if (currentUserType && userId) {
+      fetchSites(); // Fetch sites when user type and userId are available
+    }
+  }, [currentUserType, userId, adminId, managerId]);
+
+  useEffect(() => {
+    // Filter sites based on the search query
+    setFilteredSites(
+      sites.filter(
+        (site) =>
+          site.siteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          site.siteAddress.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery, sites]);
+
   const handleSiteCreated = (site: Site) => {
     setSites((prevSites) => [...prevSites, site]);
-    fetchSites(); // Ensure the latest data is fetched
+    fetchSites(); // Ensure the latest data is fetched after creation
   };
 
   const handleSiteUpdated = (updatedSite: Site) => {
@@ -65,7 +103,7 @@ import Header from "../components/Header";
       prevSites.map((site) => (site.id === updatedSite.id ? updatedSite : site))
     );
     setEditingSite(null); // Close the edit modal
-    fetchSites(); // Ensure the latest data is fetched
+    fetchSites(); // Ensure the latest data is fetched after update
   };
 
   const handleDelete = async (id: number) => {
@@ -77,7 +115,7 @@ import Header from "../components/Header";
         throw new Error("Failed to delete site");
       }
       setSites((prevSites) => prevSites.filter((site) => site.id !== id));
-      fetchSites(); // Ensure the latest data is fetched
+      fetchSites(); // Ensure the latest data is fetched after delete
     } catch (error) {
       console.error("Error deleting site:", error);
     }
@@ -134,12 +172,17 @@ import Header from "../components/Header";
                   <td className="border p-2 text-center">
                     {site.customer ? site.customer.customerName : "N/A"}
                   </td>
+
                   <td className="border p-2 text-center">{site.siteAddress}</td>
                   <td className="border p-2 text-center">{site.contactName}</td>
-                  <td className="border p-2 text-center">{site.contactNumber}</td>
-                  <td className="border p-2 text-center">{site.contactEmail}</td>
                   <td className="border p-2 text-center">
-                  <button
+                    {site.contactNumber}
+                  </td>
+                  <td className="border p-2 text-center">
+                    {site.contactEmail}
+                  </td>
+                  <td className="border p-2 text-center">
+                    <button
                       onClick={() => setEditingSite(site)}
                       className="text-blue-500 hover:text-blue-700 mr-2"
                     >
@@ -162,7 +205,7 @@ import Header from "../components/Header";
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSiteCreated={handleSiteCreated}
-          fetchSites={fetchSites} 
+          fetchSites={fetchSites}
         />
 
         {editingSite && (
@@ -172,7 +215,7 @@ import Header from "../components/Header";
             customers={customers}
             onSiteUpdated={handleSiteUpdated}
             closeModal={() => setEditingSite(null)}
-            fetchSites={fetchSites} 
+            fetchSites={fetchSites}
           />
         )}
       </div>

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MikroTikService } from '../mikrotik/mikrotik.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
@@ -12,6 +12,32 @@ export class DevicesService {
     private readonly prisma: PrismaService,
     private readonly mikrotikService: MikroTikService,
   ) {}
+
+
+
+  async findByAdminId(adminId: number) {
+    try {
+      const devices = await this.prisma.device.findMany({
+        where: { adminId: adminId }, // Expect adminId to be an integer
+      });
+      return devices;
+    } catch (error) {
+      console.error('Error fetching devices:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch devices');
+    }
+  }
+
+  async findByManagerId(managerId: number) {
+    try {
+      const devices = await this.prisma.device.findMany({
+        where: { managerId: managerId }, // Expect managerId to be an integer
+      });
+      return devices;
+    } catch (error) {
+      console.error('Error fetching devices:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch devices');
+    }
+  }
 
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
     const newDeviceId = await this.generateNewDeviceId();
@@ -28,7 +54,7 @@ export class DevicesService {
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
         adminId : createDeviceDto.adminId,
-        managerId : createDeviceDto.managerId
+        managerId : createDeviceDto.managerId,
       },
     });
   }

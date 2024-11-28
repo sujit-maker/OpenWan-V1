@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
@@ -18,8 +18,28 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
   }
 
   @Get()
-  async findAll(): Promise<Device[]> {
-    return this.devicesService.findAll();
+  async findAll(@Query('adminId') adminId?: string, @Query('managerId') managerId?: string) {
+    try {
+      if (adminId) {
+        const adminIdInt = parseInt(adminId, 10); // Convert to integer
+        if (isNaN(adminIdInt)) {
+          throw new BadRequestException('adminId must be a valid number');
+        }
+        return await this.devicesService.findByAdminId(adminIdInt); // Fetch sites for a specific admin
+      }
+
+      if (managerId) {
+        const managerIdInt = parseInt(managerId, 10); // Convert to integer
+        if (isNaN(managerIdInt)) {
+          throw new BadRequestException('managerId must be a valid number');
+        }
+        return await this.devicesService.findByManagerId(managerIdInt); // Fetch sites for a specific manager
+      }
+
+      return await this.devicesService.findAll(); // No filters, fetch all sites
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch sites');
+    }
   }
 
   @Get(':deviceId/data')

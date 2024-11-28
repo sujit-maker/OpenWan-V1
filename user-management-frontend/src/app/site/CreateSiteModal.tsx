@@ -60,6 +60,9 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
       fetchManagers(selectedAdminId); // Pass selectedAdminId for SUPERADMIN
     } else if (currentUserType === "ADMIN" && adminId) {
       fetchManagers(adminId); // Pass adminId for ADMIN
+      console.log("Admin ID value:", adminId);
+console.log("Admin ID type:", typeof adminId);
+
     }
   }, [currentUserType, selectedAdminId, adminId]);
 
@@ -152,20 +155,36 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   }, [managerId]);
 
   const fetchManagers = async (adminId: string) => {
+    if (!adminId || isNaN(Number(adminId))) {
+      console.error("Invalid adminId:", adminId); // Debugging
+      setError("Invalid adminId provided.");
+      return;
+    }
+  
     setIsLoading(true);
+    setError(null);
+    console.log("Fetching managers with adminId:", adminId); // Debugging
+  
     try {
       const response = await fetch(
         `http://localhost:8000/users/managers/admin?adminId=${adminId}`
       );
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch managers. Status: ${response.status}`);
+      }
+  
       const data: User[] = await response.json();
-      setManagers(Array.isArray(data) ? data : []); // Ensure it's an array
+      console.log("Fetched managers:", data);
+      setManagers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching managers:", error);
-      setError("Failed to fetch managers");
+      setError("Failed to fetch managers.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleSubmit = async () => {
     if (

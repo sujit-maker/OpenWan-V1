@@ -37,6 +37,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   useEffect(() => {
     if (userType === "ADMIN" && loggedInAdminId) {
       setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
+
     }
   }, [userType, loggedInAdminId]);
 
@@ -140,8 +141,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       customerData.managerId = Number(managerId); // Ensure managerId is a number
     }
 
-    // Log the customerData object for debugging purposes
-    console.log("Customer Data to be sent:", customerData);
+   
 
     try {
       // POST request to the backend to create the customer

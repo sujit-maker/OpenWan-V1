@@ -33,7 +33,7 @@ model User {
   managedSites Site[] @relation("SiteManager")
   adminSites   Site[] @relation("SiteAdmin")
 
-  // Relations to Site model
+  // Relations to Device model
   managedDevices Device[] @relation("DeviceManager")
   adminDevices   Device[] @relation("DeviceAdmin")
 }
@@ -113,12 +113,12 @@ model Device {
   deviceUsername String
   devicePassword String
 
-  adminId   Int? // Foreign key to the User model for the admin
   managerId Int? // Foreign key to the User model for the manager
+  adminId   Int? // Foreign key to the User model for the admin
 
   // Relations to the User model for admin and manager
-  managedDevices User? @relation("DeviceAdmin", fields: [adminId], references: [id])
-  adminDevices   User? @relation("DeviceManager", fields: [managerId], references: [id])
+  admin User? @relation("DeviceAdmin", fields: [adminId], references: [id])
+  manager   User? @relation("DeviceManager", fields: [managerId], references: [id])
 }
 
 model Task {

@@ -14,8 +14,6 @@ const CustomerTable: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [users, setUsers] = useState<{ [key: number]: string }>({});
-  const [isLoading, setIsLoading] = useState(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { currentUserType, userId, managerId, adminId } = useAuth();

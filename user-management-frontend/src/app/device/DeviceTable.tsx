@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import { Device, Site } from "./types";
 import { useRouter } from "next/navigation";
 import Sidebar from "../components/Sidebar";
+import { useAuth } from "../hooks/useAuth";
 
 const DeviceTable: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -16,13 +17,59 @@ const DeviceTable: React.FC = () => {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [sites, setSites] = useState<Site[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUserType, userId, managerId, adminId } = useAuth();
+
 
   const router = useRouter();
 
-  useEffect(() => {
-    fetchDevices();
-    fetchSites();
-  }, []);
+// Function to fetch sites based on user type
+const fetchDevices = async () => {
+  if (!userId || !currentUserType) {
+    setError("User not authenticated");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    let url = "";
+    if (currentUserType === "ADMIN" && adminId) {
+      url = `http://localhost:8000/devices?adminId=${adminId}`;
+    } else if (currentUserType === "MANAGER" && managerId) {
+      url = `http://localhost:8000/devices?managerId=${managerId}`;
+    } else if (currentUserType === "SUPERADMIN") {
+      url = "http://localhost:8000/devices"; 
+    }
+
+    if (!url) {
+      throw new Error("Invalid user type or missing user ID");
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Failed to fetch devices");
+    }
+
+    const data: Device[] = await response.json();
+    setDevices(data);
+  } catch (error) {
+    setError(error instanceof Error ? error.message : "Unknown error");
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchSites(); // Fetch customers when the component mounts
+}, []);
+
+useEffect(() => {
+  if (currentUserType && userId) {
+    fetchDevices(); // Fetch sites when user type and userId are available
+  }
+}, [currentUserType, userId, adminId, managerId]);
 
   useEffect(() => {
     setFilteredDevices(
@@ -35,18 +82,6 @@ const DeviceTable: React.FC = () => {
     );
   }, [searchQuery, devices]);
 
-  const fetchDevices = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/devices");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data: Device[] = await response.json();
-      setDevices(data);
-    } catch (error) {
-      console.error("Failed to fetch devices:", error);
-    }
-  };
 
   const fetchSites = async () => {
     try {

@@ -118,6 +118,7 @@ export class UserService {
         username: true,
         usertype: true,
         managerId: true,
+        adminId: true,
       },
     });
   }
@@ -175,6 +176,7 @@ export class UserService {
         username: true,
         usertype: true,
         managerId: true,
+        adminId: true,
       },
     });
 
@@ -238,6 +240,7 @@ export class UserService {
         usertype: updateUserDto.usertype ?? user.usertype,
         password: hashedPassword,
         managerId: updateUserDto.managerId ?? user.managerId,
+        adminId: updateUserDto.adminId ?? user.adminId,
       },
     });
 
