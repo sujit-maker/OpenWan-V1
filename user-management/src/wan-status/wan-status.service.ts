@@ -22,7 +22,7 @@ export class WanStatusService {
       const previousStatus = await this.prisma.mikroTik.findFirst({
         where: {
           identity: data.identity,
-          comment: data.comment, // Include comment in the condition
+          comment: data.comment, 
         },
         orderBy: { createdAt: 'desc' },
       });

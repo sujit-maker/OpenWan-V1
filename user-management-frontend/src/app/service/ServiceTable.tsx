@@ -86,7 +86,7 @@ import { Service } from "./types";
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-500 text-white px-4 mx-20 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+          className="bg-blue-500 text-white px-4  py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
         >
           Add Service
         </button>
@@ -104,9 +104,8 @@ import { Service } from "./types";
           />
         </div>
       </div>
-      <div className="overflow-x-auto lg:overflow-hidden ml-14">
-        {/* Added mobile-scroll class */}
-        <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ml-6">
+      <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg lg:ml-0">
           {" "}
           <thead className="bg-gray-400">
             <tr>

@@ -144,7 +144,7 @@ const CustomerTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 mx-14 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+            className="bg-blue-500  text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
           >
             Add Customer
           </button>
@@ -162,57 +162,48 @@ const CustomerTable: React.FC = () => {
             />
           </div>
         </div>
-        <div className="overflow-x-auto lg:overflow-hidden ml-14">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-            <thead className="bg-gray-400">
-              <tr>
-                <th className="border p-1">Customer</th>
-                <th className="border p-1">Address</th>
-                <th className="border p-1">GST NO.</th>
-                <th className="border p-1">Contact Name</th>
-                <th className="border p-1">Contact Number</th>
-                <th className="border p-1">Email</th>
-                <th className="border p-1">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((customer) => (
-                <tr key={customer.id}>
-                  <td className="border p-3 text-center">
-                    {customer.customerName}
-                  </td>
-                  <td className="border p-3 text-center">
-                    {customer.customerAddress}
-                  </td>
-                  <td className="border p-3 text-center">
-                    {customer.gstNumber}
-                  </td>
-                  <td className="border p-3 text-center">
-                    {customer.contactName}
-                  </td>
-                  <td className="border p-3 text-center">
-                    {customer.contactNumber}
-                  </td>
-                  <td className="border p-3 text-center">{customer.email}</td>
-                  <td className="border p-3 text-center">
-                    <button
-                      onClick={() => handleEdit(customer)}
-                      className="text-blue-500 hover:text-blue-700 m-1"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(customer.id)}
-                      className="text-red-500 hover:text-red-700 m-1"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg lg:ml-0">
+    <thead className="bg-gray-400">
+      <tr>
+        <th className="border p-1">Customer</th>
+        <th className="border p-1">Address</th>
+        <th className="border p-1">GST NO.</th>
+        <th className="border p-1">Contact Name</th>
+        <th className="border p-1">Contact Number</th>
+        <th className="border p-1">Email</th>
+        <th className="border p-1">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentItems.map((customer) => (
+        <tr key={customer.id}>
+          <td className="border p-3 text-center">{customer.customerName}</td>
+          <td className="border p-3 text-center">{customer.customerAddress}</td>
+          <td className="border p-3 text-center">{customer.gstNumber}</td>
+          <td className="border p-3 text-center">{customer.contactName}</td>
+          <td className="border p-3 text-center">{customer.contactNumber}</td>
+          <td className="border p-3 text-center">{customer.email}</td>
+          <td className="border p-3 text-center">
+            <button
+              onClick={() => handleEdit(customer)}
+              className="text-blue-500 hover:text-blue-700 m-1"
+            >
+              <FaEdit />
+            </button>
+            <button
+              onClick={() => handleDelete(customer.id)}
+              className="text-red-500 hover:text-red-700 m-1"
+            >
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4">

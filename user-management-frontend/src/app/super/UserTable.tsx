@@ -140,7 +140,7 @@ const UserTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
           >
             Add User
           </button>
@@ -158,48 +158,46 @@ const UserTable: React.FC = () => {
             />
           </div>
         </div>
+        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+    <thead className="bg-gray-400">
+      <tr>
+        <th className="border p-1">Username</th>
+        <th className="border p-1">User Type</th>
+        <th className="border p-1">Manager Name</th>
+        <th className="border p-1">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentUsers.map((user) => (
+        <tr key={user.id}>
+          <td className="border p-1 text-center">{user.username}</td>
+          <td className="border p-1 text-center">{user.usertype}</td>
+          <td className="border p-1 text-center">
+            {user.usertype === "EXECUTIVE"
+              ? getManagerName(user.managerId)
+              : "N/A"}
+          </td>
+          <td className="border p-1 text-center">
+            <button
+              onClick={() => handleEdit(user)}
+              className="text-blue-500 hover:text-blue-700 mr-2"
+            >
+              <FaEdit />
+            </button>
+            <button
+              onClick={() => handleDelete(user.id, user.username)}
+              className="text-red-500 hover:text-red-700"
+            >
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
-        <div className="overflow-x-auto lg:overflow-hidden ml-14 ">
-          {/* Added mobile-scroll class */}
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
-            {" "}
-            <thead className="bg-gray-400">
-              <tr>
-                <th className="border p-1">Username</th>
-                <th className="border p-1">User Type</th>
-                <th className="border p-1">Manager Name</th>
-                <th className="border p-1">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentUsers.map((user) => (
-                <tr key={user.id}>
-                  <td className="border p-1 text-center">{user.username}</td>
-                  <td className="border p-1 text-center">{user.usertype}</td>
-                  <td className="border p-1 text-center">
-                    {user.usertype === "EXECUTIVE"
-                      ? getManagerName(user.managerId)
-                      : "N/A"}
-                  </td>
-                  <td className="border p-1 text-center">
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id, user.username)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4 space-x-2">

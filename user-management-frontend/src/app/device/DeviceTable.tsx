@@ -155,7 +155,7 @@ const DeviceTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 mx-14 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
+            className="bg-blue-500 text-white px-4  py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
           >
             Add Device
           </button>
@@ -175,8 +175,8 @@ const DeviceTable: React.FC = () => {
           </div>
         </div>
         {/* Responsive table wrapper */}
-        <div className="overflow-x-auto w-full px-8 lg:px-8 ml-8">
-          <table className="min-w-full bg-white shadow-lg rounded-lg">
+        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg lg:ml-0">
             <thead className="bg-gray-400">
               <tr>
                 <th className="border p-2 text-center">Device ID</th>
