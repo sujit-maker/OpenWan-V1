@@ -18,17 +18,22 @@ export class WanStatusService {
     since: string;
   }): Promise<void> {
     try {
-      // Fetch the most recent record for the given identity
+      // Fetch the most recent record for the given identity and comment
       const previousStatus = await this.prisma.mikroTik.findFirst({
-        where: { identity: data.identity },
+        where: {
+          identity: data.identity,
+          comment: data.comment, // Include comment in the condition
+        },
         orderBy: { createdAt: 'desc' },
       });
-
+  
+      // Check if the status has changed
       if (!previousStatus || previousStatus.status !== data.status) {
         const formattedSince = new Date(data.since).toLocaleString('en-GB', {
           hour12: false,
         });
-
+  
+        // Save the new status to the database
         await this.prisma.mikroTik.create({
           data: {
             identity: data.identity,
@@ -37,7 +42,7 @@ export class WanStatusService {
             since: formattedSince,
           },
         });
-
+  
         // Send an email notification about the status change
         await this.emailService.sendEmail({
           recipients: [
@@ -62,6 +67,7 @@ export class WanStatusService {
       throw error;
     }
   }
+  
 
   // Function to retrieve logs
   async getLogs(): Promise<any[]> {

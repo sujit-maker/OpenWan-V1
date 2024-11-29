@@ -73,7 +73,6 @@ const SiteTable: React.FC = () => {
         throw new Error("Failed to fetch customers");
       }
       const data: Customer[] = await response.json();
-      console.log("Fetched customers:", data); // Log the data
       setCustomers(data);
     } catch (error) {
       console.error("Error fetching customers:", error);

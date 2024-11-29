@@ -49,7 +49,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   }, [userType, loggedInManagerId]);
 
   useEffect(() => {
-    // Fetch all admins (if needed for non-ADMIN users)
+    // Fetch all admins (if needed for superadmin users)
     const fetchAdmins = async () => {
       try {
         const adminResponse = await fetch(
@@ -128,7 +128,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       contactName,
       contactNumber,
       email,
-      adminId: Number(adminId), // Ensure adminId is a number
+      adminId: Number(adminId), 
       managerId: Number(managerId),
     };
 

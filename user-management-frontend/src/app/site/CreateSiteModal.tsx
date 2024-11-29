@@ -62,11 +62,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (currentUserType === "SUPERADMIN" && selectedAdminId) {
-      fetchManagers(selectedAdminId);
-    }
-  }, [currentUserType, selectedAdminId]);
+ 
 
   useEffect(() => {
     if (currentUserType === "SUPERADMIN" && selectedAdminId) {
@@ -97,18 +93,21 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
 
   const fetchAdmins = async () => {
     setIsLoading(true);
+    setError(null);
+    setAdmins([]); // Clear previous data to avoid confusion during loading
+  
     try {
       const response = await fetch("http://localhost:8000/users/admins");
       const data: User[] = await response.json();
-      console.log("Fetched admins:", data); // Debug logging to inspect the fetched data
       setAdmins(data);
     } catch (error) {
       console.error("Error fetching admins:", error);
-      setError("Failed to fetch admins");
+      setError("Failed to fetch admins.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     if (currentUserType === "SUPERADMIN") {
@@ -182,14 +181,13 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
 
   const fetchManagers = async (adminId: string) => {
     if (!adminId || isNaN(Number(adminId))) {
-      console.error("Invalid adminId:", adminId); // Debugging
+      console.error("Invalid adminId:", adminId); 
       setError("Invalid adminId provided.");
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    console.log("Fetching managers with adminId:", adminId); // Debugging
 
     try {
       const response = await fetch(
@@ -201,7 +199,6 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
       }
 
       const data: User[] = await response.json();
-      console.log("Fetched managers:", data);
       setManagers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching managers:", error);
@@ -373,7 +370,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
                   onChange={(e) => setCustomerId(Number(e.target.value))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Select Site</option>
+                  <option value="">Select Customer</option>
                   {customers.map((site) => (
                     <option key={site.id} value={site.id}>
                       {site.customerName}

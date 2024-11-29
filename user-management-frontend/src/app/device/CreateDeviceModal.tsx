@@ -99,7 +99,6 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
     try {
       const response = await fetch("http://localhost:8000/users/admins");
       const data: User[] = await response.json();
-      console.log("Fetched admins:", data); // Debug logging to inspect the fetched data
       setAdmins(data);
     } catch (error) {
       console.error("Error fetching admins:", error);
@@ -164,8 +163,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
 
   const fetchManagers = async (adminId: string) => {
     if (!adminId) {
-      console.error("adminId is missing, cannot fetch managers.");
-      return; // Do not proceed if adminId is missing
+      return; 
     }
   
     setIsLoading(true);
