@@ -110,20 +110,20 @@ const SiteTable: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this Site?")){
-    try {
-      const response = await fetch(`http://localhost:8000/site/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete site");
+    if (window.confirm("Are you sure you want to delete this Site?")) {
+      try {
+        const response = await fetch(`http://localhost:8000/site/${id}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to delete site");
+        }
+        setSites((prevSites) => prevSites.filter((site) => site.id !== id));
+        fetchSites(); // Ensure the latest data is fetched after delete
+      } catch (error) {
+        console.error("Error deleting site:", error);
       }
-      setSites((prevSites) => prevSites.filter((site) => site.id !== id));
-      fetchSites(); // Ensure the latest data is fetched after delete
-    } catch (error) {
-      console.error("Error deleting site:", error);
     }
-  }
   };
 
   // Pagination logic
@@ -141,81 +141,84 @@ const SiteTable: React.FC = () => {
 
   return (
     <>
-      <Header />
       <div
         className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition mb-4 md:mb-0"
-          >
+        <button
+  onClick={() => setIsCreateModalOpen(true)}
+  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
+>
             Add Site
           </button>
           <div className="relative mt-4 md:mt-0">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search site..."
-              className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
-            />
-            <FaSearch
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-              size={20}
-            />
-          </div>
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search Sites..."
+    className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
+  />
+  <FaSearch
+    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
+    size={22}
+  />
+</div>
+
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
-  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg lg:ml-0">
-            {" "}
-            <thead className="bg-gray-400">
-              <tr>
-                <th className="border p-2 ">Site</th>
-                <th className="border p-2 ">Customer</th>
-                <th className="border p-2 ">Address</th>
-                <th className="border p-2 ">Contact Name</th>
-                <th className="border p-2 ">Contact Number</th>
-                <th className="border p-2 ">Email</th>
-                <th className="border p-2 ">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((site) => (
-                <tr key={site.id}>
-                  <td className="border p-2 text-center">{site.siteName}</td>
-                  <td className="border p-2 text-center">
-                    {site.customer ? site.customer.customerName : "N/A"}
-                  </td>
-                  <td className="border p-2 text-center">{site.siteAddress}</td>
-                  <td className="border p-2 text-center">{site.contactName}</td>
-                  <td className="border p-2 text-center">
-                    {site.contactNumber}
-                  </td>
-                  <td className="border p-2 text-center">
-                    {site.contactEmail}
-                  </td>
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => setEditingSite(site)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(site.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <div className="overflow-x-auto lg:overflow-hidden">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+    <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+      <tr>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Site</th>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Customer</th>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Address</th>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Name</th>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Number</th>
+        <th className="border px-4 py-3 text-left text-sm font-semibold">Email</th>
+        <th className="border px-4 py-3 text-center text-sm font-semibold">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentItems.map((site, index) => (
+        <tr
+          key={site.id}
+          className={`hover:bg-gray-100 transition-colors ${
+            index % 2 === 0 ? 'bg-gray-50' : ''
+          }`}
+        >
+          <td className="border px-4 py-3 text-sm text-gray-800">{site.siteName}</td>
+          <td className="border px-4 py-3 text-sm text-gray-800">
+            {site.customer ? site.customer.customerName : "N/A"}
+          </td>
+          <td className="border px-4 py-3 text-sm text-gray-800">{site.siteAddress}</td>
+          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactName}</td>
+          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactNumber}</td>
+          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactEmail}</td>
+          <td className="border px-4 py-3 text-center">
+            <button
+              onClick={() => setEditingSite(site)}
+              className="text-blue-500 hover:text-blue-700 transition-colors mx-2"
+              aria-label="Edit site"
+            >
+              <FaEdit />
+            </button>
+            <button
+              onClick={() => handleDelete(site.id)}
+              className="text-red-500 hover:text-red-700 transition-colors mx-2"
+              aria-label="Delete site"
+            >
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4">

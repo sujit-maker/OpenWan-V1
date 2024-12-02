@@ -4,7 +4,6 @@ import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import { useAuth } from "../hooks/useAuth";
-import Header from "../components/Header";
 
 interface Manager {
   id: number;
@@ -171,37 +170,35 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-      <Header />
       <div
         className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500  text-white px-4  py-2 rounded shadow hover:bg-blue-600 transition"
-          >
+        <button
+  onClick={() => setIsCreateModalOpen(true)}
+  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
+>
             Add User
           </button>
           <div className="relative mt-4 md:mt-0">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search users..."
-              className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
-            />
-            <FaSearch
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-              size={20}
-            />
-          </div>
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search Users..."
+    className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
+  />
+  <FaSearch
+    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
+    size={22}
+  />
+</div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-10">
-  {/* Added mobile-scroll */}
-  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg lg:ml-0 ml-5">
-    <thead className="bg-gray-400">
+        <div className="overflow-x-auto lg:overflow-hidden">
+  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+    <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
       <tr>
         <th className="border p-2">Username</th>
         <th className="border p-2">User Type</th>

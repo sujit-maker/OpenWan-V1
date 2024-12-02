@@ -296,150 +296,142 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-semibold mb-6">Create Site</h2>
 
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] backdrop-blur-md">
+  <div className="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-2xl w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto transform transition-transform duration-300 hover:scale-105">
+    <h2 className="text-2xl font-semibold text-white mb-6 text-center">Create Site</h2>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Site Name</label>
-          <input
-            type="text"
-            value={siteName}
-            onChange={(e) => setSiteName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+    {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 shadow-md">{error}</div>}
 
-        {currentUserType === "SUPERADMIN" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Select Admin
-                </label>
-                <select
-                  value={selectedAdminId}
-                  onChange={(e) => {
-                    const newAdminId = e.target.value;
-                    setSelectedAdminId(newAdminId);
-                    setManagerId(""); // Reset managerId when admin is changed
-                    fetchManagers(newAdminId); // Fetch managers for the selected admin
-                  }}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Admin</option>
-                  {admins.map((admin) => (
-                    <option key={admin.id} value={admin.id}>
-                      {admin.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* Manager dropdown displayed only when an Admin is selected */}
-            {(currentUserType === "ADMIN" ||
-              currentUserType === "SUPERADMIN") && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Select Manager
-                </label>
-                <select
-                  value={managerId || ""} // Ensure default empty state or preselected manager
-                  onChange={(e) => setManagerId(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Manager</option>
-                  {managers.map((manager) => (
-                    <option key={manager.id} value={manager.id}>
-                      {manager.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* Site dropdown shown only when Manager is selected */}
-            {(currentUserType === "MANAGER" || managerId) && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Select Customer
-                </label>
-                <select
-                  value={customerId || ""}
-                  onChange={(e) => setCustomerId(Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Customer</option>
-                  {customers.map((site) => (
-                    <option key={site.id} value={site.id}>
-                      {site.customerName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Site Address</label>
-          <textarea
-            value={siteAddress}
-            onChange={(e) => setSiteAddress(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Contact Name</label>
-          <input
-            type="text"
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Contact Number
-          </label>
-          <input
-            type="text"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Contact Email
-          </label>
-          <input
-            type="email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={onClose}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
-          >
-            {isLoading ? <Spinner /> : "Create"}
-          </button>
-        </div>
-      </div>
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-white mb-1">Site Name</label>
+      <input
+        type="text"
+        value={siteName}
+        onChange={(e) => setSiteName(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
     </div>
+
+    {currentUserType === "SUPERADMIN" && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">Select Admin</label>
+        <select
+          value={selectedAdminId}
+          onChange={(e) => {
+            const newAdminId = e.target.value;
+            setSelectedAdminId(newAdminId);
+            setManagerId(""); // Reset managerId when admin is changed
+            fetchManagers(newAdminId); // Fetch managers for the selected admin
+          }}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Admin</option>
+          {admins.map((admin) => (
+            <option key={admin.id} value={admin.id}>
+              {admin.username}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    {(currentUserType === "ADMIN" || currentUserType === "SUPERADMIN") && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">Select Manager</label>
+        <select
+          value={managerId || ""}
+          onChange={(e) => setManagerId(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Manager</option>
+          {managers.map((manager) => (
+            <option key={manager.id} value={manager.id}>
+              {manager.username}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    {(currentUserType === "MANAGER" || managerId) && (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">Select Customer</label>
+        <select
+          value={customerId || ""}
+          onChange={(e) => setCustomerId(Number(e.target.value))}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Customer</option>
+          {customers.map((site) => (
+            <option key={site.id} value={site.id}>
+              {site.customerName}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-white mb-1">Site Address</label>
+      <textarea
+        value={siteAddress}
+        onChange={(e) => setSiteAddress(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-white mb-1">Contact Name</label>
+      <input
+        type="text"
+        value={contactName}
+        onChange={(e) => setContactName(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-white mb-1">Contact Number</label>
+      <input
+        type="text"
+        value={contactNumber}
+        onChange={(e) => setContactNumber(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-white mb-1">Contact Email</label>
+      <input
+        type="email"
+        value={contactEmail}
+        onChange={(e) => setContactEmail(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+
+    <div className="flex justify-end space-x-4 mt-6">
+      <button
+        onClick={onClose}
+        className="bg-gray-600 text-white px-4 py-2 rounded-lg transition-all hover:bg-gray-700"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSubmit}
+        disabled={isLoading}
+        className={`bg-blue-500 text-white px-6 py-2 rounded-lg flex items-center transition-all duration-200 hover:bg-blue-600 ${
+          isLoading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {isLoading ? <Spinner /> : "Create"}
+      </button>
+    </div>
+  </div>
+</div>
+
+
   );
 };
 

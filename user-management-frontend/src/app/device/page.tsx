@@ -7,8 +7,7 @@ export default function TaskPage(){
 
         <>
         
-        <Sidebar/>  
-        <Header/>    
+        <Sidebar/>   
         <DeviceTable/>
         </>
     )

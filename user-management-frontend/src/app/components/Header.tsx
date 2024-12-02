@@ -1,3 +1,4 @@
+//src/app/components/Header.tsx
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,26 +44,27 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-gray-800 text-white p-4 fixed top-0 left-0 w-full z-40">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex-grow" />
-          <FaLock
-            size={20}
-            className="text-white mr-4 cursor-pointer"
-            onClick={() => setIsModalOpen(true)} 
-            aria-label="Change Password"
-          />
-          <button
-            onClick={handleLogout}
-            className=" text-white px-4 py-2 rounded-lg flex items-center hover:bg-red-600 bg-red-500  transition-all"
-            aria-label="Logout"
-            style={{width:"90px",marginRight:"20px"}}
-          >
-            <HiLogout size={24} className="mr-2" />
-            Logout
-          </button>
-        </div>
-      </header>
+      <header className="bg-gray-500 text-white p-4 fixed top-0 left-0 w-full z-10 md:z-20"> {/* Use different z-index for mobile and desktop */}
+  <div className="container mx-auto flex items-center justify-between">
+    <div className="flex-grow" />
+    <FaLock
+      size={20}
+      className="text-white mr-4 cursor-pointer"
+      onClick={() => setIsModalOpen(true)} 
+      aria-label="Change Password"
+    />
+    <button
+      onClick={handleLogout}
+      className="text-white px-4 py-2 rounded-lg flex items-center hover:bg-red-600 bg-red-500  transition-all"
+      aria-label="Logout"
+      style={{width:"80px",marginRight:"20px"}}
+    >
+      <HiLogout size={24} className="mr-2" />
+      Logout
+    </button>
+  </div>
+</header>
+
 
       {isModalOpen && (
        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">

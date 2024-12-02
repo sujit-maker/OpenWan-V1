@@ -137,162 +137,164 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
-      <Dialog
-        as="div"
-        onClose={onClose}
-        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
-        aria-labelledby="create-user-title"
-        aria-describedby="create-user-description"
-      >
-        <Dialog.Panel className="max-w-sm w-full bg-white rounded-lg shadow-lg p-6">
-          <Dialog.Title className="text-xl font-semibold mb-4">
-            Create User
-          </Dialog.Title>
-          {error && (
-            <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
-              {error}
-            </div>
+    <Dialog
+      as="div"
+      onClose={onClose}
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999] backdrop-blur-md"
+      aria-labelledby="create-user-title"
+      aria-describedby="create-user-description"
+    >
+      <Dialog.Panel className="max-w-sm w-full bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-lg shadow-2xl p-6 transform transition-transform duration-300 hover:scale-105">
+        <Dialog.Title className="text-2xl font-semibold text-white mb-6 text-center">
+          Create User
+        </Dialog.Title>
+  
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 shadow-md">{error}</div>
+        )}
+  
+        {success && (
+          <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 shadow-md">{success}</div>
+        )}
+  
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-white mb-1">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+          </div>
+  
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+          </div>
+  
+          <div className="mb-4">
+            <label htmlFor="usertype" className="block text-sm font-medium text-white mb-1">
+              User Type
+            </label>
+            <select
+              id="usertype"
+              value={usertype}
+              onChange={(e) => {
+                setUsertype(e.target.value);
+                // Reset selections when user type changes
+                setSelectedAdminId(null);
+                setSelectedManagerId(null);
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            >
+              <option value="ADMIN">Admin</option>
+              <option value="MANAGER">Manager</option>
+              <option value="EXECUTIVE">Executive</option>
+            </select>
+          </div>
+  
+          {usertype === "EXECUTIVE" && (
+            <>
+              {/* Admin Dropdown for Executives */}
+              <div className="mb-4">
+                <label htmlFor="admin" className="block text-sm font-medium text-white mb-1">
+                  Select Admin
+                </label>
+                <select
+                  id="admin"
+                  value={selectedAdminId || ""}
+                  onChange={(e) => setSelectedAdminId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">--Select Admin--</option>
+                  {admins.map((admin) => (
+                    <option key={admin.id} value={admin.id}>
+                      {admin.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+  
+              {/* Manager Dropdown for Executives */}
+              <div className="mb-4">
+                <label htmlFor="manager" className="block text-sm font-medium text-white mb-1">
+                  Select Manager
+                </label>
+                <select
+                  id="manager"
+                  value={selectedManagerId || ""}
+                  onChange={(e) => setSelectedManagerId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">--Select Manager--</option>
+                  {managers.map((manager) => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
           )}
-          {success && (
-            <div className="bg-green-100 text-green-700 p-2 rounded mb-4">
-              {success}
-            </div>
+  
+          {usertype === "MANAGER" && (
+            <>
+              {/* Admin Dropdown for Managers */}
+              <div className="mb-4">
+                <label htmlFor="admin" className="block text-sm font-medium text-white mb-1">
+                  Select Admin
+                </label>
+                <select
+                  id="admin"
+                  value={selectedAdminId || ""}
+                  onChange={(e) => setSelectedAdminId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">--Select Admin--</option>
+                  {admins.map((admin) => (
+                    <option key={admin.id} value={admin.id}>
+                      {admin.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
           )}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full border rounded p-2 mt-1"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full border rounded p-2 mt-1"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="usertype" className="block text-gray-700">
-                User Type
-              </label>
-              <select
-                id="usertype"
-                value={usertype}
-                onChange={(e) => {
-                  setUsertype(e.target.value);
-                  // Reset selections when user type changes
-                  setSelectedAdminId(null);
-                  setSelectedManagerId(null);
-                }}
-                className="w-full border rounded p-2 mt-1"
-              >
-                <option value="ADMIN">Admin</option>
-                <option value="MANAGER">Manager</option>
-                <option value="EXECUTIVE">Executive</option>
-              </select>
-            </div>
-
-            {usertype === "EXECUTIVE" && (
-              <>
-                {/* Admin Dropdown */}
-                <div className="mb-4">
-                  <label htmlFor="admin" className="block text-gray-700">
-                    Select Admin
-                  </label>
-                  <select
-                    id="admin"
-                    value={selectedAdminId || ""}
-                    onChange={(e) => setSelectedAdminId(Number(e.target.value))}
-                    className="w-full border rounded p-2 mt-1"
-                  >
-                    <option value="">--Select Admin--</option>
-                    {admins.map((admin) => (
-                      <option key={admin.id} value={admin.id}>
-                        {admin.username}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Manager Dropdown */}
-                <div className="mb-4">
-                  <label htmlFor="manager" className="block text-gray-700">
-                    Select Manager
-                  </label>
-                  <select
-                    id="manager"
-                    value={selectedManagerId || ""}
-                    onChange={(e) =>
-                      setSelectedManagerId(Number(e.target.value))
-                    }
-                    className="w-full border rounded p-2 mt-1"
-                  >
-                    <option value="">--Select Manager--</option>
-                    {managers.map((manager) => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.username}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
-
-            {usertype === "MANAGER" && (
-              <>
-                {/* Admin Dropdown for Managers */}
-                <div className="mb-4">
-                  <label htmlFor="admin" className="block text-gray-700">
-                    Select Admin
-                  </label>
-                  <select
-                    id="admin"
-                    value={selectedAdminId || ""}
-                    onChange={(e) => setSelectedAdminId(Number(e.target.value))}
-                    className="w-full border rounded p-2 mt-1"
-                  >
-                    <option value="">--Select Admin--</option>
-                    {admins.map((admin) => (
-                      <option key={admin.id} value={admin.id}>
-                        {admin.username}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
-
+  
+          <div className="flex justify-end space-x-4 mt-6">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg flex items-center transition-all duration-200 hover:bg-blue-600"
             >
               Create User
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="ml-4 bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
+              className="ml-4 bg-gray-500 text-white px-6 py-2 rounded-lg transition-all duration-200 hover:bg-gray-600"
             >
               Cancel
             </button>
-          </form>
-        </Dialog.Panel>
-      </Dialog>
-    </Transition>
+          </div>
+        </form>
+      </Dialog.Panel>
+    </Dialog>
+  </Transition>
+  
   );
 };
 

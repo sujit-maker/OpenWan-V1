@@ -37,7 +37,6 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   useEffect(() => {
     if (userType === "ADMIN" && loggedInAdminId) {
       setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
-
     }
   }, [userType, loggedInAdminId]);
 
@@ -52,9 +51,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
     // Fetch all admins (if needed for superadmin users)
     const fetchAdmins = async () => {
       try {
-        const adminResponse = await fetch(
-          "http://localhost:8000/users/admins"
-        );
+        const adminResponse = await fetch("http://localhost:8000/users/admins");
         const adminData: User[] = await adminResponse.json();
         setAdmins(adminData);
       } catch (error) {
@@ -72,7 +69,9 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
     if (userType === "MANAGER" && loggedInManagerId) {
       const fetchAdminIdForManager = async () => {
         try {
-          const response = await fetch(`http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`);
+          const response = await fetch(
+            `http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`
+          );
           const data = await response.json();
           setAdminId(data[0]?.id || ""); // Assuming the API returns an array with the admin data
         } catch (error) {
@@ -83,7 +82,6 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       fetchAdminIdForManager();
     }
   }, [loggedInManagerId, userType]);
-
 
   // Fetch managers associated with a specific adminId
   useEffect(() => {
@@ -128,7 +126,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       contactName,
       contactNumber,
       email,
-      adminId: Number(adminId), 
+      adminId: Number(adminId),
       managerId: Number(managerId),
     };
 
@@ -141,7 +139,6 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
       customerData.managerId = Number(managerId); // Ensure managerId is a number
     }
 
-
     try {
       // POST request to the backend to create the customer
       const response = await fetch("http://localhost:8000/customers", {
@@ -149,7 +146,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(customerData), 
+        body: JSON.stringify(customerData),
       });
 
       if (!response.ok) {
@@ -170,139 +167,137 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md sm:w-96 overflow-y-auto max-h-[80vh]">
-        <h2 className="text-lg font-semibold mb-4 text-center">
-          Add New Customer
-        </h2>
-
-        {/* Customer details */}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] backdrop-blur-md"> {/* Added backdrop-blur-md for blur effect */}
+    <div className="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-2xl w-full max-w-md sm:w-96 overflow-y-auto max-h-[80vh] transform transition-transform duration-300 hover:scale-105">
+      <h2 className="text-2xl font-semibold text-white mb-4 text-center">
+        Add New Customer
+      </h2>
+  
+      {/* Customer details */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">
+          Customer Name
+        </label>
+        <input
+          type="text"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      {/* Admin Dropdown */}
+      {userType !== "ADMIN" && userType !== "MANAGER" && (
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Customer Name
+          <label className="block text-sm font-medium text-white mb-1">
+            Select Admin
           </label>
-          <input
-            type="text"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-          {/* Admin Dropdown */}
-          {userType !== "ADMIN" && userType !== "MANAGER" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Admin
-            </label>
-            <select
-              value={adminId}
-              onChange={(e) => setAdminId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="">--Select Admin--</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id}>
-                  {admin.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Manager Dropdown (Visible for ADMIN and other userTypes when adminId is set) */}
-        {adminId && userType !== "MANAGER" && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Select Manager
-            </label>
-            <select
-              value={managerId}
-              onChange={(e) => setManagerId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="">--Select Manager--</option>
-              {managers.map((manager) => (
-                <option key={manager.id} value={manager.id}>
-                  {manager.username}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Customer Address
-          </label>
-          <textarea
-            value={customerAddress}
-            onChange={(e) => setCustomerAddress(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">GST Number</label>
-          <input
-            type="text"
-            value={gstNumber}
-            onChange={(e) => setGstNumber(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Contact Name</label>
-          <input
-            type="text"
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Contact Number
-          </label>
-          <input
-            type="text"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
-
-       
-
-      
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+          <select
+            value={adminId}
+            onChange={(e) => setAdminId(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-          >
-            Save Customer
-          </button>
+            <option value="">--Select Admin--</option>
+            {admins.map((admin) => (
+              <option key={admin.id} value={admin.id}>
+                {admin.username}
+              </option>
+            ))}
+          </select>
         </div>
+      )}
+  
+      {/* Manager Dropdown */}
+      {adminId && userType !== "MANAGER" && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white mb-1">
+            Select Manager
+          </label>
+          <select
+            value={managerId}
+            onChange={(e) => setManagerId(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          >
+            <option value="">--Select Manager--</option>
+            {managers.map((manager) => (
+              <option key={manager.id} value={manager.id}>
+                {manager.username}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+  
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">
+          Customer Address
+        </label>
+        <textarea
+          value={customerAddress}
+          onChange={(e) => setCustomerAddress(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">GST Number</label>
+        <input
+          type="text"
+          value={gstNumber}
+          onChange={(e) => setGstNumber(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">Contact Name</label>
+        <input
+          type="text"
+          value={contactName}
+          onChange={(e) => setContactName(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">
+          Contact Number
+        </label>
+        <input
+          type="text"
+          value={contactNumber}
+          onChange={(e) => setContactNumber(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-1">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
+      </div>
+  
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={onClose}
+          className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg transition-all duration-200 hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg transition-all duration-200 hover:bg-blue-700"
+        >
+          Save Customer
+        </button>
       </div>
     </div>
+  </div>
+  
   );
 };
 

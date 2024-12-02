@@ -26,7 +26,7 @@ const UserTable: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10;
+  const usersPerPage = 5;
 
   useEffect(() => {
     fetchUsers();
@@ -140,7 +140,7 @@ const UserTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
           >
             Add User
           </button>
@@ -150,54 +150,67 @@ const UserTable: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search users..."
-              className="pl-8 pr-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 md:w-64"
+              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
             />
             <FaSearch
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-              size={20}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
+              size={22}
             />
           </div>
         </div>
-        <div className="overflow-x-auto lg:overflow-hidden lg:-ml-10 ml-14">
-  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-    <thead className="bg-gray-400">
-      <tr>
-        <th className="border p-1">Username</th>
-        <th className="border p-1">User Type</th>
-        <th className="border p-1">Manager Name</th>
-        <th className="border p-1">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentUsers.map((user) => (
-        <tr key={user.id}>
-          <td className="border p-1 text-center">{user.username}</td>
-          <td className="border p-1 text-center">{user.usertype}</td>
-          <td className="border p-1 text-center">
-            {user.usertype === "EXECUTIVE"
-              ? getManagerName(user.managerId)
-              : "N/A"}
-          </td>
-          <td className="border p-1 text-center">
+        <div className="overflow-x-auto lg:overflow-hidden">
+        <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+  {/* Table Header */}
+  <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+    <tr>
+      <th className="border px-6 py-3 text-left text-sm font-semibold">Username</th>
+      <th className="border px-6 py-3 text-left text-sm font-semibold">User Type</th>
+      <th className="border px-6 py-3 text-left text-sm font-semibold">Manager Name</th>
+      <th className="border px-6 py-3 text-center text-sm font-semibold">Actions</th>
+    </tr>
+  </thead>
+
+  {/* Table Body */}
+  <tbody>
+    {currentUsers.map((user, index) => (
+      <tr
+        key={user.id}
+        className={`hover:bg-gray-100 transition-colors duration-300 ease-in-out ${
+          index % 2 === 0 ? "bg-gray-50" : ""
+        }`}
+      >
+        <td className="border px-6 py-3 text-sm text-gray-800">{user.username}</td>
+        <td className="border px-6 py-3 text-sm text-gray-800">{user.usertype}</td>
+        <td className="border px-6 py-3 text-sm text-gray-800">
+          {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
+        </td>
+        <td className="border px-6 py-3 text-center">
+          <div className="flex justify-center space-x-4">
+            {/* Edit Button */}
             <button
               onClick={() => handleEdit(user)}
-              className="text-blue-500 hover:text-blue-700 mr-2"
+              className="text-blue-500 hover:text-blue-700 transition-colors duration-300 p-2 rounded-full hover:bg-blue-100"
+              aria-label="Edit user"
             >
-              <FaEdit />
+              <FaEdit size={18} />
             </button>
+
+            {/* Delete Button */}
             <button
               onClick={() => handleDelete(user.id, user.username)}
-              className="text-red-500 hover:text-red-700"
+              className="text-red-500 hover:text-red-700 transition-colors duration-300 p-2 rounded-full hover:bg-red-100"
+              aria-label="Delete user"
             >
-              <FaTrash />
+              <FaTrash size={18} />
             </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
+        </div>
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4 space-x-2">

@@ -124,126 +124,131 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
-      <Dialog
-        as="div"
-        onClose={onClose}
-        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
-        aria-labelledby="create-user-title"
-        aria-describedby="create-user-description"
-      >
-        <Dialog.Panel className="max-w-sm w-full bg-white rounded-lg shadow-lg p-6">
-          <Dialog.Title
-            id="create-user-title"
-            className="text-xl font-semibold mb-4"
+    <Dialog
+      as="div"
+      onClose={onClose}
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999]"
+      aria-labelledby="create-user-title"
+      aria-describedby="create-user-description"
+    >
+      <Dialog.Panel className="max-w-sm w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-2xl p-6 transition-transform transform scale-95 hover:scale-100 duration-300">
+        <Dialog.Title
+          id="create-user-title"
+          className="text-2xl font-bold text-white mb-4 text-center"
+        >
+          Create User
+        </Dialog.Title>
+        {error && (
+          <div
+            className="bg-red-100 text-red-700 p-3 rounded-lg shadow-lg mb-4"
+            role="alert"
+            aria-live="assertive"
           >
-            Create User
-          </Dialog.Title>
-          {error && (
-            <div
-              className="bg-red-100 text-red-700 p-2 rounded mb-4"
-              role="alert"
-              aria-live="assertive"
+            {error}
+          </div>
+        )}
+        {success && (
+          <div
+            className="bg-green-100 text-green-700 p-3 rounded-lg shadow-lg mb-4"
+            role="alert"
+            aria-live="assertive"
+          >
+            {success}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-gray-100 font-semibold">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full border border-transparent rounded-lg p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-gray-100 font-semibold">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="password"
+              required
+              className="w-full border border-transparent rounded-lg p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="usertype" className="block text-gray-100 font-semibold">
+              User Type
+            </label>
+            <select
+              id="usertype"
+              value={usertype}
+              onChange={(e) => setUsertype(e.target.value)}
+              className="w-full border border-transparent rounded-lg p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              {error}
-            </div>
-          )}
-          {success && (
-            <div
-              className="bg-green-100 text-green-700 p-2 rounded mb-4"
-              role="alert"
-              aria-live="assertive"
-            >
-              {success}
-            </div>
-          )}
-          <form onSubmit={handleSubmit}>
+              {userTypeOptions.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+          {usertype === "EXECUTIVE" && (
             <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full border rounded p-2 mt-1"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="password"
-                required
-                className="w-full border rounded p-2 mt-1"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="usertype" className="block text-gray-700">
-                User Type
+              <label htmlFor="manager" className="block text-gray-100 font-semibold">
+                Select Manager
               </label>
               <select
-                id="usertype"
-                value={usertype}
-                onChange={(e) => setUsertype(e.target.value)}
-                className="w-full border rounded p-2 mt-1"
+                id="manager"
+                value={selectedManagerId || ""}
+                onChange={handleManagerSelection}
+                className="w-full border border-transparent rounded-lg p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+                required
               >
-                {userTypeOptions.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
+                <option value="">--Select Manager--</option>
+                {managers.map((manager) => (
+                  <option key={manager.id} value={manager.id}>
+                    {manager.username}
                   </option>
                 ))}
               </select>
             </div>
-            {usertype === "EXECUTIVE" && (
-              <div className="mb-4">
-                <label htmlFor="manager" className="block text-gray-700">
-                  Select Manager
-                </label>
-                <select
-                  id="manager"
-                  value={selectedManagerId || ""}
-                  onChange={handleManagerSelection}
-                  className="w-full border rounded p-2 mt-1"
-                  required
-                >
-                  <option value="">--Select Manager--</option>
-                  {managers.map((manager) => (
-                    <option key={manager.id} value={manager.id}>
-                      {manager.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={onClose}
-                className="mr-2 bg-gray-300 text-black rounded px-4 py-2"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className={`bg-blue-500 text-white rounded px-4 py-2 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating..." : "Create User"}
-              </button>
-            </div>
-          </form>
-        </Dialog.Panel>
-      </Dialog>
-    </Transition>
+          )}
+          <div className="flex justify-end mt-6 space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-300 text-black rounded px-6 py-3 hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`bg-blue-600 text-white rounded px-6 py-3 hover:bg-blue-700 transition-all ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="animate-spin mx-auto w-5 h-5 border-4 border-t-4 border-blue-600 rounded-full"></div>
+              ) : (
+                "Create User"
+              )}
+            </button>
+          </div>
+        </form>
+      </Dialog.Panel>
+    </Dialog>
+  </Transition>
+  
   );
 };
 
