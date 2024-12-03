@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import {  FaSearch, FaEllipsisV } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 
@@ -24,6 +24,8 @@ const UserTable: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
@@ -103,6 +105,25 @@ const UserTable: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
+  useEffect(() => {
+    // Add event listener when the component mounts
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setDropdownVisible(null); // Close dropdown if clicked outside
+    }
+  };
+
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setSelectedUser(null);
@@ -140,76 +161,100 @@ const UserTable: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
-          >
+            className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
+        style={{marginTop:"-45px"}}  >
             Add User
           </button>
-          <div className="relative mt-4 md:mt-0">
+          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search users..."
               className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
-            />
+               />
             <FaSearch
               className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
               size={22}
             />
           </div>
         </div>
-        <div className="overflow-x-auto lg:overflow-hidden">
-        <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-  {/* Table Header */}
-  <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
-    <tr>
-      <th className="border px-6 py-3 text-left text-sm font-semibold">Username</th>
-      <th className="border px-6 py-3 text-left text-sm font-semibold">User Type</th>
-      <th className="border px-6 py-3 text-left text-sm font-semibold">Manager Name</th>
-      <th className="border px-6 py-3 text-center text-sm font-semibold">Actions</th>
-    </tr>
-  </thead>
+        <div className="overflow-x-auto lg:overflow-visible">
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+            {/* Table Header */}
+            <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+              <tr>
+                <th className="border px-6 py-3 text-left text-sm font-semibold">
+                  Username
+                </th>
+                <th className="border px-6 py-3 text-left text-sm font-semibold">
+                  User Type
+                </th>
+                <th className="border px-6 py-3 text-left text-sm font-semibold">
+                  Manager
+                </th>
+                <th className="border px-6 py-3 text-center text-sm font-semibold">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-  {/* Table Body */}
-  <tbody>
-    {currentUsers.map((user, index) => (
-      <tr
-        key={user.id}
-        className={`hover:bg-gray-100 transition-colors duration-300 ease-in-out ${
-          index % 2 === 0 ? "bg-gray-50" : ""
-        }`}
-      >
-        <td className="border px-6 py-3 text-sm text-gray-800">{user.username}</td>
-        <td className="border px-6 py-3 text-sm text-gray-800">{user.usertype}</td>
-        <td className="border px-6 py-3 text-sm text-gray-800">
-          {user.usertype === "EXECUTIVE" ? getManagerName(user.managerId) : "N/A"}
-        </td>
-        <td className="border px-6 py-3 text-center">
-          <div className="flex justify-center space-x-4">
-            {/* Edit Button */}
-            <button
-              onClick={() => handleEdit(user)}
-              className="text-blue-500 hover:text-blue-700 transition-colors duration-300 p-2 rounded-full hover:bg-blue-100"
-              aria-label="Edit user"
-            >
-              <FaEdit size={18} />
-            </button>
-
-            {/* Delete Button */}
-            <button
-              onClick={() => handleDelete(user.id, user.username)}
-              className="text-red-500 hover:text-red-700 transition-colors duration-300 p-2 rounded-full hover:bg-red-100"
-              aria-label="Delete user"
-            >
-              <FaTrash size={18} />
-            </button>
-          </div>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
+            {/* Table Body */}
+            <tbody>
+              {currentUsers.map((user, index) => (
+                <tr
+                  key={user.id}
+                  className={`hover:bg-gray-100 transition-colors duration-300 ease-in-out ${
+                    index % 2 === 0 ? "bg-gray-50" : ""
+                  }`}
+                >
+                  <td className="border px-6 py-3 text-sm text-gray-800">
+                    {user.username}
+                  </td>
+                  <td className="border px-6 py-3 text-sm text-gray-800">
+                    {user.usertype}
+                  </td>
+                  <td className="border px-6 py-3 text-sm text-gray-800">
+                    {user.usertype === "EXECUTIVE"
+                      ? getManagerName(user.managerId)
+                      : "N/A"}
+                  </td>
+                  <td className="border p-3 relative flex justify-center items-center">
+                  <FaEllipsisV
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() =>
+                        setDropdownVisible(
+                          dropdownVisible === user.id ? null : user.id
+                        )
+                      }
+                    />
+                    {dropdownVisible === user.id && (
+                      <div
+                        ref={dropdownRef} 
+                        className="absolute w-28 z-50 right-0 mt-2  bg-white border border-gray-300 rounded-lg shadow-md "
+                        style={{ top: "-40px", left: "-20px" }}
+                      >
+                        <ul>
+                          <li
+                            onClick={() => handleEdit(user)}
+                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => handleDelete(user.id, user.username)}
+                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Delete
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination controls */}

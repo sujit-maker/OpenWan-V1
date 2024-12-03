@@ -1,10 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import {  FaSearch, FaEllipsisV } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import { useAuth } from "../hooks/useAuth";
-import Header from "../components/Header";
 
 interface Manager {
   id: number;
@@ -26,6 +25,8 @@ const UserTable: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { managerId } = useAuth();
   // Pagination state
@@ -106,6 +107,25 @@ const UserTable: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    // Add event listener when the component mounts
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setDropdownVisible(null); // Close dropdown if clicked outside
+    }
+  };
+
   const handleEdit = (user: User) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);
@@ -141,37 +161,35 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-
       <div
         className="container mx-auto px-8 py-6 lg:pl-72"
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-        <button
-  onClick={() => setIsCreateModalOpen(true)}
-  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
->
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
+        style={{marginTop:"-45px"}}  >
             Add User
           </button>
-          <div className="relative mt-4 md:mt-0">
-  <input
-    type="text"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    placeholder="Search users..."
-    className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
-  />
-  <FaSearch
-    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
-    size={22}
-  />
-</div>
-
+          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search users..."
+              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
+            />
+            <FaSearch
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
+              size={22}
+            />
+          </div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden">
-  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-    <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+        <div className="overflow-x-auto lg:overflow-visible">
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
+            <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
               <tr>
                 <th className="border p-1 ">Username</th>
                 <th className="border p-1 ">User Type</th>
@@ -183,19 +201,37 @@ const UserTable: React.FC = () => {
                 <tr key={user.id}>
                   <td className="border p-2 text-center">{user.username}</td>
                   <td className="border p-2 text-center">{user.usertype}</td>
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id, user.username)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
+                  <td className="border p-1 text-center relative">
+                    <FaEllipsisV
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() =>
+                        setDropdownVisible(
+                          dropdownVisible === user.id ? null : user.id
+                        )
+                      }
+                    />
+                    {dropdownVisible === user.id && (
+                      <div
+                        ref={dropdownRef} // Attach ref here
+                        className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
+                        style={{ top: "-40px", left: "-20px" }}
+                      >
+                        <ul>
+                          <li
+                            onClick={() => handleEdit(user)}
+                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => handleDelete(user.id, user.username)}
+                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Delete
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

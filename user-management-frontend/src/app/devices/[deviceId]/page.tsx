@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Header from "@/app/components/Header";
 import Sidebar from "@/app/components/Sidebar";
 import { FaDownload, FaSpinner } from "react-icons/fa";
 import * as XLSX from "xlsx";
@@ -254,14 +253,13 @@ const DeviceDetails: React.FC = () => {
 
   return (
     <>
-      <Header />
       <Sidebar />
-      <div className="mx-auto px-24 py-24 ">
+      <div className="mx-auto px-24 py-24  ">
         <div className="flex mx-6 my-0 justify-end">
           <button
             onClick={backme}
-            className="bg-red-600 p-2 w-15 text-white rounded-md"
-          >
+            className="bg-red-600  p-2 w-15 text-white rounded-md"
+         style={{marginTop:"-30px"}} >
             Back
           </button>
         </div>
@@ -385,7 +383,7 @@ const DeviceDetails: React.FC = () => {
             </div>
 
             {isTableVisible && (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse border min-w-max">
                   <thead className="bg-gray-400">
                     <tr>

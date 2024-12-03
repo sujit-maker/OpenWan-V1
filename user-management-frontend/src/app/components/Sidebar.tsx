@@ -2,20 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Bell,
   Home,
   LineChart,
   Menu,
   Package,
-  ShoppingCart,
   Users,
 } from "lucide-react";
-import Link from "next/link";
-import { FaLock, FaSpinner } from "react-icons/fa";
+import { FaLock} from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
-import { DeviceHub, DeviceUnknown } from "@mui/icons-material";
+import { DeviceUnknown } from "@mui/icons-material";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -37,14 +34,21 @@ const Sidebar: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
+    // Close the sidebar every time a link is clicked
+    setIsSidebarOpen(false);
+  
+    // If the clicked link is the same as the current path, don't trigger loading or navigation
     if (currentPath === path) return;
-
-    setLoadingState(true); // Set loading state to true when navigating
+  
+    // Set loading state to true if navigating to a different page
+    setLoadingState(true);
+  
+    // Wait 200ms before redirecting to allow sidebar close animation
     setTimeout(() => {
       router.push(path);
     }, 200); // Wait 200ms before redirecting
   };
-
+  
   const getManageUsersLink = () => {
     if (!currentUserType) return "";
 
@@ -168,12 +172,7 @@ const Sidebar: React.FC = () => {
         {loadingState && (
           <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
             <div className="relative flex justify-center items-center">
-              <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-purple-500"></div>
-              <img
-                src="https://www.svgrepo.com/show/509001/avatar-thinking-9.svg"
-                className="rounded-full h-28 w-28"
-                alt="Thinking Avatar"
-              />
+              <div className="absolute animate-spin  rounded-full h-32 w-32 border-t-4 border-b-4 border-purple-500"></div>
             </div>
           </div>
         )}
@@ -193,11 +192,11 @@ const Sidebar: React.FC = () => {
               onClick={() => setIsModalOpen(true)}
               aria-label="Change Password"
             />
-            <button
+           <button
               onClick={handleLogout}
               className="text-white px-4 py-2 rounded-lg flex items-center hover:bg-red-600 bg-red-500 transition-all"
               aria-label="Logout"
-              style={{ width: "80px", marginRight: "20px" }}
+              style={{ width: "100px", marginRight: "20px" }}
             >
               <HiLogout size={24} className="mr-2" />
               Logout
@@ -267,7 +266,7 @@ const Sidebar: React.FC = () => {
                 }`}
               >
                 <Users className="h-6 w-6 text-purple-600" />
-                {isSidebarOpen && <span className="text-lg">Manage Users</span>}
+                {isSidebarOpen && <span className="text-lg">User Management</span>}
               </button>
 
               <button
@@ -297,7 +296,7 @@ const Sidebar: React.FC = () => {
                 }`}
               >
                 <DeviceUnknown className="h-6 w-6 text-pink-600" />
-                {isSidebarOpen && <span className="text-lg">Gateway</span>}
+                {isSidebarOpen && <span className="text-lg">Device</span>}
               </button>
             </nav>
           </div>

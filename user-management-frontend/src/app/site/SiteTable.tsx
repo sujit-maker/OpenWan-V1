@@ -1,11 +1,10 @@
 // SiteTable.tsx
 "use client";
-import React, { useState, useEffect } from "react";
-import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { FaSearch, FaEllipsisV } from "react-icons/fa";
 import CreateSiteModal from "./CreateSiteModal";
 import EditSiteModal from "./EditSiteModal";
 import { Customer, Site } from "./types";
-import Header from "../components/Header";
 import { useAuth } from "../hooks/useAuth";
 
 const SiteTable: React.FC = () => {
@@ -17,7 +16,11 @@ const SiteTable: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const { currentUserType, userId, managerId, adminId } = useAuth();
+  const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,12 +104,41 @@ const SiteTable: React.FC = () => {
     fetchSites(); // Ensure the latest data is fetched after creation
   };
 
+  const handleEdit = (site: Site) => {
+    setEditingSite(site); // Correctly sets the editing site
+    setIsEditModalOpen(true); // Optional, if you want an explicit toggle
+  };
+  
+
   const handleSiteUpdated = (updatedSite: Site) => {
     setSites((prevSites) =>
       prevSites.map((site) => (site.id === updatedSite.id ? updatedSite : site))
     );
     setEditingSite(null); // Close the edit modal
     fetchSites(); // Ensure the latest data is fetched after update
+  };
+
+  useEffect(() => {
+    // Add event listener when the component mounts
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setDropdownVisible(null); // Close dropdown if clicked outside
+    }
+  };
+
+  const handleDropdownToggle = (siteId: number) => {
+    setDropdownVisible((prev) => (prev === siteId ? null : siteId)); // Toggle visibility based on siteId
   };
 
   const handleDelete = async (id: number) => {
@@ -139,6 +171,9 @@ const SiteTable: React.FC = () => {
     }
   };
 
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <>
       <div
@@ -146,79 +181,96 @@ const SiteTable: React.FC = () => {
         style={{ marginTop: 80 }}
       >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-        <button
-  onClick={() => setIsCreateModalOpen(true)}
-  className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
->
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
+            style={{marginTop:"-45px"}}  >
             Add Site
           </button>
-          <div className="relative mt-4 md:mt-0">
-  <input
-    type="text"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    placeholder="Search Sites..."
-    className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
-  />
-  <FaSearch
-    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
-    size={22}
-  />
-</div>
-
+          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search Sites..."
+              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
+            />
+            <FaSearch
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
+              size={22}
+            />
+          </div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-hidden">
-  <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-    <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
-      <tr>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Site</th>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Customer</th>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Address</th>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Name</th>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Number</th>
-        <th className="border px-4 py-3 text-left text-sm font-semibold">Email</th>
-        <th className="border px-4 py-3 text-center text-sm font-semibold">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentItems.map((site, index) => (
-        <tr
-          key={site.id}
-          className={`hover:bg-gray-100 transition-colors ${
-            index % 2 === 0 ? 'bg-gray-50' : ''
-          }`}
-        >
-          <td className="border px-4 py-3 text-sm text-gray-800">{site.siteName}</td>
-          <td className="border px-4 py-3 text-sm text-gray-800">
-            {site.customer ? site.customer.customerName : "N/A"}
-          </td>
-          <td className="border px-4 py-3 text-sm text-gray-800">{site.siteAddress}</td>
-          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactName}</td>
-          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactNumber}</td>
-          <td className="border px-4 py-3 text-sm text-gray-800">{site.contactEmail}</td>
-          <td className="border px-4 py-3 text-center">
-            <button
-              onClick={() => setEditingSite(site)}
-              className="text-blue-500 hover:text-blue-700 transition-colors mx-2"
-              aria-label="Edit site"
-            >
-              <FaEdit />
-            </button>
-            <button
-              onClick={() => handleDelete(site.id)}
-              className="text-red-500 hover:text-red-700 transition-colors mx-2"
-              aria-label="Delete site"
-            >
-              <FaTrash />
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+        <div className="overflow-x-auto lg:overflow-visible">
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
+            <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white ">
+              <tr>
+              <th className="border px-6 py-3 text-center text-sm font-semibold">
+              Id
+                </th>
+                <th className="border px-6 py-3 text-center text-sm font-semibold">
+                  Site
+                </th>
+                <th className="border px-6 py-3 text-center text-sm font-semibold">
+                  Customer
+                </th>
+                <th className="border px-6 py-3 text-center text-sm font-semibold">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((site, index) => (
+                <tr
+                  key={site.id}
+                  className={`hover:bg-gray-100 transition-colors ${
+                    index % 2 === 0 ? "bg-gray-50" : ""
+                  }`}
+                >
+                  <td className="border px-4 py-3 text-center text-sm">
+                    {site.id}
+                  </td>
+                  <td className="border px-4 py-3 text-center text-sm text-gray-800">
+                    {site.siteName}
+                  </td>
+                  <td className="border px-4 py-3 text-center text-sm text-gray-800">
+                    {site.customer ? site.customer.customerName : "N/A"}
+                  </td>
 
+                  <td className="border p-3 relative flex justify-center  items-center">
+                  <FaEllipsisV
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() => handleDropdownToggle(site.id)}
+                    />
+                    {dropdownVisible === site.id && (
+                      <div
+                        ref={dropdownRef} // Attach ref here
+                        className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
+                        style={{ top: "-40px", left: "-20px" }}
+                      >
+                        <ul>
+                          <li
+                            onClick={() => handleEdit(site)}
+                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => handleDelete(site.id)}
+                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
+                          >
+                            Delete
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4">

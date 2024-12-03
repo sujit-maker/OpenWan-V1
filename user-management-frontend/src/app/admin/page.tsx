@@ -5,10 +5,9 @@ import UserTable from "./UserTable";
 export default function AdminPage() {
   return (
     <>
-    <div>
       <Sidebar/>
        <UserTable/>
-    </div>
+  
     </>
   );
 }

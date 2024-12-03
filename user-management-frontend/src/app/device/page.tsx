@@ -5,8 +5,7 @@ import DeviceTable from "./DeviceTable";
 export default function TaskPage(){
     return (
 
-        <>
-        
+        <>     
         <Sidebar/>   
         <DeviceTable/>
         </>
