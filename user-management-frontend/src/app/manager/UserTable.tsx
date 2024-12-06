@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import {  FaSearch, FaEllipsisV } from "react-icons/fa";
+import { FaSearch, FaEllipsisV } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import { useAuth } from "../hooks/useAuth";
@@ -161,18 +161,23 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-      <div
-        className="container mx-auto px-8 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
+<div
+  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+  style={{
+    marginTop: 80,
+    marginLeft:"-150px",
+    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+  }}
+>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
-        style={{marginTop:"-45px"}}  >
+            style={{ marginTop: "-45px" }}
+          >
             Add User
           </button>
-          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
+          <div className="relative mt-4 md:mt-0 " style={{ marginTop: "-5px" }}>
             <input
               type="text"
               value={searchQuery}
@@ -187,7 +192,7 @@ const UserTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto lg:overflow-visible">
+        <div className="lg:overflow-visible">
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
             <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
               <tr>
@@ -201,7 +206,7 @@ const UserTable: React.FC = () => {
                 <tr key={user.id}>
                   <td className="border p-2 text-center">{user.username}</td>
                   <td className="border p-2 text-center">{user.usertype}</td>
-                  <td className="border p-1 text-center relative">
+                  <td className="border p-3 relative flex justify-center items-center">
                     <FaEllipsisV
                       className="text-gray-500 cursor-pointer"
                       onClick={() =>

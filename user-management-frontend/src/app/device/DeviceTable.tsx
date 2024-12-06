@@ -181,10 +181,14 @@ const DeviceTable: React.FC = () => {
 
   return (
     <>
-      <div
-        className="container mx-auto px-8 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
+<div
+  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+  style={{
+    marginTop: 80,
+    marginLeft:"-150px",
+    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+  }}
+>
         {" "}
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
@@ -242,27 +246,27 @@ const DeviceTable: React.FC = () => {
                       {dropdownVisible === device.id && (
                         <div
                           ref={dropdownRef} // Attach ref here
-                          className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
+                          className="absolute  z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
                           style={{ top: "-40px", left: "-20px", zIndex: 50 }}
                         >
                           <ul>
                             <li
                               onClick={() => handleConnect(device)}
-                              className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                              className="px-4 py-0.3 text-blue-500 cursor-pointer hover:bg-gray-200"
                             >
                               Connect
                             </li>
 
                             <li
                               onClick={() => handleEdit(device)}
-                              className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                              className="px-4 py-0.3 text-blue-500 cursor-pointer hover:bg-gray-200"
                             >
                               Edit
                             </li>
 
                             <li
                               onClick={() => handleDelete(device.id)}
-                              className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
+                              className="px-4 py-0.3 text-red-500 cursor-pointer hover:bg-gray-200"
                             >
                               Delete
                             </li>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import {  FaSearch, FaEllipsisV } from "react-icons/fa";
+import { FaSearch, FaEllipsisV } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 
@@ -154,108 +154,112 @@ const UserTable: React.FC = () => {
 
   return (
     <>
-      <div
-        className="container mx-auto px-8 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
-        style={{marginTop:"-45px"}}  >
-            Add User
-          </button>
-          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search users..."
-              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
-               />
-            <FaSearch
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
-              size={22}
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto lg:overflow-visible">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
-            {/* Table Header */}
-            <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
-              <tr>
-                <th className="border px-6 py-3 text-left text-sm font-semibold">
-                  Username
-                </th>
-                <th className="border px-6 py-3 text-left text-sm font-semibold">
-                  User Type
-                </th>
-                <th className="border px-6 py-3 text-left text-sm font-semibold">
-                  Manager
-                </th>
-                <th className="border px-6 py-3 text-center text-sm font-semibold">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+<div
+  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+  style={{
+    marginTop: 80,
+    marginLeft:"-150px",
+    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+  }}
+>
 
-            {/* Table Body */}
-            <tbody>
-              {currentUsers.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className={`hover:bg-gray-100 transition-colors duration-300 ease-in-out ${
-                    index % 2 === 0 ? "bg-gray-50" : ""
-                  }`}
+  <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+    <button
+      onClick={() => setIsCreateModalOpen(true)}
+      className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
+    >
+      Add User
+    </button>
+    <div className="relative w-full sm:w-auto">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search users..."
+        className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-72 transition-all duration-300 ease-in-out"
+      />
+      <FaSearch
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+        size={22}
+      />
+    </div>
+  </div>
+  <div className="overflow-x-auto">
+    <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+      {/* Table Header */}
+      <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+        <tr>
+          <th className="border px-6 py-3 text-left text-sm font-semibold">
+            Username
+          </th>
+          <th className="border px-6 py-3 text-left text-sm font-semibold">
+            User Type
+          </th>
+          <th className="border px-6 py-3 text-left text-sm font-semibold">
+            Manager
+          </th>
+          <th className="border px-6 py-3 text-center text-sm font-semibold">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      {/* Table Body */}
+      <tbody>
+        {currentUsers.map((user, index) => (
+          <tr
+            key={user.id}
+            className={`hover:bg-gray-100 transition-colors duration-300 ease-in-out ${
+              index % 2 === 0 ? "bg-gray-50" : ""
+            }`}
+          >
+            <td className="border px-6 py-3 text-sm text-gray-800">
+              {user.username}
+            </td>
+            <td className="border px-6 py-3 text-sm text-gray-800">
+              {user.usertype}
+            </td>
+            <td className="border px-6 py-3 text-sm text-gray-800">
+              {user.usertype === "EXECUTIVE"
+                ? getManagerName(user.managerId)
+                : "N/A"}
+            </td>
+            <td className="border p-3 relative flex justify-center items-center">
+              <FaEllipsisV
+                className="text-gray-500 cursor-pointer"
+                onClick={() =>
+                  setDropdownVisible(
+                    dropdownVisible === user.id ? null : user.id
+                  )
+                }
+              />
+              {dropdownVisible === user.id && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute w-28 z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md"
+                  style={{ top: "-40px", left: "-20px" }}
                 >
-                  <td className="border px-6 py-3 text-sm text-gray-800">
-                    {user.username}
-                  </td>
-                  <td className="border px-6 py-3 text-sm text-gray-800">
-                    {user.usertype}
-                  </td>
-                  <td className="border px-6 py-3 text-sm text-gray-800">
-                    {user.usertype === "EXECUTIVE"
-                      ? getManagerName(user.managerId)
-                      : "N/A"}
-                  </td>
-                  <td className="border p-3 relative flex justify-center items-center">
-                  <FaEllipsisV
-                      className="text-gray-500 cursor-pointer"
-                      onClick={() =>
-                        setDropdownVisible(
-                          dropdownVisible === user.id ? null : user.id
-                        )
-                      }
-                    />
-                    {dropdownVisible === user.id && (
-                      <div
-                        ref={dropdownRef} 
-                        className="absolute w-28 z-50 right-0 mt-2  bg-white border border-gray-300 rounded-lg shadow-md "
-                        style={{ top: "-40px", left: "-20px" }}
-                      >
-                        <ul>
-                          <li
-                            onClick={() => handleEdit(user)}
-                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Edit
-                          </li>
-                          <li
-                            onClick={() => handleDelete(user.id, user.username)}
-                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Delete
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  <ul>
+                    <li
+                      onClick={() => handleEdit(user)}
+                      className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
+                    >
+                      Edit
+                    </li>
+                    <li
+                      onClick={() => handleDelete(user.id, user.username)}
+                      className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
+                    >
+                      Delete
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 
         {/* Pagination controls */}
         <div className="flex justify-center mt-4 space-x-2">

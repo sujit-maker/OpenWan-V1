@@ -157,9 +157,13 @@ const CustomerTable: React.FC = () => {
   return (
     <>
       <div
-        className="container mx-auto px-8 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
+  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+  style={{
+    marginTop: 80,
+    marginLeft:"-150px",
+    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+  }}
+>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -181,8 +185,8 @@ const CustomerTable: React.FC = () => {
             />
           </div>
         </div>
-        <div className="overflow-x-auto lg:overflow-visible">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+        <div className="lg:overflow-visible" >
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg" >
             <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
               <tr>
                 <th className="border p-1">Customer Id</th>

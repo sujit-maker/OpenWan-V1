@@ -12,11 +12,14 @@ import { FaLock} from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
-import { DeviceUnknown } from "@mui/icons-material";
+import { DeviceUnknown,} from "@mui/icons-material";
+import CustomerTable from "../customer/CustomerTable";
+import UserTable from "../manager/UserTable";
 
-const Sidebar: React.FC = () => {
+const Man: React.FC = () => {
   const router = useRouter();
-  const { changePassword, loading } = useAuth();
+  const { changePassword, loading,username } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true); // Dropdown state
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -24,29 +27,41 @@ const Sidebar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null); // Add success message state
-
   const { currentUserType } = useAuth();
   const currentPath = usePathname();
   const [loadingState, setLoadingState] = useState(false); // Custom state for tracking loading
+
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.querySelector(".dropdown-menu");
+      const personIcon = document.querySelector(".person-icon");
+      
+      if (dropdown && !dropdown.contains(event.target as Node) && personIcon && !personIcon.contains(event.target as Node)) {
+        setIsDropdownOpen(false);  // Close the dropdown if clicked outside
+      }
+    };
+  
+    document.addEventListener("click", handleClickOutside);
+  
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+  
+
 
   const handleLogout = () => {
     router.push("/");
   };
 
   const handleNavigation = (path: string) => {
-    // Close the sidebar every time a link is clicked
     setIsSidebarOpen(false);
-  
-    // If the clicked link is the same as the current path, don't trigger loading or navigation
     if (currentPath === path) return;
-  
-    // Set loading state to true if navigating to a different page
     setLoadingState(true);
-  
-    // Wait 200ms before redirecting to allow sidebar close animation
     setTimeout(() => {
       router.push(path);
-    }, 200); // Wait 200ms before redirecting
+    }, 200); 
   };
   
   const getManageUsersLink = () => {
@@ -87,6 +102,20 @@ const Sidebar: React.FC = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
+  const toggleDropdown = (event: React.MouseEvent) => {
+    event.stopPropagation();  // Stop event propagation to avoid outside click from closing the dropdown
+    console.log("Dropdown clicked");  // Debugging: Log when the dropdown is clicked
+    console.log(username)
+  
+    // Toggle the dropdown state and log the updated state
+    setIsDropdownOpen((prev) => {
+      console.log("Previous Dropdown State: ", prev);  // Debugging: Log previous state
+      return !prev;
+    });
+  };
+  
+
+
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       setErrorMessage("Passwords do not match");
@@ -111,61 +140,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Change Password
-            </h2>
-            {errorMessage && (
-              <div className="text-red-500 mb-4">{errorMessage}</div>
-            )}
-            {successMessage && (
-              <div className="text-green-500 mb-4">{successMessage}</div>
-            )}
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg"
-                placeholder="Enter new password"
-                aria-label="New Password"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg"
-                placeholder="Confirm new password"
-                aria-label="Confirm Password"
-              />
-            </div>
-            <div className="flex justify-center">
-              <button
-                onClick={handleChangePassword}
-                disabled={loading} // Disable the button if loading
-                className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
-              >
-                {loading ? "Loading..." : "Change Password"}
-              </button>
-
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all ml-4"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    
 
       <div className="flex">
         {/* Loading Spinner */}
@@ -182,8 +157,9 @@ const Sidebar: React.FC = () => {
           <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"></div>
         )}
 
-        {/* Header */}
-        <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
+
+  {/* Header */}
+  <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
           <div className="flex-grow " />
           <div className="flex items-center">
             <FaLock
@@ -203,6 +179,8 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
         </header>
+    
+
 
         {/* Sidebar Toggle Button */}
         <Button
@@ -216,7 +194,7 @@ const Sidebar: React.FC = () => {
 
         {/* Sidebar */}
         <aside
-          className={`fixed top-0 left-0 h-full bg-gradient-to-b from-gray-100 to-gray-300 shadow-lg z-30 py-4 transition-all duration-300 ease-in-out
+          className={`h-screen left-0 bg-gradient-to-b from-gray-100 to-gray-300 shadow-lg z-30 py-4 transition-all duration-300 ease-in-out
           ${
             isMobile
               ? isSidebarOpen
@@ -303,10 +281,12 @@ const Sidebar: React.FC = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">{/* Your page content here */}</main>
+        <main className="flex-1 p-6">{/* Your page content here */}
+            < UserTable/>
+        </main>
       </div>
     </>
   );
 };
 
-export default Sidebar;
+export default Man;

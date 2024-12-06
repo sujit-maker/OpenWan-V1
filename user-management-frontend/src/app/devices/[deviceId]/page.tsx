@@ -248,7 +248,7 @@ const DeviceDetails: React.FC = () => {
     );
   }
   const backme = () => {
-    router.push("/device");
+    router.push("/dev");
   };
 
   return (
@@ -367,6 +367,7 @@ const DeviceDetails: React.FC = () => {
             </div>
           )}
         </div>
+
         {/* WAN Logs */}
         {showLogs && wanLogs.length > 0 && (
           <div className="mt-8">
@@ -383,7 +384,7 @@ const DeviceDetails: React.FC = () => {
             </div>
 
             {isTableVisible && (
-              <div className="overflow-x-auto w-full">
+              <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse border min-w-max">
                   <thead className="bg-gray-400">
                     <tr>

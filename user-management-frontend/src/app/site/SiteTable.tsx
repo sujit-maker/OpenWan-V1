@@ -7,7 +7,7 @@ import EditSiteModal from "./EditSiteModal";
 import { Customer, Site } from "./types";
 import { useAuth } from "../hooks/useAuth";
 
-const SiteTable: React.FC = () => {
+  const SiteTable: React.FC = () => {
   const [sites, setSites] = useState<Site[]>([]);
   const [filteredSites, setFilteredSites] = useState<Site[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -176,10 +176,14 @@ const SiteTable: React.FC = () => {
 
   return (
     <>
-      <div
-        className="container mx-auto px-8 py-6 lg:pl-72"
-        style={{ marginTop: 80 }}
-      >
+<div
+  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+  style={{
+    marginTop: 80,
+    marginLeft:"-150px",
+    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+  }}
+>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
