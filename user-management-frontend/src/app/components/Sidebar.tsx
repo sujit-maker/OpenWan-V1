@@ -208,7 +208,7 @@ const Sidebar: React.FC = () => {
         <Button
           variant="outline"
           size="icon"
-          className="absolute top-4 left-4 z-20"
+          className=" fixed top-4 left-4 z-20"
           onClick={handleSidebarToggle}
         >
           <Menu className="h-5 w-5" />

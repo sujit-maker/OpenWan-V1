@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Customer, Site } from "./types"; // Adjust path as needed
 import { useAuth } from "../hooks/useAuth"; // Adjust path as needed
 import { Spinner } from "react-bootstrap";
+import { Transition, Dialog } from "@headlessui/react";
 
 interface CreateSiteModalProps {
   isOpen: boolean;
@@ -297,9 +298,18 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
 
   return (
 
-<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] backdrop-blur-md">
-  <div className="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-2xl w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto transform transition-transform duration-300 hover:scale-105">
-    <h2 className="text-2xl font-semibold text-white mb-6 text-center">Create Site</h2>
+    <Transition show={isOpen} as={React.Fragment}>
+    <Dialog
+      as="div"
+      onClose={onClose}
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999] backdrop-blur-md"
+      aria-labelledby="create-user-title"
+      aria-describedby="create-user-description"
+    >
+      <Dialog.Panel className="max-w-sm w-full bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-lg shadow-2xl p-6 transform transition-transform duration-300 hover:scale-105">
+        <Dialog.Title className="text-2xl font-semibold text-white mb-6 text-center">
+          Create Site
+        </Dialog.Title>
 
     {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 shadow-md">{error}</div>}
 
@@ -428,8 +438,9 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
         {isLoading ? <Spinner /> : "Create"}
       </button>
     </div>
-  </div>
-</div>
+    </Dialog.Panel>
+    </Dialog>
+  </Transition>
 
 
   );

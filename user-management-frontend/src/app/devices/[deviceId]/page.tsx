@@ -254,19 +254,30 @@ const DeviceDetails: React.FC = () => {
   return (
     <>
       <Sidebar />
-      <div className="mx-auto px-24 py-24  ">
-        <div className="flex mx-6 my-0 justify-end">
-          <button
-            onClick={backme}
-            className="bg-red-600  p-2 w-15 text-white rounded-md"
-         style={{marginTop:"-30px"}} >
-            Back
-          </button>
-        </div>
+      <div
+  className="mx-auto px-4 sm:px-24 py-24 w-full sm:w-auto"
+  style={{
+    ...(window.innerWidth < 640
+      ? {
+          marginTop: "20px",
+          textAlign: "center",
+        }
+      : {}),
+  }}
+>
+  {/* <div className="flex justify-end sm:justify-start mx-6 my-0">
+    <button
+      onClick={backme}
+      className="bg-red-600 p-2 w-15 text-white rounded-md"
+      style={{ marginTop: "-30px" }}
+    >
+      Back
+    </button>
+  </div> */}
 
-        <h1 className="text-2xl font-bold mb-8">
-          Device Dashboard - {deviceId}
-        </h1>
+  <h1 className="text-2xl font-bold mb-8 text-center sm:text-left">
+    Device Dashboard - {deviceId}
+  </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
           {/* Device Data Cards */}

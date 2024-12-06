@@ -1,3 +1,4 @@
+import { Transition, Dialog } from "@headlessui/react";
 import React, { useState, useEffect } from "react";
 
 // Define the User type for the manager data
@@ -167,8 +168,16 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] backdrop-blur-md"> {/* Added backdrop-blur-md for blur effect */}
-    <div className="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-2xl w-full max-w-md sm:w-96 overflow-y-auto max-h-[80vh] transform transition-transform duration-300 hover:scale-105">
+    <Transition show={isOpen} as={React.Fragment}>
+    <Dialog
+      as="div"
+      onClose={onClose}
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50 z-[9999] backdrop-blur-md"
+      aria-labelledby="create-user-title"
+      aria-describedby="create-user-description"
+    >
+    <Dialog.Panel className="max-w-sm w-full max-h-[90vh] bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-xl overflow-y-auto transform transition-transform duration-300 hover:scale-105">
+       
       <h2 className="text-2xl font-semibold text-white mb-4 text-center">
         Add New Customer
       </h2>
@@ -295,8 +304,9 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
           Save Customer
         </button>
       </div>
-    </div>
-  </div>
+      </Dialog.Panel>
+    </Dialog>
+  </Transition>
   
   );
 };

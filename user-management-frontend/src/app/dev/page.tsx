@@ -140,6 +140,63 @@ const Dev: React.FC = () => {
 
   return (
     <>
+
+
+{isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Change Password
+            </h2>
+            {errorMessage && (
+              <div className="text-red-500 mb-4">{errorMessage}</div>
+            )}
+            {successMessage && (
+              <div className="text-green-500 mb-4">{successMessage}</div>
+            )}
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                placeholder="Enter new password"
+                aria-label="New Password"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                placeholder="Confirm new password"
+                aria-label="Confirm Password"
+              />
+            </div>
+            <div className="flex justify-center">
+              <button
+                onClick={handleChangePassword}
+                disabled={loading} // Disable the button if loading
+                className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+              >
+                {loading ? "Loading..." : "Change Password"}
+              </button>
+
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all ml-4"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     
 
       <div className="flex">

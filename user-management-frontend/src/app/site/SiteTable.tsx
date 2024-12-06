@@ -184,26 +184,26 @@ import { useAuth } from "../hooks/useAuth";
     ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
   }}
 >
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-gradient-to-r from-indigo-500  to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 mb-4 md:mb-0"
-            style={{marginTop:"-45px"}}  >
-            Add Site
-          </button>
-          <div className="relative mt-4 md:mt-0 " style={{marginTop:"-5px"}}>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Sites..."
-              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-48 md:w-72 transition-all duration-300 ease-in-out"
-            />
-            <FaSearch
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 transition-all duration-300 ease-in-out"
-              size={22}
-            />
-          </div>
+<div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+    <button
+      onClick={() => setIsCreateModalOpen(true)}
+      className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
+    >
+      Add Site
+    </button>
+    <div className="relative w-full sm:w-auto">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search Sites..."
+        className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-72 transition-all duration-300 ease-in-out"
+      />
+      <FaSearch
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+        size={22}
+      />
+    </div>
         </div>
 
         <div className="overflow-x-auto lg:overflow-visible">
