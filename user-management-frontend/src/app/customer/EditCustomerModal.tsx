@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { Customer } from './types'; 
 
@@ -7,10 +8,12 @@ interface EditCustomerModalProps {
   closeModal: () => void;
 }
 
-const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ customer, onCustomerUpdated, closeModal }) => {
+  const EditCustomerModal: React.FC<EditCustomerModalProps> = ({ customer, onCustomerUpdated, closeModal }) => {
   const [updatedCustomer, setUpdatedCustomer] = useState<Customer>(customer);
-
-  const handleInputChange = (field: keyof Customer, value: string) => {
+  
+  const handleInputChange = (field: keyof Customer, 
+    
+    value: string) => {
     setUpdatedCustomer(prev => ({ ...prev, [field]: value }));
   };
 

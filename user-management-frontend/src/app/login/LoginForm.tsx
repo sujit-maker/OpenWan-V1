@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';

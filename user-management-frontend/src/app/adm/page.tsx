@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, LineChart, Menu, Package, Users } from "lucide-react";
@@ -35,7 +35,7 @@ const Adm: React.FC = () => {
         personIcon &&
         !personIcon.contains(event.target as Node)
       ) {
-        setIsDropdownOpen(false); // Close the dropdown if clicked outside
+        setIsDropdownOpen(false); 
       }
     };
 
@@ -97,18 +97,6 @@ const Adm: React.FC = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
-  const toggleDropdown = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Stop event propagation to avoid outside click from closing the dropdown
-    console.log("Dropdown clicked"); // Debugging: Log when the dropdown is clicked
-    console.log(username);
-
-    // Toggle the dropdown state and log the updated state
-    setIsDropdownOpen((prev) => {
-      console.log("Previous Dropdown State: ", prev); // Debugging: Log previous state
-      return !prev;
-    });
-  };
-
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       setErrorMessage("Passwords do not match");
@@ -133,8 +121,7 @@ const Adm: React.FC = () => {
 
   return (
     <>
-
-{isModalOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:w-96">
             <h2 className="text-xl font-bold mb-4 text-center">
@@ -189,7 +176,7 @@ const Adm: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       <div className="flex">
         {/* Loading Spinner */}
         {loadingState && (

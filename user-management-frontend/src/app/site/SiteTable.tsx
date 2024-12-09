@@ -1,11 +1,17 @@
 // SiteTable.tsx
-"use client";
+"use client";;
 import React, { useState, useEffect, useRef } from "react";
-import { FaSearch, FaEllipsisV } from "react-icons/fa";
+import { FaSearch, FaEllipsisV, FaEdit, FaTrashAlt } from "react-icons/fa";
 import CreateSiteModal from "./CreateSiteModal";
 import EditSiteModal from "./EditSiteModal";
 import { Customer, Site } from "./types";
 import { useAuth } from "../hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
   const SiteTable: React.FC = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -181,7 +187,7 @@ import { useAuth } from "../hooks/useAuth";
   style={{
     marginTop: 80,
     marginLeft:"-150px",
-    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+    ...(typeof window !== "undefined" && window.innerWidth < 768 ? { position: "fixed", marginLeft: "-275px" } : {}),
   }}
 >
 <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
@@ -242,34 +248,39 @@ import { useAuth } from "../hooks/useAuth";
                     {site.customer ? site.customer.customerName : "N/A"}
                   </td>
 
-                  <td className="border p-3 relative flex justify-center  items-center">
-                  <FaEllipsisV
-                      className="text-gray-500 cursor-pointer"
-                      onClick={() => handleDropdownToggle(site.id)}
-                    />
-                    {dropdownVisible === site.id && (
-                      <div
-                        ref={dropdownRef} // Attach ref here
-                        className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
-                        style={{ top: "-40px", left: "-20px" }}
-                      >
-                        <ul>
-                          <li
-                            onClick={() => handleEdit(site)}
-                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Edit
-                          </li>
-                          <li
-                            onClick={() => handleDelete(site.id)}
-                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Delete
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </td>
+                  <td className="border p-3 relative flex justify-center items-center">
+                {/* Dropdown Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition duration-200 focus:outline-none"
+                      aria-label="Actions"
+                    >
+                      <FaEllipsisV className="text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={5}
+                    className="w-28 p-1 bg-white border border-gray-200 rounded-lg shadow-lg"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(site)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-green-100 transition duration-200"
+                    >
+                      <FaEdit className="text-green-600" />
+                      <span className="text-green-600 font-bold">Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(site.id)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-red-100 transition duration-200"
+                    >
+                      <FaTrashAlt className="text-red-600" />
+                      <span className="text-red-600 font-bold">Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </td>
                 </tr>
               ))}
             </tbody>

@@ -1,9 +1,9 @@
-"use client";
+"use client";;
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../hooks/useAuth";
 
-const Dashboard: React.FC = () => {
+  const Dashboard: React.FC = () => {
   const { managerId, adminId, superadminId } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
   const [adminUserCount, setAdminUserCount] = useState<number | null>(null);
@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
         if (superadminId) {
           // Fetch all counts for superadmin
           const allCountsResponse = await fetch(
-            `http://40.0.0.25:8000/users/counts`
+            `http://localhost:8000/users/counts`
           );
           const allCountsData = await allCountsResponse.json();
 
@@ -37,7 +37,7 @@ const Dashboard: React.FC = () => {
         // Fetch managers count if managerId is present
         if (managerId) {
           const response = await fetch(
-            `http://40.0.0.25:8000/users/count/manager/${managerId}`
+            `http://localhost:8000/users/count/manager/${managerId}`
           );
           const data = await response.json();
           if (typeof data === "number") {
@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
         if (adminId) {
           // Fetch managers associated with adminId
           const adminResponse = await fetch(
-            `http://40.0.0.25:8000/users/count/admin/${adminId}`
+            `http://localhost:8000/users/count/admin/${adminId}`
           );
           const adminData = await adminResponse.json();
           if (typeof adminData === "number") {
@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
 
           // Fetch executives associated with adminId
           const executiveResponse = await fetch(
-            `http://40.0.0.25:8000/users/count/executives/admin/${adminId}`
+            `http://localhost:8000/users/count/executives/admin/${adminId}`
           );
           const executiveData = await executiveResponse.json();
           if (typeof executiveData === "number") {
@@ -86,13 +86,13 @@ const Dashboard: React.FC = () => {
   }, [managerId, adminId, superadminId]);
 
   return (
-    <div className="flex h-screen">
-    {/* Sidebar */}
+    <div className="flex  h-screen">
+
     <Sidebar />
   
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1  flex flex-col">
       {/* Main Content */}
-      <div className="my-28 px-2">
+      <div className="my-28 px-2 mr-5">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Dashboard
         </h1>

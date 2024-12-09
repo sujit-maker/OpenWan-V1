@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Site } from "./types";
@@ -442,7 +443,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
           </label>
           <input
             id="devicePassword"
-            type="password"
+            type="text"
             value={devicePassword}
             onChange={(e) => setDevicePassword(e.target.value)}
             required
@@ -450,25 +451,21 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
           />
         </div>
 
-        {/* Buttons */}
-        <div className="flex justify-end mt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="mr-2 bg-gray-300 text-black rounded-lg px-6 py-3 transition-all duration-200 hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className={`bg-blue-500 text-white rounded-lg px-6 py-3 transition-all duration-200 hover:bg-blue-600 ${
-              isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={isLoading}
-          >
-            {isLoading ? "Creating..." : "Add Device"}
-          </button>
-        </div>
+        <div className="flex justify-between mt-6">
+        <button
+          onClick={onClose}
+          className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg transition-all duration-200 hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg transition-all duration-200 hover:bg-blue-700"
+        >
+          Save Device
+        </button>
+      </div>
+
       </form>
     </Dialog.Panel>
   </Dialog>

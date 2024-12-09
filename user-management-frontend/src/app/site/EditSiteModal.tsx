@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Customer, Site } from './types'; // Adjust path as needed
 

@@ -1,9 +1,15 @@
-"use client";
+"use client";;
 import React, { useState, useEffect, useRef } from "react";
-import { FaSearch, FaEllipsisV } from "react-icons/fa";
+import { FaSearch, FaEllipsisV, FaEdit, FaTrashAlt } from "react-icons/fa";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import { useAuth } from "../hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface Manager {
   id: number;
@@ -206,38 +212,39 @@ const UserTable: React.FC = () => {
                 <tr key={user.id}>
                   <td className="border p-2 text-center">{user.username}</td>
                   <td className="border p-2 text-center">{user.usertype}</td>
-                  <td className="border p-3 relative flex justify-center items-center">
-                    <FaEllipsisV
-                      className="text-gray-500 cursor-pointer"
-                      onClick={() =>
-                        setDropdownVisible(
-                          dropdownVisible === user.id ? null : user.id
-                        )
-                      }
-                    />
-                    {dropdownVisible === user.id && (
-                      <div
-                        ref={dropdownRef} // Attach ref here
-                        className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
-                        style={{ top: "-40px", left: "-20px" }}
-                      >
-                        <ul>
-                          <li
-                            onClick={() => handleEdit(user)}
-                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Edit
-                          </li>
-                          <li
-                            onClick={() => handleDelete(user.id, user.username)}
-                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Delete
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </td>
+                  <td className="border p-2 relative flex justify-center items-center">
+                {/* Dropdown Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition duration-200 focus:outline-none"
+                      aria-label="Actions"
+                    >
+                      <FaEllipsisV className="text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={5}
+                    className="w-28 p-1 bg-white border border-gray-200 rounded-lg shadow-lg"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(user)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-green-100 transition duration-200"
+                    >
+                      <FaEdit className="text-green-600" />
+                      <span className="text-green-600 font-bold">Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(user.id,user.username)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-red-100 transition duration-200"
+                    >
+                      <FaTrashAlt className="text-red-600" />
+                      <span className="text-red-600 font-bold">Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </td>
                 </tr>
               ))}
             </tbody>

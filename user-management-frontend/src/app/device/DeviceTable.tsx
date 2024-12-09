@@ -1,11 +1,17 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { FaSearch, FaEllipsisV } from "react-icons/fa";
+import { FaSearch, FaEllipsisV, FaEdit, FaPlug, FaTrashAlt } from "react-icons/fa";
 import CreateDeviceModal from "./CreateDeviceModal";
 import EditDeviceModal from "./EditDeviceModal";
 import { Device, Site } from "./types";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const DeviceTable: React.FC = () => {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -19,14 +25,14 @@ const DeviceTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [connectLoading, setConnectLoading] = useState<boolean>(false); // New state for connect loading
+  const [connectLoading, setConnectLoading] = useState<boolean>(false); 
 
   const { currentUserType, userId, managerId, adminId } = useAuth();
   const router = useRouter();
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of customers per page
+  const [itemsPerPage] = useState(5); 
 
   // Function to fetch sites based on user type
   const fetchDevices = async () => {
@@ -66,12 +72,12 @@ const DeviceTable: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchSites(); // Fetch customers when the component mounts
+    fetchSites(); 
   }, []);
 
   useEffect(() => {
     if (currentUserType && userId) {
-      fetchDevices(); // Fetch sites when user type and userId are available
+      fetchDevices();
     }
   }, [currentUserType, userId, adminId, managerId]);
 
@@ -116,16 +122,21 @@ const DeviceTable: React.FC = () => {
   };
 
   const handleConnect = async (device: Device) => {
-    setConnectLoading(true); // Set the connect loading state to true
+    setConnectLoading(true);
+  
+    // Ensure the spinner is reflected in the DOM before navigation
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  
     try {
-      // Simulate the "connect" action (you can replace this with actual logic)
+      // Simulate the "connect" action or replace with actual logic
       await router.push(`/devices/${device.deviceId}`);
     } catch (error) {
       console.error("Failed to connect:", error);
     } finally {
-      setConnectLoading(false); // Reset loading state after action is complete
+      setConnectLoading(false); 
     }
   };
+  
 
   const handleEdit = (device: Device) => {
     setSelectedDevice(device);
@@ -136,7 +147,6 @@ const DeviceTable: React.FC = () => {
     // Add event listener when the component mounts
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Cleanup event listener on unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -147,7 +157,7 @@ const DeviceTable: React.FC = () => {
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node)
     ) {
-      setDropdownVisible(null); // Close dropdown if clicked outside
+      setDropdownVisible(null);
     }
   };
 
@@ -156,7 +166,7 @@ const DeviceTable: React.FC = () => {
   };
 
   const handleDropdownToggle = (siteId: number) => {
-    setDropdownVisible((prev) => (prev === siteId ? null : siteId)); // Toggle visibility based on siteId
+    setDropdownVisible((prev) => (prev === siteId ? null : siteId)); 
   };
 
   const handleDeviceUpdated = (updatedDevice: Device) => {
@@ -181,102 +191,109 @@ const DeviceTable: React.FC = () => {
 
   return (
     <>
-<div
-  className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
-  style={{
-    marginTop: 80,
-    marginLeft:"-150px",
-    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
-  }}
->
+
+      {connectLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+          <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      <div
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
+        style={{
+          marginTop: 80,
+          marginLeft: "-150px",
+          ...(window.innerWidth < 768
+            ? { position: "fixed", marginLeft: "-275px" }
+            : {}), 
+        }}
+      >
         {" "}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-    <button
-      onClick={() => setIsCreateModalOpen(true)}
-      className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
-    >
-      Add Device
-    </button>
-    <div className="relative w-full sm:w-auto">
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search Devices..."
-        className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-72 transition-all duration-300 ease-in-out"
-      />
-      <FaSearch
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
-        size={22}
-      />
-    </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
+          >
+            Add Device
+          </button>
+          <div className="relative w-full sm:w-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search Devices..."
+              className="pl-12 pr-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-72 transition-all duration-300 ease-in-out"
+            />
+            <FaSearch
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+              size={22}
+            />
+          </div>
         </div>
         {/* Responsive table wrapper */}
-        <div className="overflow-x-auto lg:overflow-visible ">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
-            <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
-              <tr>
-                <th className="border p-2 text-center">ID</th>
-                <th className="border p-2 text-center">Device</th>
-                <th className="border p-2 text-center">Site</th>
-                <th className="border p-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((device) => {
-                const site = sites.find((site) => site.id === device.siteId); // Find the site by ID
-                return (
-                  <tr key={device.id}>
-                    <td className="border p-2 text-center">
-                      {device.deviceId}
-                    </td>
-                    <td className="border p-2 text-center">
-                      {device.deviceName}
-                    </td>
-                    <td className="border p-2 text-center">
-                      {site ? site.siteName : "N/A"}
-                    </td>{" "}
-                    <td className="border p-3 relative flex justify-center  items-center">
-                      <FaEllipsisV
-                        className="text-gray-500 cursor-pointer "
-                        onClick={() => handleDropdownToggle(device.id)}
-                      />
-                      {dropdownVisible === device.id && (
-                        <div
-                          ref={dropdownRef} // Attach ref here
-                          className="absolute  z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
-                          style={{ top: "-40px", left: "-20px", zIndex: 50 }}
-                        >
-                          <ul>
-                            <li
-                              onClick={() => handleConnect(device)}
-                              className="px-4 py-0.3 text-blue-500 cursor-pointer hover:bg-gray-200"
-                            >
-                              Connect
-                            </li>
-
-                            <li
-                              onClick={() => handleEdit(device)}
-                              className="px-4 py-0.3 text-blue-500 cursor-pointer hover:bg-gray-200"
-                            >
-                              Edit
-                            </li>
-
-                            <li
-                              onClick={() => handleDelete(device.id)}
-                              className="px-4 py-0.3 text-red-500 cursor-pointer hover:bg-gray-200"
-                            >
-                              Delete
-                            </li>
-                          </ul>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className=" lg:overflow-visible ">
+        <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+      <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+        <tr>
+          <th className="border p-2 text-center">id</th>
+          <th className="border p-2 text-center">Device</th>
+          <th className="border p-2 text-center">Site</th>
+          <th className="border p-2 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentItems.map((device) => {
+          const site = sites.find((site) => site.id === device.siteId);
+          return (
+            <tr key={device.id}>
+              <td className="border p-2 text-center">{device.deviceId}</td>
+              <td className="border p-2 text-center">{device.deviceName}</td>
+              <td className="border p-2 text-center">{site ? site.siteName : "N/A"}</td>
+              <td className="border p-3 relative flex justify-center items-center">
+                {/* Dropdown Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition duration-200 focus:outline-none"
+                      aria-label="Actions"
+                    >
+                      <FaEllipsisV className="text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={5}
+                    className="w-28 p-1 bg-white border border-gray-200 rounded-lg shadow-lg"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleConnect(device)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-blue-100 transition duration-200"
+                    >
+                      <FaPlug className="text-blue-600" />
+                      <span className="text-blue-600 font-bold">Connect</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(device)}
+                      className="flex items-center cursor-pointer  space-x-2 px-3 py-2 rounded-md hover:bg-green-100 transition duration-200"
+                    >
+                      <FaEdit className="text-green-600" />
+                      <span className="text-green-600 font-bold">Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(device.id)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-red-100 transition duration-200"
+                    >
+                      <FaTrashAlt className="text-red-600" />
+                      <span className="text-red-600 font-bold">Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
         </div>
         {/* Pagination controls */}
         <div className="flex justify-center mt-4">

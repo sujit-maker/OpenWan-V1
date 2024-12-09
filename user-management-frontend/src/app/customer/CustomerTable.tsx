@@ -1,10 +1,16 @@
-"use client";
+"use client";;
 import React, { useEffect, useRef, useState } from "react";
-import {  FaSearch, FaEllipsisV } from "react-icons/fa";
+import {  FaSearch, FaEllipsisV, FaEdit, FaTrash, FaTrashAlt } from "react-icons/fa";
 import CreateCustomerModal from "./CreateCustomerModal";
 import EditCustomerModal from "./EditCustomerModal";
 import { Customer } from "./types";
 import { useAuth } from "../hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const CustomerTable: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -189,7 +195,7 @@ const CustomerTable: React.FC = () => {
           <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg" >
             <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
               <tr>
-                <th className="border p-1">Customer Id</th>
+                <th className="border p-1">Id</th>
                 <th className="border p-1">Customer</th>
                 <th className="border p-1">Actions</th>
               </tr>
@@ -202,39 +208,38 @@ const CustomerTable: React.FC = () => {
                     {customer.customerName}
                   </td>
                   <td className="border p-3 relative flex justify-center items-center">
-                  <FaEllipsisV
-                      className="text-gray-500 cursor-pointer"
-                      onClick={() =>
-                        setDropdownVisible(
-                          dropdownVisible === customer.id ? null : customer.id
-                        )
-                      }
-                    />
-                    {dropdownVisible === customer.id && (
-                      <div
-                        ref={dropdownRef} // Attach ref here
-                        className="absolute z-50 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md w-40"
-                        style={{ top: "-40px", left: "-20px" }}
-                      >
-                        <ul>
-                          <li
-                            onClick={() => handleEdit(customer)}
-                            className="px-4 py-2 text-blue-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Edit
-                          </li>
-                          <li
-                            onClick={() =>
-                              handleDelete(customer.id)
-                            }
-                            className="px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100"
-                          >
-                            Delete
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </td>
+                {/* Dropdown Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition duration-200 focus:outline-none"
+                      aria-label="Actions"
+                    >
+                      <FaEllipsisV className="text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={5}
+                    className="w-28 p-1  bg-white border border-gray-200 rounded-lg shadow-lg"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(customer)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-green-100 transition duration-200"
+                    >
+                      <FaEdit className="text-green-600" />
+                      <span className="text-green-600 font-bold">Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(customer.id)}
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-red-100 transition duration-200"
+                    >
+                      <FaTrashAlt className="text-red-600" />
+                      <span className="text-red-600 font-bold">Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </td>
                 </tr>
               ))}
             </tbody>

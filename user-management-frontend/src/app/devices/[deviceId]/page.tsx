@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
@@ -94,9 +94,7 @@ const DeviceDetails: React.FC = () => {
         console.error("Device ID is missing");
         return;
       }
-      const response = await fetch(
-        `http://localhost:8000/devices/${deviceId}`
-      );
+      const response = await fetch(`http://localhost:8000/devices/${deviceId}`);
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -236,15 +234,15 @@ const DeviceDetails: React.FC = () => {
   if (!deviceData) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-      <div className="text-center">
+        <div className="text-center">
           <h1 className="text-4xl font-serif text-blue-800 animate-pulse mb-4">
-              Loading...
+            Loading...
           </h1>
           <div className="flex justify-center items-center">
-              <FaSpinner className="animate-spin text-blue-800 text-6xl" />
+            <FaSpinner className="animate-spin text-blue-800 text-6xl" />
           </div>
+        </div>
       </div>
-  </div>
     );
   }
   const backme = () => {
@@ -255,17 +253,17 @@ const DeviceDetails: React.FC = () => {
     <>
       <Sidebar />
       <div
-  className="mx-auto px-4 sm:px-24 py-24 w-full sm:w-auto"
-  style={{
-    ...(window.innerWidth < 640
-      ? {
-          marginTop: "20px",
-          textAlign: "center",
-        }
-      : {}),
-  }}
->
-  {/* <div className="flex justify-end sm:justify-start mx-6 my-0">
+        className="px-4 sm:px-24 py-20 w-full sm:w-auto"
+        style={{
+          ...(window.innerWidth < 640
+            ? {
+                marginTop: "20px",
+                textAlign: "center",
+              }
+            : {}),
+        }}
+      >
+        {/* <div className="flex justify-end sm:justify-start mx-6 my-0">
     <button
       onClick={backme}
       className="bg-red-600 p-2 w-15 text-white rounded-md"
@@ -275,9 +273,9 @@ const DeviceDetails: React.FC = () => {
     </button>
   </div> */}
 
-  <h1 className="text-2xl font-bold mb-8 text-center sm:text-left">
-    Device Dashboard - {deviceId}
-  </h1>
+        <h1 className="text-2xl font-bold mb-8 text-center sm:text-left">
+          Device Dashboard - {deviceId}
+        </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
           {/* Device Data Cards */}

@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import CreateTaskModal from "./CreateTaskModal";

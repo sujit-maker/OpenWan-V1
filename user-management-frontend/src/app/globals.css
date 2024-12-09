@@ -93,6 +93,11 @@
     
 }
 
+header {
+  z-index: 10; /* Or lower value */
+}
+
+
 
 @layer base {
   * {
