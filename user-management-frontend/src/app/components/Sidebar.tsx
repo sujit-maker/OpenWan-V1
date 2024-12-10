@@ -1,14 +1,8 @@
-"use client";;
+"use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Users,
-} from "lucide-react";
-import { FaLock} from "react-icons/fa";
+import { Home, LineChart, Menu, Package, Users } from "lucide-react";
+import { FaLock } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
@@ -23,11 +17,11 @@ const Sidebar: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); 
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { currentUserType } = useAuth();
   const currentPath = usePathname();
-  const [loadingState, setLoadingState] = useState(false); 
+  const [loadingState, setLoadingState] = useState(false);
 
   const handleLogout = () => {
     router.push("/");
@@ -36,19 +30,19 @@ const Sidebar: React.FC = () => {
   const handleNavigation = (path: string) => {
     // Close the sidebar every time a link is clicked
     setIsSidebarOpen(false);
-  
+
     // If the clicked link is the same as the current path, don't trigger loading or navigation
     if (currentPath === path) return;
-  
+
     // Set loading state to true if navigating to a different page
     setLoadingState(true);
-  
+
     // Wait 200ms before redirecting to allow sidebar close animation
     setTimeout(() => {
       router.push(path);
-    }, 200); 
+    }, 200);
   };
-  
+
   const getManageUsersLink = () => {
     if (!currentUserType) return "";
 
@@ -80,7 +74,7 @@ const Sidebar: React.FC = () => {
     if (loadingState) {
       setLoadingState(false);
     }
-  }, [currentPath]); 
+  }, [currentPath]);
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -146,10 +140,11 @@ const Sidebar: React.FC = () => {
                 aria-label="Confirm Password"
               />
             </div>
+
             <div className="flex justify-center">
               <button
                 onClick={handleChangePassword}
-                disabled={loading} 
+                disabled={loading}
                 className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
               >
                 {loading ? "Loading..." : "Change Password"}
@@ -183,14 +178,15 @@ const Sidebar: React.FC = () => {
 
         {/* Header */}
         <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
-?          <div className="flex items-center">
+          ?{" "}
+          <div className="flex items-center">
             <FaLock
               size={20}
               className="text-white mr-4 cursor-pointer"
               onClick={() => setIsModalOpen(true)}
               aria-label="Change Password"
             />
-           <button
+            <button
               onClick={handleLogout}
               className="text-white px-4 py-2 rounded-lg flex items-center hover:bg-red-600 bg-red-500 transition-all"
               aria-label="Logout"
@@ -243,59 +239,69 @@ const Sidebar: React.FC = () => {
 
             {/* Navigation Links */}
             <nav className="flex-1 px-2 py-6 text-base font-medium">
-              <button
-                onClick={() => handleNavigation("/dashboard")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <Home
-                  className={`${
-                    isSidebarOpen ? "justify-start" : "justify-center"
-                  } text-blue-600 transition-all`}
-                />
-                {isSidebarOpen && <span className="text-lg">Dashboard</span>}
-              </button>
+              {currentUserType !== "EXECUTIVE" && (
+                <>
+                  <button
+                    onClick={() => handleNavigation("/dashboard")}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <Home
+                      className={`${
+                        isSidebarOpen ? "justify-start" : "justify-center"
+                      } text-blue-600 transition-all`}
+                    />
+                    {isSidebarOpen && (
+                      <span className="text-lg">Dashboard</span>
+                    )}
+                  </button>
 
-              <button
-                onClick={() => handleNavigation(getManageUsersLink())}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <Users className="h-6 w-6 text-purple-600" />
-                {isSidebarOpen && <span className="text-lg">User Management</span>}
-              </button>
+                  <button
+                    onClick={() => handleNavigation(getManageUsersLink())}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <Users className="h-6 w-6 text-purple-600" />
+                    {isSidebarOpen && (
+                      <span className="text-lg">User Management</span>
+                    )}
+                  </button>
 
-              <button
-                onClick={() => handleNavigation("/cus")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <Package className="h-6 w-6 text-green-600" />
-                {isSidebarOpen && <span className="text-lg">Customers</span>}
-              </button>
+                  <button
+                    onClick={() => handleNavigation("/cus")}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <Package className="h-6 w-6 text-green-600" />
+                    {isSidebarOpen && (
+                      <span className="text-lg">Customers</span>
+                    )}
+                  </button>
 
-              <button
-                onClick={() => handleNavigation("/sit")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <LineChart className="h-6 w-6 text-orange-600" />
-                {isSidebarOpen && <span className="text-lg">Site</span>}
-              </button>
+                  <button
+                    onClick={() => handleNavigation("/sit")}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <LineChart className="h-6 w-6 text-orange-600" />
+                    {isSidebarOpen && <span className="text-lg">Site</span>}
+                  </button>
 
-              <button
-                onClick={() => handleNavigation("/dev")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <DeviceUnknown className="h-6 w-6 text-pink-600" />
-                {isSidebarOpen && <span className="text-lg">Device</span>}
-              </button>
+                  <button
+                    onClick={() => handleNavigation("/dev")}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <DeviceUnknown className="h-6 w-6 text-pink-600" />
+                    {isSidebarOpen && <span className="text-lg">Device</span>}
+                  </button>
+                </>
+              )}
             </nav>
           </div>
         </aside>

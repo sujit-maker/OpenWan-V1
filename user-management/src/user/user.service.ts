@@ -63,32 +63,32 @@ export class UserService {
     managerId?: number,
     adminId?: number,
   ) {
-    const { username, password, usertype } = createUserDto;
-
+    const { username, password, usertype, deviceId } = createUserDto;
+  
     // Check if username already exists
     const userExists = await this.prisma.user.findUnique({
       where: { username },
     });
-
+  
     if (userExists) {
       throw new BadRequestException('Username already exists');
     }
-
+  
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
+  
     // Prepare user data
     const userData: any = {
       username,
       password: hashedPassword,
       usertype,
     };
-
+  
     // Connect the admin if the usertype is MANAGER and adminId is provided
     if (usertype === UserType.MANAGER && adminId) {
       userData.admin = { connect: { id: adminId } };
     }
-
+  
     // Connect the manager for EXECUTIVE users (managerId is mandatory for EXECUTIVE)
     if (usertype === UserType.EXECUTIVE) {
       if (!managerId) {
@@ -97,19 +97,25 @@ export class UserService {
         );
       }
       userData.manager = { connect: { id: managerId } };
-
+  
       // Optionally connect admin if provided
       if (adminId) {
         userData.admin = { connect: { id: adminId } };
       }
     }
-
+  
+    // Optionally connect deviceId
+    if (deviceId) {
+      userData.device = { connect: { id: deviceId } };
+    }
+  
     // Create user
     const user = await this.prisma.user.create({
       data: userData,
     });
     return user;
   }
+  
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -119,10 +125,32 @@ export class UserService {
         usertype: true,
         managerId: true,
         adminId: true,
+        deviceId:true,
       },
     });
   }
 
+   // Fetch deviceId for a specific user
+   async getDeviceIdForUser(id: string): Promise<{ deviceId: string }> {
+    const userId = Number(id); // Convert the string to a number if needed
+  
+    // Fetch user by the correct identifier (id is a number now)
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,  // id is a number now
+      },
+      select: {
+        deviceId: true,
+      },
+    });
+  
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+  
+    return { deviceId: user.deviceId };
+  }
+  
   // Fetch admins associated with a managerId
   async findAdminsByManagerId(managerId: number) {
     // First, get the manager(s) associated with the given managerId
@@ -177,6 +205,7 @@ export class UserService {
         usertype: true,
         managerId: true,
         adminId: true,
+        deviceId: true,
       },
     });
 

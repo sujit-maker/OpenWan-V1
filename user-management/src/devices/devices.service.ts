@@ -39,6 +39,27 @@ export class DevicesService {
     }
   }
 
+  async findBySiteId(siteId: number) {
+    try {
+      const devices = await this.prisma.device.findMany({
+        where: { siteId: siteId }, // Fetch devices based on siteId
+        include: {
+          site: {
+            select: {
+              siteName: true, // Include siteName from the related site model
+            },
+          },
+        },
+      });
+      return devices;
+    } catch (error) {
+      console.error('Error fetching devices by siteId:', error); // Log any errors for debugging
+      throw new BadRequestException('Failed to fetch devices for the specified site');
+    }
+  }
+  
+  
+
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
     const newDeviceId = await this.generateNewDeviceId();
   

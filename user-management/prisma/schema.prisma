@@ -36,7 +36,11 @@ model User {
   // Relations to Device model
   managedDevices Device[] @relation("DeviceManager")
   adminDevices   Device[] @relation("DeviceAdmin")
+
+ deviceId String?  // Optional string field for device ID
+  device   Device?  @relation(fields: [deviceId], references: [deviceId])
 }
+
 
 enum UserType {
   ADMIN
@@ -101,15 +105,15 @@ enum ServiceType {
 }
 
 model Device {
-  id             Int    @id @default(autoincrement())
-  deviceId       String @unique
-  deviceName     String
-  site           Site   @relation(fields: [siteId], references: [id])
-  siteId         Int
-  deviceType     String
-  deviceIp       String
-  devicePort     String
-  portCount      String
+  id       Int    @id @default(autoincrement())
+  deviceId String @unique
+  deviceName String
+  site      Site   @relation(fields: [siteId], references: [id])
+  siteId    Int
+  deviceType String
+  deviceIp  String
+  devicePort String
+  portCount String
   deviceUsername String
   devicePassword String
 
@@ -117,8 +121,10 @@ model Device {
   adminId   Int? // Foreign key to the User model for the admin
 
   // Relations to the User model for admin and manager
-  admin User? @relation("DeviceAdmin", fields: [adminId], references: [id])
-  manager   User? @relation("DeviceManager", fields: [managerId], references: [id])
+  admin   User? @relation("DeviceAdmin", fields: [adminId], references: [id])
+  manager User? @relation("DeviceManager", fields: [managerId], references: [id])
+
+  user User[] // Add this field to complete the relation
 }
 
 model Task {

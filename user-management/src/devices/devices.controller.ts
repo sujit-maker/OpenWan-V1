@@ -60,6 +60,20 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
     return this.mikrotikService.fetchAllData(routerUrl, auth);
   }
 
+  @Get('site/:siteId')
+async findBySiteId(@Param('siteId') siteId: string) {
+  try {
+    const siteIdInt = parseInt(siteId, 10); // Convert the siteId to an integer
+    if (isNaN(siteIdInt)) {
+      throw new BadRequestException('siteId must be a valid number');
+    }
+    return await this.devicesService.findBySiteId(siteIdInt); // Fetch devices associated with the given siteId
+  } catch (error) {
+    throw new BadRequestException('Failed to fetch devices for the specified site');
+  }
+}
+
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Device | null> {
     return this.devicesService.findOne(id);

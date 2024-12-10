@@ -19,4 +19,7 @@ export class CreateUserDto {
 
   @IsOptional()   
   adminId?: number;
+
+  @IsOptional()
+  deviceId?:string
 }

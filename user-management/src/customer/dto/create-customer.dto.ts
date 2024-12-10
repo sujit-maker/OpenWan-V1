@@ -1,13 +1,13 @@
-import { IsOptional, IsInt } from "class-validator";
+  import { IsOptional, IsInt } from "class-validator";
 
-// src/customer/dto/create-customer.dto.ts
-export class CreateCustomerDto {
+  export class CreateCustomerDto {
   customerName: string;
   customerAddress: string;
   gstNumber: string;
   contactName: string;
   contactNumber: string;
   email: string;
+
   @IsOptional()
   @IsInt()
   adminId?: number;
@@ -15,4 +15,5 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsInt()
   managerId?: number;
+
 }

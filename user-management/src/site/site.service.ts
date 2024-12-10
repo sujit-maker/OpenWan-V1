@@ -7,7 +7,6 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 export class SiteService {
   constructor(private prisma: PrismaService) {}
 
-
   async findByAdminId(adminId: number) {
     try {
       const sites = await this.prisma.site.findMany({
@@ -43,6 +42,25 @@ export class SiteService {
     } catch (error) {
       console.error('Error fetching sites:', error); // Log any errors
       throw new BadRequestException('Failed to fetch sites');
+    }
+  }
+
+  async findByCustomerId(customerId: number) {
+    try {
+      const sites = await this.prisma.site.findMany({
+        where: { customerId: customerId },
+        include: {
+          customer: {
+            select: {
+              customerName: true,  // Include customer name
+            },
+          },
+        },
+      });
+      return sites;
+    } catch (error) {
+      console.error('Error fetching sites by customerId:', error); // Log any errors
+      throw new BadRequestException('Failed to fetch sites for the specified customer');
     }
   }
   
@@ -101,23 +119,25 @@ export class SiteService {
   // Fetch a Specific Site by ID with Customer Name
   async findOne(id: number) {
     const site = await this.prisma.site.findUnique({
-      where: { id },
+      where: {
+        id: id  // Ensure you're passing the actual `id` here, not `Int`
+      },
       include: {
         customer: {
           select: {
-            customerName: true, 
-          },
-        },
-      },
+            customerName: true
+          }
+        }
+      }
     });
-
+  
     if (!site) {
       throw new NotFoundException(`Site with ID ${id} not found.`);
     }
-
+  
     return site;
   }
-
+  
   // Update a Site
   async update(id: number, updateSiteDto: UpdateSiteDto) {
     const { customerId, siteName, siteAddress, contactName, contactNumber, contactEmail, adminId, managerId } = updateSiteDto;

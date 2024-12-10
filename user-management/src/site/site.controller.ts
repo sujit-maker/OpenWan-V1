@@ -36,6 +36,19 @@ export class SiteController {
       throw new BadRequestException('Failed to fetch sites');
     }
   }
+
+  @Get('customer/:customerId')
+  async findByCustomerId(@Param('customerId') customerId: string) {
+    try {
+      const customerIdInt = parseInt(customerId, 10); // Convert to integer
+      if (isNaN(customerIdInt)) {
+        throw new BadRequestException('customerId must be a valid number');
+      }
+      return await this.siteService.findByCustomerId(customerIdInt); // Fetch sites for the given customer
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch sites for the specified customer');
+    }
+  }
   
 
   @Get(':id')

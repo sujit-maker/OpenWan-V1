@@ -12,6 +12,7 @@ import {
   UnauthorizedException,
   HttpException,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -182,6 +183,18 @@ export class UserController {
     }
   }
 
+   // Endpoint to get deviceId for a user
+   @Get(':id/deviceId')
+   async getDeviceId(@Param('id') id: string) {
+     const user = await this.userService.getDeviceIdForUser(id);
+     if (!user) {
+       throw new NotFoundException(`User with id ${id} not found`);
+     }
+     return { deviceId: user.deviceId };
+ }
+ 
+ 
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const idNumber = parseInt(id, 10);
@@ -198,15 +211,15 @@ export class UserController {
 
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto) {
-    const { usertype, managerId, adminId } = createUserDto;
-
+    const { usertype, managerId, adminId, deviceId } = createUserDto;
+  
     // Validate usertype and dependencies
     if (usertype === UserType.EXECUTIVE && !managerId) {
       throw new BadRequestException(
         'managerId is required for EXECUTIVE user type',
       );
     }
-
+  
     try {
       return await this.userService.createUser(
         createUserDto,
@@ -218,33 +231,38 @@ export class UserController {
       throw new InternalServerErrorException('Failed to create user');
     }
   }
+  
 
   @Post('exe')
-  async createExecutive(
-    @Body() createExecutiveDto: CreateUserDto,
-    @User() user: any,
-  ) {
-    // Add managerId and adminId to the DTO
-    createExecutiveDto.managerId = user.id;
-    const adminId = user.adminId;
+async createExecutive(
+  @Body() createExecutiveDto: CreateUserDto,
+  @User() user: any,
+) {
+  // Add managerId and adminId to the DTO
+  createExecutiveDto.managerId = user.id; // Assign the logged-in user's ID as managerId
+  const adminId = user.adminId;          // Extract adminId from the logged-in user
+  createExecutiveDto.deviceId = user.deviceId; // Extract deviceId from the logged-in user
 
-    console.log('Creating Executive:', {
+  console.log('Creating Executive:', {
+    createExecutiveDto,
+    managerId: createExecutiveDto.managerId,
+    adminId,
+    deviceId: createExecutiveDto.deviceId,
+  });
+
+  try {
+    // Pass the updated DTO, managerId, and adminId to the userService
+    return await this.userService.createUser(
       createExecutiveDto,
-      managerId: createExecutiveDto.managerId,
+      createExecutiveDto.managerId,
       adminId,
-    });
-
-    try {
-      return await this.userService.createUser(
-        createExecutiveDto,
-        createExecutiveDto.managerId,
-        adminId,
-      );
-    } catch (error) {
-      console.error('Error creating executive:', error);
-      throw new InternalServerErrorException('Failed to create executive.');
-    }
+    );
+  } catch (error) {
+    console.error('Error creating executive:', error);
+    throw new InternalServerErrorException('Failed to create executive.');
   }
+}
+
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

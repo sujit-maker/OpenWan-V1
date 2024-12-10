@@ -1,19 +1,19 @@
- "use client";
- import { useState, useEffect } from "react";
- import { useRouter } from "next/navigation";
- import { loginUser, changeUserPassword } from "../authservice/authService";
- import { toast } from "react-toastify";
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { loginUser, changeUserPassword } from "../authservice/authService";
+import { toast } from "react-toastify";
 
- type UserType = "ADMIN" | "EXECUTIVE" | "MANAGER" | "SUPERADMIN";
+type UserType = "ADMIN" | "EXECUTIVE" | "MANAGER" | "SUPERADMIN";
 
- interface LoginResponse {
+interface LoginResponse {
   access_token: string;
   id: string;
   usertype: UserType;
-  username: string; 
- }
+  username: string;
+}
 
-  export const useAuth = () => {
+export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
@@ -21,7 +21,7 @@
   const [managerId, setManagerId] = useState<string | null>(null);
   const [superadminId, setSuperadminId] = useState<string | null>(null);
   const [adminId, setAdminId] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null); 
+  const [username, setUsername] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -46,21 +46,18 @@
       setAdminId(getLocalStorage("adminId"));
       setSuperadminId(getLocalStorage("superadminId"));
       const userType = getLocalStorage("userType");
-      const storedUsername = getLocalStorage("username"); // Fetch username from localStorage
+      const storedUsername = getLocalStorage("username");
       if (userType) {
         setCurrentUserType(userType as UserType);
       }
       if (storedUsername) {
-        setUsername(storedUsername); // Set username in state
+        setUsername(storedUsername);
       }
     }
   }, []);
 
   // Login function
-  const login = async (
-    username: string,
-    password: string
-  ): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
@@ -71,7 +68,7 @@
       );
       setCurrentUserType(usertype);
       setUserId(id);
-      setUsername(fetchedUsername); // Set username on successful login
+      setUsername(fetchedUsername);
 
       if (usertype === "MANAGER") {
         setManagerId(id);
@@ -84,39 +81,55 @@
       setLocalStorage("access_token", access_token);
       setLocalStorage("userId", id);
       setLocalStorage("userType", usertype);
-      setLocalStorage("username", fetchedUsername); // Save username in localStorage
+      setLocalStorage("username", fetchedUsername);
       setLocalStorage("managerId", usertype === "MANAGER" ? id : null);
       setLocalStorage("adminId", usertype === "ADMIN" ? id : null);
       setLocalStorage("superadminId", usertype === "SUPERADMIN" ? id : null);
 
-      // Display success toast
       toast.success("Login successful!");
 
-      // Delay for 1 second to allow the toast message to be visible
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Redirect based on the user type
-      switch (usertype) {
-        case "ADMIN":
-          router.push("/dashboard");
-          break;
-        case "EXECUTIVE":
-          router.push("/executive");
-          break;
-        case "MANAGER":
-          router.push("/dashboard");
-          break;
-        case "SUPERADMIN":
-          router.push("/dashboard");
-          break;
-        default:
-          throw new Error("Invalid usertype");
+      // Check if the user is of type "EXECUTIVE"
+      if (usertype === "EXECUTIVE") {
+        // Fetch the deviceId for the executive (you may need an API endpoint for this)
+        const response = await fetch(`http://localhost:8000/users/${id}/deviceId`);
+        if (response.ok) {
+          const data = await response.json();
+          const deviceId = data.deviceId;
+
+          // Redirect to the device-specific page
+          if (deviceId) {
+            router.push(`/devices/${deviceId}`);
+          } else {
+            toast.error("No device associated with this user.");
+            router.push("/executive"); // Default fallback page
+          }
+        } else {
+          toast.error("Failed to fetch device details.");
+        }
+      } else {
+        // Redirect based on user type
+        switch (usertype) {
+          case "ADMIN":
+            router.push("/dashboard");
+            break;
+          case "MANAGER":
+            router.push("/dashboard");
+            break;
+          case "SUPERADMIN":
+            router.push("/dashboard");
+            break;
+          default:
+            throw new Error("Invalid usertype");
+        }
       }
+
       return true;
     } catch (error: any) {
       setError(error.message || "Login failed. Please try again.");
       toast.error(error.message || "Login failed. Please try again.");
-      return false; // Login failed
+      return false;
     } finally {
       setLoading(false);
     }
@@ -129,14 +142,14 @@
     setManagerId(null);
     setAdminId(null);
     setSuperadminId(null);
-    setUsername(null); // Clear username
+    setUsername(null);
     setLocalStorage("access_token", null);
     setLocalStorage("userId", null);
     setLocalStorage("userType", null);
     setLocalStorage("managerId", null);
     setLocalStorage("adminId", null);
     setLocalStorage("superadminId", null);
-    setLocalStorage("username", null); 
+    setLocalStorage("username", null);
     router.push("/");
   };
 
@@ -175,7 +188,7 @@
     managerId,
     adminId,
     superadminId,
-    username, 
+    username,
     changePassword,
   };
 };
