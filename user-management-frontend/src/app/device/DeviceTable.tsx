@@ -203,9 +203,7 @@ const DeviceTable: React.FC = () => {
         style={{
           marginTop: 80,
           marginLeft: "-150px",
-          ...(window.innerWidth < 768
-            ? { position: "fixed", marginLeft: "-275px" }
-            : {}), 
+          ...(typeof window !== "undefined" && window.innerWidth < 768 ? { position: "fixed", marginLeft: "-275px" } : {}),
         }}
       >
         {" "}

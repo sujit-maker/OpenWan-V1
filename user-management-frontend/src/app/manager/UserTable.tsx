@@ -172,7 +172,7 @@ const UserTable: React.FC = () => {
   style={{
     marginTop: 80,
     marginLeft:"-150px",
-    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+    ...(typeof window !== "undefined" && window.innerWidth < 768 ? { position: "fixed", marginLeft: "-275px" } : {}),
   }}
 >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">

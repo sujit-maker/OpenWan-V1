@@ -164,12 +164,14 @@ const UserTable: React.FC = () => {
   className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:pl-72"
   style={{
     marginTop: 80,
-    marginLeft:"-150px",
-    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), 
+    marginLeft: "-150px",
+    ...(typeof window !== "undefined" && window.innerWidth < 768
+      ? { position: "fixed", marginLeft: "-275px" }
+      : {}),
   }}
 >
 
-  <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+  <div className="flex flex-col sm:flex-row justify-between items-center mb-4" >
     <button
       onClick={() => setIsCreateModalOpen(true)}
       className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"

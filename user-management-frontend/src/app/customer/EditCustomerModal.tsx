@@ -40,7 +40,7 @@ interface EditCustomerModalProps {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-all duration-500 ease-in-out">
     <div className="bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-xl w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto transform transition-transform duration-300 ease-in-out hover:scale-105 z-50">
-      <h2 className="text-xl font-semibold mb-4 text-center text-white">Edit Device</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center text-white">Edit Customer</h2>
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Customer Name</label>
           <input

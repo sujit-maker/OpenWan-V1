@@ -200,7 +200,7 @@ const UserTable: React.FC = () => {
   style={{
     marginTop: 80,
     marginLeft:"-150px",
-    ...(window.innerWidth < 768 ? { position: "fixed",marginLeft:"-275px" } : {}), // Fixed position only for mobile
+    ...(typeof window !== "undefined" && window.innerWidth < 768 ? { position: "fixed", marginLeft: "-275px" } : {}),
   }}
 >
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -226,7 +226,7 @@ const UserTable: React.FC = () => {
         </div>
 
         <div className="lg:overflow-visible">
-          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
+          <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg" >
             <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
               <tr>
                 <th className="border p-2">Username</th>

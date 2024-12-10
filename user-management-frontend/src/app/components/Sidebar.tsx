@@ -23,11 +23,11 @@ const Sidebar: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Add success message state
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); 
 
   const { currentUserType } = useAuth();
   const currentPath = usePathname();
-  const [loadingState, setLoadingState] = useState(false); // Custom state for tracking loading
+  const [loadingState, setLoadingState] = useState(false); 
 
   const handleLogout = () => {
     router.push("/");
@@ -46,7 +46,7 @@ const Sidebar: React.FC = () => {
     // Wait 200ms before redirecting to allow sidebar close animation
     setTimeout(() => {
       router.push(path);
-    }, 200); // Wait 200ms before redirecting
+    }, 200); 
   };
   
   const getManageUsersLink = () => {
@@ -78,10 +78,9 @@ const Sidebar: React.FC = () => {
   // Watch for changes in pathname to detect when navigation is complete
   useEffect(() => {
     if (loadingState) {
-      // Optionally, check if the page is fully loaded or delay a bit
       setLoadingState(false);
     }
-  }, [currentPath]); // Effect when path changes
+  }, [currentPath]); 
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -150,7 +149,7 @@ const Sidebar: React.FC = () => {
             <div className="flex justify-center">
               <button
                 onClick={handleChangePassword}
-                disabled={loading} // Disable the button if loading
+                disabled={loading} 
                 className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
               >
                 {loading ? "Loading..." : "Change Password"}
@@ -184,8 +183,7 @@ const Sidebar: React.FC = () => {
 
         {/* Header */}
         <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
-          <div className="flex-grow " />
-          <div className="flex items-center">
+?          <div className="flex items-center">
             <FaLock
               size={20}
               className="text-white mr-4 cursor-pointer"
