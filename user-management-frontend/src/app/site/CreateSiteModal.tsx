@@ -38,9 +38,9 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
   const [adminId, setAdminId] = useState(""); 
   const [managerId, setManagerId] = useState(""); 
 
-  const loggedInAdminId = localStorage.getItem("adminId");
-  const loggedInManagerId = localStorage.getItem("managerId"); 
-  const userType = localStorage.getItem("userType");
+  const loggedInAdminId = typeof window !== "undefined" ? localStorage.getItem("adminId") : null;
+  const loggedInManagerId = typeof window !== "undefined" ? localStorage.getItem("managerId") : null;
+  const userType = typeof window !== "undefined" ? localStorage.getItem("userType") : null;
 
 
 

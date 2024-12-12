@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
@@ -436,28 +436,27 @@ const DeviceDetails: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
-
-                {/* Pagination Controls */}
-                <div className="flex justify-center mt-4  space-x-6">
-                  <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 text-balance  text-white bg-gray-600 rounded-3xl disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={indexOfLastEntry >= wanLogs.length}
-                    className="px-3 py-1 text-balance size-10 w-16 text-white bg-gray-600 rounded-3xl disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
               </div>
             )}
           </div>
         )}
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4  space-x-6">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 text-balance  text-white bg-gray-600 rounded-3xl disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={indexOfLastEntry >= wanLogs.length}
+            className="px-3 py-1 text-balance size-10 w-16 text-white bg-gray-600 rounded-3xl disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </>
   );

@@ -8,7 +8,7 @@ interface CreateDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDeviceCreated: () => void;
-}
+} 
 
 interface User {
   id: string;

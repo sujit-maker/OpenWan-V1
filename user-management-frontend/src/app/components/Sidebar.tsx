@@ -237,26 +237,23 @@ const Sidebar: React.FC = () => {
               </Button>
             </div>
 
-            {/* Navigation Links */}
             <nav className="flex-1 px-2 py-6 text-base font-medium">
+              <button
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                  isSidebarOpen ? "justify-start" : "justify-center"
+                }`}
+              >
+                <Home
+                  className={`${
+                    isSidebarOpen ? "justify-start" : "justify-center"
+                  } text-blue-600 transition-all`}
+                />
+                {isSidebarOpen && <span className="text-lg">Dashboard</span>}
+              </button>
+
+              {/* Navigation Links */}
               {currentUserType !== "EXECUTIVE" && (
                 <>
-                  <button
-                    onClick={() => handleNavigation("/dashboard")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                      isSidebarOpen ? "justify-start" : "justify-center"
-                    }`}
-                  >
-                    <Home
-                      className={`${
-                        isSidebarOpen ? "justify-start" : "justify-center"
-                      } text-blue-600 transition-all`}
-                    />
-                    {isSidebarOpen && (
-                      <span className="text-lg">Dashboard</span>
-                    )}
-                  </button>
-
                   <button
                     onClick={() => handleNavigation(getManageUsersLink())}
                     className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${

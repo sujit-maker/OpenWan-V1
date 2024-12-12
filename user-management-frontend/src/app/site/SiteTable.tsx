@@ -143,9 +143,7 @@ import {
     }
   };
 
-  const handleDropdownToggle = (siteId: number) => {
-    setDropdownVisible((prev) => (prev === siteId ? null : siteId)); // Toggle visibility based on siteId
-  };
+
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this Site?")) {

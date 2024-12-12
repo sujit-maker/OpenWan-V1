@@ -13,7 +13,7 @@ interface LoginResponse {
   username: string;
 }
 
-export const useAuth = () => {
+  export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
@@ -41,8 +41,8 @@ export const useAuth = () => {
   // Fetch IDs, userType, and username from localStorage on component mount
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setUserId(getLocalStorage("userId"));
       setManagerId(getLocalStorage("managerId"));
+      setUserId(getLocalStorage("userId"));
       setAdminId(getLocalStorage("adminId"));
       setSuperadminId(getLocalStorage("superadminId"));
       const userType = getLocalStorage("userType");
@@ -92,7 +92,6 @@ export const useAuth = () => {
 
       // Check if the user is of type "EXECUTIVE"
       if (usertype === "EXECUTIVE") {
-        // Fetch the deviceId for the executive (you may need an API endpoint for this)
         const response = await fetch(`http://localhost:8000/users/${id}/deviceId`);
         if (response.ok) {
           const data = await response.json();
@@ -103,7 +102,6 @@ export const useAuth = () => {
             router.push(`/devices/${deviceId}`);
           } else {
             toast.error("No device associated with this user.");
-            router.push("/executive"); // Default fallback page
           }
         } else {
           toast.error("Failed to fetch device details.");
