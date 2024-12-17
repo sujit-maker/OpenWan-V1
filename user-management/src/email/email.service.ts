@@ -27,7 +27,7 @@ export class EmailService {
 
     const options: nodemailer.SendMailOptions = {
       from: this.configService.get<string>('EMAIL_USER'),
-      to: recipients,
+      to: recipients.join(','),
       subject: subject,
       html: html,
     };

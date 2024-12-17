@@ -37,7 +37,7 @@ import { Task } from "./types";
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch("http://localhost:8000/tasks");
+      const response = await fetch("http://122.169.108.252:8000/tasks");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -51,7 +51,7 @@ import { Task } from "./types";
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
-        const response = await fetch(`http://localhost:8000/tasks/${id}`, {
+        const response = await fetch(`http://122.169.108.252:8000/tasks/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {

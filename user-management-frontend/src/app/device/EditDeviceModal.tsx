@@ -18,7 +18,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
   useEffect(() => {
     const fetchSites = async () => {
       try {
-        const response = await fetch('http://localhost:8000/site');
+        const response = await fetch('http://122.169.108.252:8000/site');
         if (!response.ok) {
           throw new Error('Failed to fetch sites');
         }
@@ -37,43 +37,56 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
   };
 
   const handleSave = async () => {
+    // Initialize an object for updated fields
+    const updatedFields: any = {};
+    
+    // Handle emailId separately (since it needs to be an array)
+    if (updatedDevice.emailId && typeof updatedDevice.emailId === 'string' && updatedDevice.emailId.trim() !== '') {
+      updatedFields.emailId = [updatedDevice.emailId.trim()]; // Ensure emailId is an array
+    }
+    
+    // For other fields, only include them if they're updated
+    if (updatedDevice.deviceName) updatedFields.deviceName = updatedDevice.deviceName;
+    if (updatedDevice.deviceType) updatedFields.deviceType = updatedDevice.deviceType;
+    if (updatedDevice.deviceIp) updatedFields.deviceIp = updatedDevice.deviceIp;
+    if (updatedDevice.devicePort) updatedFields.devicePort = updatedDevice.devicePort;
+    if (updatedDevice.portCount) updatedFields.portCount = updatedDevice.portCount;
+    if (updatedDevice.deviceUsername) updatedFields.deviceUsername = updatedDevice.deviceUsername;
+    if (updatedDevice.devicePassword) updatedFields.devicePassword = updatedDevice.devicePassword;
+    if (updatedDevice.siteId) updatedFields.siteId = updatedDevice.siteId;
+  
+
+  
     try {
-      const response = await fetch(`http://localhost:8000/devices/${updatedDevice.id}`, {
+      // Construct the PUT request with only the updated fields
+      const response = await fetch(`http://122.169.108.252:8000/devices/${updatedDevice.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          deviceId: updatedDevice.deviceId,
-          deviceName: updatedDevice.deviceName,
-          deviceType: updatedDevice.deviceType,
-          deviceIp: updatedDevice.deviceIp,
-          devicePort: updatedDevice.devicePort,
-          portCount: updatedDevice.portCount,
-          deviceUsername: updatedDevice.deviceUsername,
-          devicePassword: updatedDevice.devicePassword,
-          siteId: updatedDevice.siteId,
-        }),
+        body: JSON.stringify(updatedFields), // Send only the updated fields
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Error: ${errorData.message || 'Failed to update device'}`);
       }
-
+  
+      // Handle the successful update
       const updatedDeviceData = await response.json();
-      onDeviceUpdated(updatedDeviceData);
-      closeModal();
+      onDeviceUpdated(updatedDeviceData); // Pass the updated device data to the parent
+      closeModal(); // Close the modal
     } catch (error) {
-      console.error('Failed to update device:', error);
+      console.error('Failed to update device:', error); // Log any errors
     }
   };
-
+  
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 transition-all duration-500 ease-in-out">
       <div className="bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 p-6 rounded-lg shadow-xl w-full max-w-sm sm:w-96 max-h-[90vh] overflow-y-auto transform transition-transform duration-300 ease-in-out hover:scale-105 z-50">
 
         <h2 className="text-xl font-semibold py-8 text-center text-white">Edit Device</h2>
 
-        <div className="mb-4" style={{marginTop:"-20px"}}>
+        <div className="mb-4" style={{ marginTop: "-20px" }}>
           <label className="block text-sm font-medium text-gray-200 mb-2">Device ID</label>
           <input
             type="text"
@@ -147,6 +160,16 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
             type="text"
             value={updatedDevice.portCount}
             onChange={(e) => handleInputChange('portCount', e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-200 mb-2">Email Id</label>
+          <input
+            type="email"
+            value={updatedDevice.emailId}
+            onChange={(e) => handleInputChange('emailId', e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
         </div>

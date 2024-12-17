@@ -91,6 +91,7 @@ export class DevicesService {
         deviceIp: createDeviceDto.deviceIp,
         devicePort: createDeviceDto.devicePort,
         portCount: createDeviceDto.portCount,
+        emailId: createDeviceDto.emailId,
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
         adminId: createDeviceDto.adminId,

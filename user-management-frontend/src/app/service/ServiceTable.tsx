@@ -33,7 +33,7 @@ import { Service } from "./types";
 
   const fetchServices = async () => {
     try {
-      const response = await fetch("http://localhost:8000/services");
+      const response = await fetch("http://122.169.108.252:8000/services");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -47,7 +47,7 @@ import { Service } from "./types";
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
-        const response = await fetch(`http://localhost:8000/services/${id}`, {
+        const response = await fetch(`http://122.169.108.252:8000/services/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {

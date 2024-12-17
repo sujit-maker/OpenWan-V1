@@ -33,9 +33,7 @@ import "react-toastify/dist/ReactToastify.css";
   
     const success = await login(username, password);
     if (success) {
-      toast.success("Login successful!");
     } else {
-      toast.error("Invalid credentials. Please try again.");
     }
   };
   

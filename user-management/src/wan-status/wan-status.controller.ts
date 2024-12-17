@@ -12,6 +12,7 @@ export class WanStatusController {
     try {
       const sinceDateString = new Date(data.since).toISOString();
 
+      // Call the service to save the WAN status change
       await this.wanStatusService.saveData({
         ...data,
         since: sinceDateString,  
@@ -26,8 +27,7 @@ export class WanStatusController {
     }
   }
 
-  
-
+  // Endpoint to get logs
   @Get()
   async getAllLogs(): Promise<any> {
     try {

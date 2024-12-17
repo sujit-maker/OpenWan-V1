@@ -43,11 +43,11 @@ const CustomerTable: React.FC = () => {
     try {
       let url = "";
       if (currentUserType === "ADMIN" && adminId) {
-        url = `http://localhost:8000/customers?adminId=${adminId}`;
+        url = `http://122.169.108.252:8000/customers?adminId=${adminId}`;
       } else if (currentUserType === "MANAGER" && managerId) {
-        url = `http://localhost:8000/customers?managerId=${managerId}`;
+        url = `http://122.169.108.252:8000/customers?managerId=${managerId}`;
       } else if (currentUserType === "SUPERADMIN") {
-        url = "http://localhost:8000/customers"; // Fetch all customers for SUPERADMIN
+        url = "http://122.169.108.252:8000/customers"; // Fetch all customers for SUPERADMIN
       }
 
       // Check if url is empty (if no condition matches)
@@ -100,7 +100,7 @@ const CustomerTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
-        const response = await fetch(`http://localhost:8000/customers/${id}`, {
+        const response = await fetch(`http://122.169.108.252:8000/customers/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {
