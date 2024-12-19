@@ -18,7 +18,6 @@ export class WanStatusService {
     since: string;
   }): Promise<void> {
     try {
-      console.log(`Received data:`, data); // Log incoming data for debugging
 
       // Fetch the most recent record for the given identity and comment
       const previousStatus = await this.prisma.mikroTik.findFirst({
@@ -29,10 +28,7 @@ export class WanStatusService {
         orderBy: { createdAt: 'desc' },
       });
 
-      console.log(
-        `Previous status for identity "${data.identity}" and comment "${data.comment}":`,
-        previousStatus ? previousStatus.status : 'None (first entry)',
-      );
+    
 
       // Check if the status has changed
       if (!previousStatus || previousStatus.status !== data.status) {
@@ -49,7 +45,6 @@ export class WanStatusService {
             since: formattedSince,
           },
         });
-        console.log('New status saved:', newStatus);
 
         // Fetch the device data, including emailId (stored as JSON or array)
         const device = await this.prisma.device.findFirst({
@@ -58,7 +53,6 @@ export class WanStatusService {
         });
 
         if (device) {
-          console.log(`Fetched device for identity "${data.identity}":`, device);
 
           // Parse email IDs from JSON field or use them directly if already in array format
           const emailRecipients = this.parseEmailIds(device.emailId);
@@ -88,7 +82,6 @@ export class WanStatusService {
               `,
             });
 
-            console.log(`Email notification sent to:`, emailRecipients);
           } else {
             console.warn(
               `No valid email addresses found for identity "${data.identity}".`,
@@ -111,10 +104,7 @@ export class WanStatusService {
   // Helper function to parse email IDs from JSON or array
   private parseEmailIds(emailId: any): string[] {
     try {
-      console.log('Parsing email IDs:', emailId); // Log raw emailId for debugging
-
       if (Array.isArray(emailId)) {
-        console.log('Email IDs are already in array format:', emailId);
         return emailId; // Directly return the array if emailId is already an array
       }
 
@@ -122,7 +112,6 @@ export class WanStatusService {
         const parsedEmails = JSON.parse(emailId).filter(
           (email: string) => typeof email === 'string',
         );
-        console.log('Parsed email IDs:', parsedEmails); // Log parsed emails
         return parsedEmails;
       }
 
