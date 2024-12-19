@@ -16,7 +16,7 @@ const Dash: React.FC = () => {
   useEffect(() => {
     if (managerId) {
       axios
-        .get(`http://122.169.108.252:8000/customers/manager?managerId=${managerId}`)
+        .get(`http://localhost:8000/customers/manager?managerId=${managerId}`)
         .then((response) => setCustomerCount(response.data.count))
         .catch((error) => console.error("Error fetching customer count:", error));
     }
@@ -26,7 +26,7 @@ const Dash: React.FC = () => {
   useEffect(() => {
     if (managerId) {
       axios
-        .get(`http://122.169.108.252:8000/site/manager?managerId=${managerId}`)
+        .get(`http://localhost:8000/site/manager?managerId=${managerId}`)
         .then((response) => setSiteCount(response.data.count))
         .catch((error) => console.error("Error fetching site count:", error));
     }
@@ -36,7 +36,7 @@ const Dash: React.FC = () => {
   useEffect(() => {
     if (managerId) {
       axios
-        .get(`http://122.169.108.252:8000/devices/manager?managerId=${managerId}`)
+        .get(`http://localhost:8000/devices/manager?managerId=${managerId}`)
         .then((response) => setDeviceCount(response.data.count))
         .catch((error) => console.error("Error fetching device count:", error));
     }

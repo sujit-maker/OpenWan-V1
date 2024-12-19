@@ -44,11 +44,11 @@ import {
     try {
       let url = "";
       if (currentUserType === "ADMIN" && adminId) {
-        url = `http://122.169.108.252:8000/site?adminId=${adminId}`;
+        url = `http://localhost:8000/site?adminId=${adminId}`;
       } else if (currentUserType === "MANAGER" && managerId) {
-        url = `http://122.169.108.252:8000/site?managerId=${managerId}`;
+        url = `http://localhost:8000/site?managerId=${managerId}`;
       } else if (currentUserType === "SUPERADMIN") {
-        url = "http://122.169.108.252:8000/site"; // Fetch all sites for SUPERADMIN
+        url = "http://localhost:8000/site"; // Fetch all sites for SUPERADMIN
       }
 
       if (!url) {
@@ -76,7 +76,7 @@ import {
   // Function to fetch customers (separate from sites)
   const fetchCustomers = async () => {
     try {
-      const response = await fetch("http://122.169.108.252:8000/customers");
+      const response = await fetch("http://localhost:8000/customers");
       if (!response.ok) {
         console.error(`Failed to fetch customers. Status: ${response.status}`);
         throw new Error("Failed to fetch customers");
@@ -148,7 +148,7 @@ import {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this Site?")) {
       try {
-        const response = await fetch(`http://122.169.108.252:8000/site/${id}`, {
+        const response = await fetch(`http://localhost:8000/site/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {

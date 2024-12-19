@@ -16,7 +16,7 @@ import { useAuth } from "../hooks/useAuth";
         if (superadminId) {
           // Fetch all counts for superadmin
           const allCountsResponse = await fetch(
-            `http://122.169.108.252:8000/users/counts`
+            `http://localhost:8000/users/counts`
           );
           const allCountsData = await allCountsResponse.json();
 
@@ -37,7 +37,7 @@ import { useAuth } from "../hooks/useAuth";
         // Fetch managers count if managerId is present
         if (managerId) {
           const response = await fetch(
-            `http://122.169.108.252:8000/users/count/manager/${managerId}`
+            `http://localhost:8000/users/count/manager/${managerId}`
           );
           const data = await response.json();
           if (typeof data === "number") {
@@ -51,7 +51,7 @@ import { useAuth } from "../hooks/useAuth";
         if (adminId) {
           // Fetch managers associated with adminId
           const adminResponse = await fetch(
-            `http://122.169.108.252:8000/users/count/admin/${adminId}`
+            `http://localhost:8000/users/count/admin/${adminId}`
           );
           const adminData = await adminResponse.json();
           if (typeof adminData === "number") {
@@ -65,7 +65,7 @@ import { useAuth } from "../hooks/useAuth";
 
           // Fetch executives associated with adminId
           const executiveResponse = await fetch(
-            `http://122.169.108.252:8000/users/count/executives/admin/${adminId}`
+            `http://localhost:8000/users/count/executives/admin/${adminId}`
           );
           const executiveData = await executiveResponse.json();
           if (typeof executiveData === "number") {

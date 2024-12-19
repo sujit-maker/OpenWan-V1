@@ -20,7 +20,7 @@ const EditServiceModal: React.FC<EditServiceModalProps> = ({
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://122.169.108.252:8000/services/${updatedService.id}`, {
+      const response = await fetch(`http://localhost:8000/services/${updatedService.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

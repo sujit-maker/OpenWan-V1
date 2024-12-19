@@ -46,8 +46,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
   const fetchDropdownData = async () => {
     try {
       const [customerRes, serviceRes] = await Promise.all([
-        fetch("http://122.169.108.252:8000/customers"),
-        fetch("http://122.169.108.252:8000/services"),
+        fetch("http://localhost:8000/customers"),
+        fetch("http://localhost:8000/services"),
       ]);
 
       const [customersData, servicesData] = await Promise.all([
@@ -73,7 +73,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
 
   const fetchSitesForCustomer = async (customerName: string) => {
     try {
-      const response = await fetch(`http://122.169.108.252:8000/site?customerName=${encodeURIComponent(customerName)}`);
+      const response = await fetch(`http://localhost:8000/site?customerName=${encodeURIComponent(customerName)}`);
       const sitesData = await response.json();
       setSites(sitesData || []);
     } catch (error) {
@@ -83,7 +83,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onTa
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://122.169.108.252:8000/tasks", {
+      const response = await fetch("http://localhost:8000/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

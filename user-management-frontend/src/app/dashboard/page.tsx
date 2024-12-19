@@ -14,7 +14,6 @@ const Dashboard: React.FC = () => {
       try {
         if (currentUserType === "SUPERADMIN") {
           // Fetch data for SUPERADMIN
-<<<<<<< HEAD
           const response = await fetch(`http://localhost:8000/users/counts`);
           const data = await response.json();
           if (data.managers && data.admins) {
@@ -27,20 +26,6 @@ const Dashboard: React.FC = () => {
             `http://localhost:8000/users/count/admin/${adminId}`
           );
           const data = await response.json();
-=======
-          const response = await fetch(`http://122.169.108.252:8000/users/counts`);
-          const data = await response.json();
-          if (data.managers && data.admins) {
-            setManagersCount(data.managers);
-            setAdminUserCount(data.admins);
-          }
-        } else if (currentUserType === "ADMIN" && adminId) {
-          // Fetch data for ADMIN
-          const response = await fetch(
-            `http://122.169.108.252:8000/users/count/admin/${adminId}`
-          );
-          const data = await response.json();
->>>>>>> beead4b4843d038cfdbb1e955fc17e55bef45430
           setManagersCount(data);
           setAdminUserCount(null); // Clear SUPERADMIN data
         }
