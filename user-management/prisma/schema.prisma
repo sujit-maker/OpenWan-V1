@@ -114,6 +114,7 @@ model Device {
   deviceIp  String
   devicePort String
   portCount String
+  emailId   Json?   
   deviceUsername String
   devicePassword String
   

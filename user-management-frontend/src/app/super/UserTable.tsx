@@ -203,9 +203,6 @@ const UserTable: React.FC = () => {
           <th className="border px-6 py-3 text-left text-sm font-semibold">
             User Type
           </th>
-          <th className="border px-6 py-3 text-left text-sm font-semibold">
-            Manager
-          </th>
           <th className="border px-6 py-3 text-center text-sm font-semibold">
             Actions
           </th>
@@ -225,11 +222,6 @@ const UserTable: React.FC = () => {
             </td>
             <td className="border px-6 py-3 text-sm text-gray-800">
               {user.usertype}
-            </td>
-            <td className="border px-6 py-3 text-sm text-gray-800">
-              {user.usertype === "EXECUTIVE"
-                ? getManagerName(user.managerId)
-                : "N/A"}
             </td>
             <td className="border p-3 relative flex justify-center items-center">
                 {/* Dropdown Menu */}

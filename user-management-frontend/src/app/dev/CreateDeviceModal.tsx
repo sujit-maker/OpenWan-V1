@@ -20,11 +20,13 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   onClose,
   onDeviceCreated,
 }) => {
+  const [deviceId,setDeviceId] = useState("");
   const [deviceName, setDeviceName] = useState("");
   const [deviceType, setDeviceType] = useState("");
   const [deviceIp, setDeviceIp] = useState("");
   const [devicePort, setDevicePort] = useState("");
   const [portCount, setPortCount] = useState("");
+  const [emailId, setEmailId] = useState<string[]>([]); // Array for multiple emails
   const [deviceUsername, setDeviceUsername] = useState("");
   const [devicePassword, setDevicePassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,6 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
     }
   }, [currentUserType, loggedInAdminId]);
-
 
   // Fetch sites when the modal is open
   useEffect(() => {
@@ -181,18 +182,39 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       setIsLoading(false);
     }
   };
+
+   // Function to handle adding a new email input
+   const addEmailInput = () => {
+    setEmailId([...emailId, ""]);
+  };
+
+  // Function to handle removing an email input
+  const removeEmailInput = (index: number) => {
+    const updatedEmails = emailId.filter((_, i) => i !== index);
+    setEmailId(updatedEmails);
+  };
+
+  // Function to handle updating the email input value
+  const handleEmailChange = (index: number, value: string) => {
+    const updatedEmails = [...emailId];
+    updatedEmails[index] = value;
+    setEmailId(updatedEmails);
+  };
+
   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const payload = {
+      deviceId,
       deviceName,
       siteId,
       deviceType,
       deviceIp,
       devicePort,
       portCount,
+      emailId,
       deviceUsername,
       devicePassword,
       adminId:
@@ -215,7 +237,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       const data = await response.json();
       if (response.ok) {
         setSuccess("Device created successfully!");
-        alert("Site created successfully!");
+        alert("Device created successfully!");
         setError(null);
         onDeviceCreated();
         resetForm();
@@ -233,11 +255,13 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
   };
 
   const resetForm = () => {
+    setDeviceId("");
     setDeviceName("");
     setDeviceType("");
     setDeviceIp("");
     setDevicePort("");
     setPortCount("");
+    setEmailId([]);
     setDeviceUsername("");
     setDevicePassword("");
   };
@@ -278,6 +302,21 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       )}
 
       <form onSubmit={handleSubmit}>
+
+      <div className="mb-4">
+          <label htmlFor="deviceName" className="block text-white text-sm font-medium">
+            Device Identity
+          </label>
+          <input
+            id="deviceId"
+            type="text"
+            value={deviceId}
+            onChange={(e) => setDeviceId(e.target.value)}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+        </div>
+
         {/* Device Name Input */}
         <div className="mb-4">
           <label htmlFor="deviceName" className="block text-white text-sm font-medium">
@@ -420,6 +459,39 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
             className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {/* Email Inputs */}
+        <div className="mb-4 text-black">
+      <h2 className="text-lg text-white font-medium mb-4">Email IDs</h2>
+      {emailId.map((email, index) => (
+        <div key={index} className="flex items-center mb-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => handleEmailChange(index, e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder={`Email ${index + 1}`}
+          />
+          {emailId.length > 1 && (
+            <button
+              type="button"
+              onClick={() => removeEmailInput(index)}
+              className="ml-2 text-red-500 hover:text-red-700"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addEmailInput}
+        className="px-3 py-1 2xl text-white rounded-lg hover:bg-black"
+      >
+        ✚
+      </button>
+    </div>
+
 
         {/* Device Username */}
         <div className="mb-4">

@@ -1,8 +1,13 @@
 // src/devices/dto/update-device.dto.ts
 
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDeviceDto {
+
+  @IsNotEmpty()
+  @IsString()
+  deviceId: string;
+
   @IsOptional()
   @IsString()
   deviceName?: string;
@@ -25,6 +30,14 @@ export class UpdateDeviceDto {
   @IsNotEmpty()
   @IsString()
   portCount: string;
+
+   @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsString({ each: true }) // Validates each item in the array as a string
+  emailId?: string[];
+
 
   @IsOptional()
   @IsString()

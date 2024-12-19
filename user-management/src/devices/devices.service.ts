@@ -80,17 +80,18 @@ export class DevicesService {
   }
 
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
-    const newDeviceId = await this.generateNewDeviceId();
+    // const newDeviceId = await this.generateNewDeviceId();
 
     return this.prisma.device.create({
       data: {
-        deviceId: newDeviceId,
+        deviceId: createDeviceDto.deviceId,
         deviceName: createDeviceDto.deviceName,
         siteId: createDeviceDto.siteId,
         deviceType: createDeviceDto.deviceType,
         deviceIp: createDeviceDto.deviceIp,
         devicePort: createDeviceDto.devicePort,
         portCount: createDeviceDto.portCount,
+        emailId: createDeviceDto.emailId,
         deviceUsername: createDeviceDto.deviceUsername,
         devicePassword: createDeviceDto.devicePassword,
         adminId: createDeviceDto.adminId,
@@ -99,18 +100,18 @@ export class DevicesService {
     });
   }
 
-  private async generateNewDeviceId(): Promise<string> {
-    const lastDevice = await this.prisma.device.findFirst({
-      orderBy: { id: 'desc' },
-    });
-    let newDeviceId = 'gateway-01';
-    if (lastDevice?.deviceId) {
-      const lastDeviceNumber =
-        parseInt(lastDevice.deviceId.split('-')[1], 10) || 0;
-      newDeviceId = `gateway-${String(lastDeviceNumber + 1).padStart(2, '0')}`;
-    }
-    return newDeviceId;
-  }
+  // private async generateNewDeviceId(): Promise<string> {
+  //   const lastDevice = await this.prisma.device.findFirst({
+  //     orderBy: { id: 'desc' },
+  //   });
+  //   let newDeviceId = 'gateway-01';
+  //   if (lastDevice?.deviceId) {
+  //     const lastDeviceNumber =
+  //       parseInt(lastDevice.deviceId.split('-')[1], 10) || 0;
+  //     newDeviceId = `gateway-${String(lastDeviceNumber + 1).padStart(2, '0')}`;
+  //   }
+  //   return newDeviceId;
+  // }
 
   async getDeviceById(deviceId: string): Promise<Device> {
     const device = await this.prisma.device.findUnique({

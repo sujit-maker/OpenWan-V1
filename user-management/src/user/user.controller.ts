@@ -47,30 +47,30 @@ export class UserController {
     return this.userService.getUserCountByAdminId(parsedAdminId);
   }
 
-  @Get('count/manager/:managerId')
-  async getExecutiveCount(
-    @Param('managerId') managerId: string,
-  ): Promise<number> {
-    // Parse the managerId to a number
-    const parsedManagerId = parseInt(managerId, 10);
+  // @Get('count/manager/:managerId')
+  // async getExecutiveCount(
+  //   @Param('managerId') managerId: string,
+  // ): Promise<number> {
+  //   // Parse the managerId to a number
+  //   const parsedManagerId = parseInt(managerId, 10);
 
-    if (isNaN(parsedManagerId)) {
-      throw new HttpException('Invalid manager ID', HttpStatus.BAD_REQUEST);
-    }
+  //   if (isNaN(parsedManagerId)) {
+  //     throw new HttpException('Invalid manager ID', HttpStatus.BAD_REQUEST);
+  //   }
 
-    return this.userService.getUserCountByManagerId(parsedManagerId);
-  }
+  //   return this.userService.getUserCountByManagerId(parsedManagerId);
+  // }
 
-  @Get('count/executives/admin/:adminId')
-  async getExecutivesCount(@Param('adminId') adminId: string): Promise<number> {
-    const parsedAdminId = parseInt(adminId, 10);
+  // @Get('count/executives/admin/:adminId')
+  // async getExecutivesCount(@Param('adminId') adminId: string): Promise<number> {
+  //   const parsedAdminId = parseInt(adminId, 10);
 
-    if (isNaN(parsedAdminId)) {
-      throw new HttpException('Invalid admin ID', HttpStatus.BAD_REQUEST);
-    }
+  //   if (isNaN(parsedAdminId)) {
+  //     throw new HttpException('Invalid admin ID', HttpStatus.BAD_REQUEST);
+  //   }
 
-    return this.userService.getExecutiveCountByAdminId(parsedAdminId);
-  }
+  //   return this.userService.getExecutiveCountByAdminId(parsedAdminId);
+  // }
 
   @Get('counts')
   async getUserCounts() {
@@ -156,32 +156,32 @@ export class UserController {
     return await this.userService.findUsersByAdminId(parsedAdminId);
   }
 
-  @Get('executives')
-  async findExecutivesByManager(@Query('managerId') managerId: string) {
-    // Check if managerId is provided
-    if (!managerId || managerId.trim() === '') {
-      throw new BadRequestException('Manager ID is required');
-    }
+  // @Get('executives')
+  // async findExecutivesByManager(@Query('managerId') managerId: string) {
+  //   // Check if managerId is provided
+  //   if (!managerId || managerId.trim() === '') {
+  //     throw new BadRequestException('Manager ID is required');
+  //   }
 
-    // Convert managerId to a number
-    const managerIdNumber = parseInt(managerId.trim(), 10);
+  //   // Convert managerId to a number
+  //   const managerIdNumber = parseInt(managerId.trim(), 10);
 
-    // Validate if managerId is a number and is greater than 0
-    if (isNaN(managerIdNumber) || managerIdNumber <= 0) {
-      throw new BadRequestException('Invalid manager ID format');
-    }
+  //   // Validate if managerId is a number and is greater than 0
+  //   if (isNaN(managerIdNumber) || managerIdNumber <= 0) {
+  //     throw new BadRequestException('Invalid manager ID format');
+  //   }
 
-    try {
-      const executives =
-        await this.userService.findExecutivesByManager(managerIdNumber);
-      return executives;
-    } catch (error) {
-      console.error('Error fetching executives:', error);
-      throw new InternalServerErrorException(
-        'An error occurred while fetching executives',
-      );
-    }
-  }
+  //   try {
+  //     const executives =
+  //       await this.userService.findExecutivesByManager(managerIdNumber);
+  //     return executives;
+  //   } catch (error) {
+  //     console.error('Error fetching executives:', error);
+  //     throw new InternalServerErrorException(
+  //       'An error occurred while fetching executives',
+  //     );
+  //   }
+  // }
 
    // Endpoint to get deviceId for a user
    @Get(':id/deviceId')

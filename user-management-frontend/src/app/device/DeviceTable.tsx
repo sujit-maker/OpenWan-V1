@@ -233,7 +233,7 @@ const DeviceTable: React.FC = () => {
         <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg">
       <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
         <tr>
-          <th className="border p-2 text-center">id</th>
+          <th className="border p-2 text-center">Identity</th>
           <th className="border p-2 text-center">Device</th>
           <th className="border p-2 text-center">Site</th>
           <th className="border p-2 text-center">Actions</th>

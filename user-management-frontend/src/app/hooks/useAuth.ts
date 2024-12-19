@@ -13,7 +13,7 @@ interface LoginResponse {
   username: string;
 }
 
-  export const useAuth = () => {
+export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<UserType | null>(null);
@@ -66,66 +66,51 @@ interface LoginResponse {
         username,
         password
       );
+
       setCurrentUserType(usertype);
       setUserId(id);
       setUsername(fetchedUsername);
 
-      if (usertype === "MANAGER") {
-        setManagerId(id);
-      } else if (usertype === "ADMIN") {
-        setAdminId(id);
-      } else if (usertype === "SUPERADMIN") {
-        setSuperadminId(id);
-      }
-
+      // Store data in localStorage
       setLocalStorage("access_token", access_token);
       setLocalStorage("userId", id);
       setLocalStorage("userType", usertype);
       setLocalStorage("username", fetchedUsername);
-      setLocalStorage("managerId", usertype === "MANAGER" ? id : null);
-      setLocalStorage("adminId", usertype === "ADMIN" ? id : null);
-      setLocalStorage("superadminId", usertype === "SUPERADMIN" ? id : null);
+      if (usertype === "MANAGER") setLocalStorage("managerId", id);
+      if (usertype === "ADMIN") setLocalStorage("adminId", id);
+      if (usertype === "SUPERADMIN") setLocalStorage("superadminId", id);
 
       toast.success("Login successful!");
 
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
-      // Check if the user is of type "EXECUTIVE"
+      // Handle EXECUTIVE user redirection
       if (usertype === "EXECUTIVE") {
         const response = await fetch(`http://localhost:8000/users/${id}/deviceId`);
         if (response.ok) {
           const data = await response.json();
           const deviceId = data.deviceId;
 
-          // Redirect to the device-specific page
           if (deviceId) {
             router.push(`/devices/${deviceId}`);
           } else {
             toast.error("No device associated with this user.");
+            throw new Error("No device associated with this user.");
           }
         } else {
-          toast.error("Failed to fetch device details.");
+          throw new Error("Failed to fetch device details.");
         }
       } else {
         // Redirect based on user type
-        switch (usertype) {
-          case "ADMIN":
-            router.push("/dashboard");
-            break;
-          case "MANAGER":
-            router.push("/dash");
-            break;
-          case "SUPERADMIN":
-            router.push("/dashboard");
-            break;
-          default:
-            throw new Error("Invalid usertype");
-        }
+        const routes: Record<UserType, string> = {
+          ADMIN: "/dashboard",
+          MANAGER: "/dash",
+          SUPERADMIN: "/dashboard",
+          EXECUTIVE: "/",
+        };
+        router.push(routes[usertype]);
       }
 
       return true;
     } catch (error: any) {
-      setError(error.message || "Login failed. Please try again.");
       toast.error(error.message || "Login failed. Please try again.");
       return false;
     } finally {
@@ -164,13 +149,9 @@ interface LoginResponse {
       if (!userId) throw new Error("User not authenticated.");
 
       await changeUserPassword(userId, newPassword, confirmPassword);
-      alert("Password changed successfully.");
+      toast.success("Password changed successfully.");
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message || "Failed to change password.");
-      } else {
-        setError("An unknown error occurred.");
-      }
+      setError(error instanceof Error ? error.message : "An unknown error occurred.");
     } finally {
       setLoading(false);
     }

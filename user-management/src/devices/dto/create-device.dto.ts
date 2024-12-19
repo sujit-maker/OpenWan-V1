@@ -1,6 +1,11 @@
-import { IsNotEmpty, IsString, IsInt, IsIP, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsIP, IsOptional, ArrayNotEmpty, ArrayUnique, IsArray } from 'class-validator';
 
 export class CreateDeviceDto {
+
+  @IsNotEmpty()
+  @IsString()
+  deviceId: string;
+
   @IsNotEmpty()
   @IsString()
   deviceName: string;
@@ -24,6 +29,14 @@ export class CreateDeviceDto {
   @IsNotEmpty()
   @IsString()
   portCount: string;
+
+  
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsString({ each: true }) // Validates each item in the array as a string
+  emailId?: string[];
 
   @IsNotEmpty()
   @IsString()
