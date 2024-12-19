@@ -79,7 +79,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
         try {
           // Fetch adminId associated with the logged-in manager
           const response = await fetch(
-            `http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`
+            `http://122.169.108.252:8000/users/admins/manager?managerId=${loggedInManagerId}`
           );
           const data = await response.json();
           setAdminId(data[0]?.id || ""); 
@@ -98,7 +98,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     setAdmins([]); 
 
     try {
-      const response = await fetch("http://localhost:8000/users/admins");
+      const response = await fetch("http://122.169.108.252:8000/users/admins");
       const data: User[] = await response.json();
       setAdmins(data);
     } catch (error) {
@@ -152,7 +152,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
 
     try {
 
-      const url = `http://localhost:8000/customers?managerId=${managerId}`;
+      const url = `http://122.169.108.252:8000/customers?managerId=${managerId}`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -190,7 +190,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:8000/users/managers/admin?adminId=${adminId}`
+        `http://122.169.108.252:8000/users/managers/admin?adminId=${adminId}`
       );
 
       if (!response.ok) {
@@ -251,7 +251,7 @@ const CreateSiteModal: React.FC<CreateSiteModalProps> = ({
     }
 
     try {
-      const response = await fetch("http://localhost:8000/site", {
+      const response = await fetch("http://122.169.108.252:8000/site", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

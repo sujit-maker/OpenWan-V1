@@ -57,7 +57,7 @@ const DeviceDetails: React.FC = () => {
 
   const fetchWanLogs = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8000/wanstatus`);
+      const response = await fetch(`http://122.169.108.252:8000/wanstatus`);
       if (!response.ok) throw new Error("Failed to fetch WAN logs");
       const data = await response.json();
       setWanLogs(data.data);
@@ -94,7 +94,7 @@ const DeviceDetails: React.FC = () => {
         console.error("Device ID is missing");
         return;
       }
-      const response = await fetch(`http://localhost:8000/devices/${deviceId}`);
+      const response = await fetch(`http://122.169.108.252:8000/devices/${deviceId}`);
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -118,7 +118,7 @@ const DeviceDetails: React.FC = () => {
   const fetchWANDetails = async (wan: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/devices/${deviceId}/wan-ip?wan=${wan}`
+        `http://122.169.108.252:8000/devices/${deviceId}/wan-ip?wan=${wan}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -135,7 +135,7 @@ const DeviceDetails: React.FC = () => {
   const fetchNetwatchStatus = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/devices/${deviceId}/tool/netwatch`
+        `http://122.169.108.252:8000/devices/${deviceId}/tool/netwatch`
       );
       if (response.ok) {
         const data = await response.json();
@@ -166,7 +166,7 @@ const DeviceDetails: React.FC = () => {
     const fetchDeviceData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/devices/${deviceId}/data`
+          `http://122.169.108.252:8000/devices/${deviceId}/data`
         );
         if (!response.ok) throw new Error("Failed to fetch device data");
         const data = await response.json();

@@ -13,7 +13,6 @@ model User {
   password  String
   usertype  UserType
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   // Self-referential relations
   manager    User?  @relation("UserManager", fields: [managerId], references: [id])
@@ -117,7 +116,6 @@ model Device {
   emailId   Json?   
   deviceUsername String
   devicePassword String
-  
 
   managerId Int? // Foreign key to the User model for the manager
   adminId   Int? // Foreign key to the User model for the admin

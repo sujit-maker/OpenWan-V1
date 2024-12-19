@@ -359,7 +359,6 @@ export class UserService {
     });
 
     if (executives.length === 0) {
-      console.log(`No executives found for manager ID ${managerId}`);
     }
 
     return executives;

@@ -18,7 +18,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
   useEffect(() => {
     const fetchSites = async () => {
       try {
-        const response = await fetch('http://localhost:8000/site');
+        const response = await fetch('http://122.169.108.252:8000/site');
         if (!response.ok) {
           throw new Error('Failed to fetch sites');
         }
@@ -38,7 +38,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/devices/${updatedDevice.id}`, {
+      const response = await fetch(`http://122.169.108.252:8000/devices/${updatedDevice.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -48,6 +48,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
           deviceIp: updatedDevice.deviceIp,
           devicePort: updatedDevice.devicePort,
           portCount: updatedDevice.portCount,
+          emailId: updatedDevice.emailId,
           deviceUsername: updatedDevice.deviceUsername,
           devicePassword: updatedDevice.devicePassword,
           siteId: updatedDevice.siteId,
@@ -147,6 +148,16 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
             type="text"
             value={updatedDevice.portCount}
             onChange={(e) => handleInputChange('portCount', e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-200 mb-2">Email Id</label>
+          <input
+            type="email"
+            value={updatedDevice.emailId}
+            onChange={(e) => handleInputChange('emailId', e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
         </div>

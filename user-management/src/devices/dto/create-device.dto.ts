@@ -30,7 +30,10 @@ export class CreateDeviceDto {
   @IsString()
   portCount: string;
 
+<<<<<<< HEAD
   
+=======
+>>>>>>> beead4b4843d038cfdbb1e955fc17e55bef45430
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()

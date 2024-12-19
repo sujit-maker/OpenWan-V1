@@ -11,6 +11,7 @@ export interface Device {
     deviceIp: string;
     devicePort: string;
     portCount :string;
+    emailId: string;
     deviceUsername: string;
     devicePassword: string;
   }

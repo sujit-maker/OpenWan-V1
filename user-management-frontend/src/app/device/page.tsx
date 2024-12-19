@@ -13,7 +13,6 @@ import { HiLogout } from "react-icons/hi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 import { DeviceUnknown,} from "@mui/icons-material";
-import CustomerTable from "../customer/CustomerTable";
 import DeviceTable from "../device/DeviceTable";
 
 const Dev: React.FC = () => {
@@ -102,17 +101,7 @@ const Dev: React.FC = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
-  const toggleDropdown = (event: React.MouseEvent) => {
-    event.stopPropagation();  // Stop event propagation to avoid outside click from closing the dropdown
-    console.log("Dropdown clicked");  // Debugging: Log when the dropdown is clicked
-    console.log(username)
-  
-    // Toggle the dropdown state and log the updated state
-    setIsDropdownOpen((prev) => {
-      console.log("Previous Dropdown State: ", prev);  // Debugging: Log previous state
-      return !prev;
-    });
-  };
+
   
 
 

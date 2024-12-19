@@ -29,7 +29,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   // Handle Save action
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/tasks/${updatedTask.id}`, {
+      const response = await fetch(`http://122.169.108.252:8000/tasks/${updatedTask.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedTask),
