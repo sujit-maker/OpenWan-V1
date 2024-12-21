@@ -265,7 +265,7 @@ const DeviceTable: React.FC = () => {
                   >
                     <DropdownMenuItem
                       onClick={() => handleConnect(device)}
-                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-blue-100 transition duration-200"
+                      className="flex items-center cursor-pointer space-x-2 px-3 py-2 rounded-md hover:bg-blue-300 transition duration-200"
                     >
                       <FaPlug className="text-blue-600" />
                       <span className="text-blue-600 font-bold">Connect</span>

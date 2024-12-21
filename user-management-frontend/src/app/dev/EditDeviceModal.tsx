@@ -62,6 +62,7 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = ({
 
       const updatedDeviceData = await response.json();
       onDeviceUpdated(updatedDeviceData);
+      alert("Device Updated successfully!");
       closeModal();
     } catch (error) {
       console.error('Failed to update device:', error);

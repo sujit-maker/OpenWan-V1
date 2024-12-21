@@ -30,7 +30,7 @@ import {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of customers per page
+  const [itemsPerPage] = useState(5); 
 
   // Function to fetch sites based on user type
   const fetchSites = async () => {
@@ -48,7 +48,7 @@ import {
       } else if (currentUserType === "MANAGER" && managerId) {
         url = `http://localhost:8000/site?managerId=${managerId}`;
       } else if (currentUserType === "SUPERADMIN") {
-        url = "http://localhost:8000/site"; // Fetch all sites for SUPERADMIN
+        url = "http://localhost:8000/site"; 
       }
 
       if (!url) {
@@ -70,7 +70,7 @@ import {
   };
 
   useEffect(() => {
-    fetchCustomers(); // Fetch customers when the component mounts
+    fetchCustomers(); 
   }, []);
 
   // Function to fetch customers (separate from sites)
@@ -90,12 +90,11 @@ import {
 
   useEffect(() => {
     if (currentUserType && userId) {
-      fetchSites(); // Fetch sites when user type and userId are available
+      fetchSites(); 
     }
   }, [currentUserType, userId, adminId, managerId]);
 
   useEffect(() => {
-    // Filter sites based on the search query
     setFilteredSites(
       sites.filter(
         (site) =>
@@ -107,12 +106,12 @@ import {
 
   const handleSiteCreated = (site: Site) => {
     setSites((prevSites) => [...prevSites, site]);
-    fetchSites(); // Ensure the latest data is fetched after creation
+    fetchSites(); 
   };
 
   const handleEdit = (site: Site) => {
-    setEditingSite(site); // Correctly sets the editing site
-    setIsEditModalOpen(true); // Optional, if you want an explicit toggle
+    setEditingSite(site); 
+    setIsEditModalOpen(true); 
   };
   
 
@@ -120,15 +119,12 @@ import {
     setSites((prevSites) =>
       prevSites.map((site) => (site.id === updatedSite.id ? updatedSite : site))
     );
-    setEditingSite(null); // Close the edit modal
-    fetchSites(); // Ensure the latest data is fetched after update
+    setEditingSite(null); 
+    fetchSites();
   };
 
   useEffect(() => {
-    // Add event listener when the component mounts
     document.addEventListener("mousedown", handleClickOutside);
-
-    // Cleanup event listener on unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -139,10 +135,9 @@ import {
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node)
     ) {
-      setDropdownVisible(null); // Close dropdown if clicked outside
+      setDropdownVisible(null); 
     }
   };
-
 
 
   const handleDelete = async (id: number) => {
@@ -155,7 +150,7 @@ import {
           throw new Error("Failed to delete site");
         }
         setSites((prevSites) => prevSites.filter((site) => site.id !== id));
-        fetchSites(); // Ensure the latest data is fetched after delete
+        fetchSites(); 
       } catch (error) {
         console.error("Error deleting site:", error);
       }

@@ -69,8 +69,7 @@ const Adm: React.FC = () => {
         return "/man";
       case "SUPERADMIN":
         return "/super";
-      case "EXECUTIVE":
-        return "/executive";
+      
       default:
         return "/";
     }
@@ -257,7 +256,7 @@ const Adm: React.FC = () => {
             <nav className="flex-1 px-2 py-6 text-base font-medium">
               <button
                 onClick={() => handleNavigation("/dashboard")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >
@@ -271,7 +270,7 @@ const Adm: React.FC = () => {
 
               <button
                 onClick={() => handleNavigation(getManageUsersLink())}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >
@@ -283,7 +282,7 @@ const Adm: React.FC = () => {
 
               <button
                 onClick={() => handleNavigation("/customer")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >
@@ -293,7 +292,7 @@ const Adm: React.FC = () => {
 
               <button
                 onClick={() => handleNavigation("/site")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >
@@ -303,7 +302,7 @@ const Adm: React.FC = () => {
 
               <button
                 onClick={() => handleNavigation("/dev")}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >

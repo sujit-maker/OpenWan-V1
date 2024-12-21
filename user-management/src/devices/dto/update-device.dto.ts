@@ -13,7 +13,8 @@ export class UpdateDeviceDto {
   deviceName?: string;
 
   @IsNotEmpty()
-  siteId: number; 
+  @IsInt()
+  siteId: number;
 
   @IsOptional()
   @IsString()

@@ -11,7 +11,7 @@ interface LoginResponse {
   id: string;
   usertype: UserType;
   username: string;
-}
+}                                                      
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);

@@ -21,22 +21,22 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
   async findAll(@Query('adminId') adminId?: string, @Query('managerId') managerId?: string) {
     try {
       if (adminId) {
-        const adminIdInt = parseInt(adminId, 10); // Convert to integer
+        const adminIdInt = parseInt(adminId, 10); 
         if (isNaN(adminIdInt)) {
           throw new BadRequestException('adminId must be a valid number');
         }
-        return await this.devicesService.findByAdminId(adminIdInt); // Fetch devices for a specific admin
+        return await this.devicesService.findByAdminId(adminIdInt); 
       }
 
       if (managerId) {
-        const managerIdInt = parseInt(managerId, 10); // Convert to integer
+        const managerIdInt = parseInt(managerId, 10); 
         if (isNaN(managerIdInt)) {
           throw new BadRequestException('managerId must be a valid number');
         }
-        return await this.devicesService.findByManagerId(managerIdInt); // Fetch devices for a specific manager
+        return await this.devicesService.findByManagerId(managerIdInt); 
       }
 
-      return await this.devicesService.findAll(); // No filters, fetch all devices
+      return await this.devicesService.findAll(); 
     } catch (error) {
       throw new BadRequestException('Failed to fetch devices');
     }
@@ -72,11 +72,11 @@ import { MikroTikService } from 'src/mikrotik/mikrotik.service';
   @Get('site/:siteId')
 async findBySiteId(@Param('siteId') siteId: string) {
   try {
-    const siteIdInt = parseInt(siteId, 10); // Convert the siteId to an integer
+    const siteIdInt = parseInt(siteId, 10); 
     if (isNaN(siteIdInt)) {
       throw new BadRequestException('siteId must be a valid number');
     }
-    return await this.devicesService.findBySiteId(siteIdInt); // Fetch devices associated with the given siteId
+    return await this.devicesService.findBySiteId(siteIdInt); 
   } catch (error) {
     throw new BadRequestException('Failed to fetch devices for the specified site');
   }
@@ -127,7 +127,6 @@ async findBySiteId(@Param('siteId') siteId: string) {
     if (!device) {
       throw new NotFoundException(`Device with ID ${deviceId} not found`);
     }
-
     return this.devicesService.getNetwatchData(deviceId); 
   }
 

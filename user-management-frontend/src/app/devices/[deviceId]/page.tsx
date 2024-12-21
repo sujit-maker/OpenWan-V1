@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
 import { FaDownload, FaSpinner } from "react-icons/fa";
 import * as XLSX from "xlsx";
@@ -53,7 +53,6 @@ const DeviceDetails: React.FC = () => {
   const [portCount, setPortCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 6;
-  const router = useRouter();
 
   const fetchWanLogs = useCallback(async () => {
     try {
@@ -245,9 +244,6 @@ const DeviceDetails: React.FC = () => {
       </div>
     );
   }
-  const backme = () => {
-    router.push("/dev");
-  };
 
   return (
     <>

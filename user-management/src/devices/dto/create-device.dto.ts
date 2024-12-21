@@ -19,7 +19,7 @@ export class CreateDeviceDto {
   deviceType: string;
 
   @IsNotEmpty()
-  @IsIP()
+  @IsString()
   deviceIp: string;
 
   @IsNotEmpty()
@@ -34,7 +34,7 @@ export class CreateDeviceDto {
   @IsArray()
   @ArrayNotEmpty()
   @ArrayUnique()
-  @IsString({ each: true }) // Validates each item in the array as a string
+  @IsString({ each: true }) 
   emailId?: string[];
 
   @IsNotEmpty()
@@ -47,9 +47,9 @@ export class CreateDeviceDto {
   
   @IsOptional()
   @IsInt()
-  adminId?: number; // Optional field for admin
+  adminId?: number; 
 
   @IsOptional()
   @IsInt()
-  managerId?: number; // Optional field for manager
+  managerId?: number; 
 }

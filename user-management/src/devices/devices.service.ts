@@ -22,11 +22,11 @@ export class DevicesService {
   async findByAdminId(adminId: number) {
     try {
       const devices = await this.prisma.device.findMany({
-        where: { adminId: adminId }, // Expect adminId to be an integer
+        where: { adminId: adminId },
       });
       return devices;
     } catch (error) {
-      console.error('Error fetching devices:', error); // Log any errors
+      console.error('Error fetching devices:', error);
       throw new BadRequestException('Failed to fetch devices');
     }
   }
@@ -34,11 +34,11 @@ export class DevicesService {
   async findByManagerId(managerId: number) {
     try {
       const devices = await this.prisma.device.findMany({
-        where: { managerId: managerId }, // Expect managerId to be an integer
+        where: { managerId: managerId },
       });
       return devices;
     } catch (error) {
-      console.error('Error fetching devices:', error); // Log any errors
+      console.error('Error fetching devices:', error);
       throw new BadRequestException('Failed to fetch devices');
     }
   }
@@ -61,18 +61,18 @@ export class DevicesService {
   async findBySiteId(siteId: number) {
     try {
       const devices = await this.prisma.device.findMany({
-        where: { siteId: siteId }, // Fetch devices based on siteId
+        where: { siteId: siteId },
         include: {
           site: {
             select: {
-              siteName: true, // Include siteName from the related site model
+              siteName: true,
             },
           },
         },
       });
       return devices;
     } catch (error) {
-      console.error('Error fetching devices by siteId:', error); // Log any errors for debugging
+      console.error('Error fetching devices by siteId:', error);
       throw new BadRequestException(
         'Failed to fetch devices for the specified site',
       );
@@ -80,8 +80,6 @@ export class DevicesService {
   }
 
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
-    // const newDeviceId = await this.generateNewDeviceId();
-
     return this.prisma.device.create({
       data: {
         deviceId: createDeviceDto.deviceId,
@@ -99,19 +97,6 @@ export class DevicesService {
       },
     });
   }
-
-  // private async generateNewDeviceId(): Promise<string> {
-  //   const lastDevice = await this.prisma.device.findFirst({
-  //     orderBy: { id: 'desc' },
-  //   });
-  //   let newDeviceId = 'gateway-01';
-  //   if (lastDevice?.deviceId) {
-  //     const lastDeviceNumber =
-  //       parseInt(lastDevice.deviceId.split('-')[1], 10) || 0;
-  //     newDeviceId = `gateway-${String(lastDeviceNumber + 1).padStart(2, '0')}`;
-  //   }
-  //   return newDeviceId;
-  // }
 
   async getDeviceById(deviceId: string): Promise<Device> {
     const device = await this.prisma.device.findUnique({
@@ -192,16 +177,16 @@ export class DevicesService {
     return fetchFunction.call(this.mikrotikService, routerUrl, auth);
   }
 
-   // New method to categorize device based on WAN status
-   async categorizeDeviceByWanStatus(deviceId: string): Promise<string> {
+  // New method to categorize device based on WAN status
+  async categorizeDeviceByWanStatus(deviceId: string): Promise<string> {
     const device = await this.prisma.device.findUnique({
       where: { deviceId },
     });
-  
+
     if (!device) {
       throw new NotFoundException(`Device with ID ${deviceId} not found`);
     }
-  
+
     const wanStatuses = await Promise.all([
       this.mikrotikService.fetchWan1Status(device.deviceIp, {
         username: device.deviceUsername,
@@ -220,9 +205,9 @@ export class DevicesService {
         password: device.devicePassword,
       }),
     ]);
-  
+
     const activeWans = wanStatuses.filter((wan) => wan !== null).length;
-  
+
     if (activeWans === wanStatuses.length) {
       return 'full working';
     } else if (activeWans > 0) {
@@ -231,7 +216,6 @@ export class DevicesService {
       return 'no working';
     }
   }
-  
 
   async findAll(): Promise<Device[]> {
     return this.prisma.device.findMany();

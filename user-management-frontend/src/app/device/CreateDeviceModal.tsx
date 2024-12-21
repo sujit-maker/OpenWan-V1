@@ -476,9 +476,9 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
             <button
               type="button"
               onClick={() => removeEmailInput(index)}
-              className="ml-2 text-red-500 hover:text-red-700"
+              className="ml-2 text-black bold hover:text-white"
             >
-              Remove
+              ━
             </button>
           )}
         </div>
@@ -486,7 +486,7 @@ const CreateDeviceModal: React.FC<CreateDeviceModalProps> = ({
       <button
         type="button"
         onClick={addEmailInput}
-        className="px-3 py-1 2xl text-white rounded-lg hover:bg-black"
+        className="px-3 py-1 2xl text-white rounded-lg hover:bg-slate-800"
       >
         ✚
       </button>

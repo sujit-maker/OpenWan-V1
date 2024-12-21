@@ -28,16 +28,9 @@ const Sidebar: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
-    // Close the sidebar every time a link is clicked
     setIsSidebarOpen(false);
-
-    // If the clicked link is the same as the current path, don't trigger loading or navigation
     if (currentPath === path) return;
-
-    // Set loading state to true if navigating to a different page
     setLoadingState(true);
-
-    // Wait 200ms before redirecting to allow sidebar close animation
     setTimeout(() => {
       router.push(path);
     }, 200);
@@ -53,8 +46,7 @@ const Sidebar: React.FC = () => {
         return "/man";
       case "SUPERADMIN":
         return "/super";
-      case "EXECUTIVE":
-        return "/executive";
+      
       default:
         return "/";
     }
@@ -224,7 +216,7 @@ const Sidebar: React.FC = () => {
         >
           <div className="flex h-full flex-col ">
             {/* Sidebar Header */}
-            <div className="flex items-center border-b px-4 h-14  ">
+            <div className="flex items-center border-b px-4 h-14 ">
               <Button
                 variant="outline"
                 size="icon"
@@ -238,25 +230,27 @@ const Sidebar: React.FC = () => {
             </div>
 
             <nav className="flex-1 px-2 py-6 text-base font-medium">
-              <button
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
-                  isSidebarOpen ? "justify-start" : "justify-center"
-                }`}
-              >
-                <Home
-                  className={`${
-                    isSidebarOpen ? "justify-start" : "justify-center"
-                  } text-blue-600 transition-all`}
-                />
-                {isSidebarOpen && <span className="text-lg">Dashboard</span>}
-              </button>
-
               {/* Navigation Links */}
-              {currentUserType !== "EXECUTIVE" && (
                 <>
                   <button
+                    onClick={() => handleNavigation("/dashboard")}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
+                      isSidebarOpen ? "justify-start" : "justify-center"
+                    }`}
+                  >
+                    <Home
+                      className={`${
+                        isSidebarOpen ? "justify-start" : "justify-center"
+                      } text-blue-600 transition-all`}
+                    />
+                    {isSidebarOpen && (
+                      <span className="text-lg">Dashboard</span>
+                    )}
+                  </button>
+
+                  <button
                     onClick={() => handleNavigation(getManageUsersLink())}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -268,7 +262,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/customer")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -280,7 +274,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/site")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -290,7 +284,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/device")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -298,13 +292,9 @@ const Sidebar: React.FC = () => {
                     {isSidebarOpen && <span className="text-lg">Device</span>}
                   </button>
                 </>
-              )}
             </nav>
           </div>
         </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6">{/* Your page content here */}</main>
       </div>
     </>
   );

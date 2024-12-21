@@ -14,7 +14,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
   onClose,
   onUserCreated,
-  currentUserType,
   adminId,
 }) => {
   const [username, setUsername] = useState("");

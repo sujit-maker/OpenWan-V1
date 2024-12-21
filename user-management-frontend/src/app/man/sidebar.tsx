@@ -53,8 +53,7 @@ const Sidebar: React.FC = () => {
         return "/man";
       case "SUPERADMIN":
         return "/sup";
-      case "EXECUTIVE":
-        return "/executive";
+      
       default:
         return "/";
     }
@@ -241,7 +240,7 @@ const Sidebar: React.FC = () => {
               <button
               onClick={() => handleNavigation("/dash")}
 
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                   isSidebarOpen ? "justify-start" : "justify-center"
                 }`}
               >
@@ -260,7 +259,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/cus")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -272,7 +271,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/sit")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
@@ -282,7 +281,7 @@ const Sidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleNavigation("/dev")}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-100 ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all hover:bg-blue-300 ${
                       isSidebarOpen ? "justify-start" : "justify-center"
                     }`}
                   >
