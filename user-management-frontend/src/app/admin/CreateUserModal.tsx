@@ -98,7 +98,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const resetForm = () => {
     setUsername("");
     setPassword("");
-    setUsertype("MANAGER"); // Default to "MANAGER"
+    setUsertype("MANAGER"); 
   };
 
   return (

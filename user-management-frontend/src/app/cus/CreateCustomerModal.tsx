@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 
 // Define the User type for the manager data
 interface User {
-  id: string; // Assuming the manager's ID is a string
-  username: string; // Assuming the manager's username is a string
+  id: string; 
+  username: string; 
 }
 
 interface CreateCustomerModalProps {
@@ -25,27 +25,27 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   const [contactName, setContactName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
-  const [adminId, setAdminId] = useState(""); // Store admin ID
-  const [managerId, setManagerId] = useState(""); // Store manager ID
+  const [adminId, setAdminId] = useState("");
+  const [managerId, setManagerId] = useState(""); 
 
   const [admins, setAdmins] = useState<User[]>([]);
   const [managers, setManagers] = useState<User[]>([]);
 
   const userType = localStorage.getItem("userType");
   const loggedInAdminId = localStorage.getItem("adminId");
-  const loggedInManagerId = localStorage.getItem("managerId"); // Fetch managerId from localStorage if user is a manager
+  const loggedInManagerId = localStorage.getItem("managerId"); 
 
   // Automatically set adminId for ADMIN users and fetch managers
   useEffect(() => {
     if (userType === "ADMIN" && loggedInAdminId) {
-      setAdminId(loggedInAdminId); // Pre-fill adminId for ADMIN userType
+      setAdminId(loggedInAdminId); 
     }
   }, [userType, loggedInAdminId]);
 
   // If the user is a MANAGER, pre-fill managerId from localStorage
   useEffect(() => {
     if (userType === "MANAGER" && loggedInManagerId) {
-      setManagerId(loggedInManagerId); // Pre-fill managerId for MANAGER userType
+      setManagerId(loggedInManagerId);
     }
   }, [userType, loggedInManagerId]);
 
@@ -75,7 +75,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
             `http://localhost:8000/users/admins/manager?managerId=${loggedInManagerId}`
           );
           const data = await response.json();
-          setAdminId(data[0]?.id || ""); // Assuming the API returns an array with the admin data
+          setAdminId(data[0]?.id || ""); 
         } catch (error) {
           console.error("Failed to fetch adminId for manager:", error);
         }
@@ -89,7 +89,7 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
   useEffect(() => {
     const fetchFilteredManagers = async () => {
       if (!adminId) {
-        setManagers([]); // Clear managers if no adminId is set
+        setManagers([]); 
         return;
       }
       try {
@@ -97,14 +97,14 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
           `http://localhost:8000/users/managers/admin?adminId=${adminId}`
         );
         const filteredData: User[] = await response.json();
-        setManagers(filteredData); // Update managers based on adminId
+        setManagers(filteredData); 
       } catch (error) {
         console.error("Failed to fetch filtered managers:", error);
       }
     };
 
     fetchFilteredManagers();
-  }, [adminId]); // Trigger fetching filtered managers whenever adminId changes
+  }, [adminId]); 
 
   const handleSubmit = async () => {
     // Validation for required fields
@@ -134,11 +134,10 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
 
     // If the user is a MANAGER, automatically include the managerId (do not require the manager to select)
     if (userType === "MANAGER" && loggedInManagerId) {
-      customerData.managerId = Number(loggedInManagerId); // Use the logged-in manager's ID directly
-      customerData.adminId = Number(adminId); // Include the adminId associated with the manager
+      customerData.managerId = Number(loggedInManagerId);
+      customerData.adminId = Number(adminId);
     } else if (userType !== "MANAGER" && managerId && managerId !== "") {
-      // For Admins and other user types, use the selected managerId from the dropdown
-      customerData.managerId = Number(managerId); // Ensure managerId is a number
+      customerData.managerId = Number(managerId); 
     }
 
     try {
@@ -157,8 +156,8 @@ const CreateCustomerModal: React.FC<CreateCustomerModalProps> = ({
         alert("Failed to create customer: " + errorText);
       } else {
         alert("Customer created successfully!");
-        onCustomerCreated(); // Callback when customer is created
-        onClose(); // Close the modal
+        onCustomerCreated();
+        onClose(); 
       }
     } catch (error) {
       console.error("Failed to create customer:", error);

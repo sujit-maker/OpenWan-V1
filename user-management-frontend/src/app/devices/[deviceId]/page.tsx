@@ -273,8 +273,8 @@ const DeviceDetails: React.FC = () => {
           Device Dashboard - {deviceId}
         </h1>
 
+        {/* Device Data Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
-          {/* Device Data Cards */}
           <div className="bg-gray-400 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 hover:shadow-xl p-4 border border-gray-200 w-full max-w-sm">
             <h2 className="text-lg text-black font-semibold mb-2">
               Date & Time
@@ -436,6 +436,7 @@ const DeviceDetails: React.FC = () => {
             )}
           </div>
         )}
+        
         {/* Pagination Controls */}
         <div className="flex justify-center mt-4  space-x-6">
           <button

@@ -12,20 +12,20 @@ import UserTable from "../admin/UserTable";
 const Adm: React.FC = () => {
   const router = useRouter();
   const { changePassword, loading, username } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(true); // Dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true); 
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Add success message state
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); 
   const { currentUserType } = useAuth();
   const currentPath = usePathname();
-  const [loadingState, setLoadingState] = useState(false); // Custom state for tracking loading
+  const [loadingState, setLoadingState] = useState(false); 
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+      const handleClickOutside = (event: MouseEvent) => {
       const dropdown = document.querySelector(".dropdown-menu");
       const personIcon = document.querySelector(".person-icon");
 
@@ -69,7 +69,6 @@ const Adm: React.FC = () => {
         return "/man";
       case "SUPERADMIN":
         return "/super";
-      
       default:
         return "/";
     }
@@ -84,14 +83,11 @@ const Adm: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Watch for changes in pathname to detect when navigation is complete
   useEffect(() => {
     if (loadingState) {
-      // Optionally, check if the page is fully loaded or delay a bit
       setLoadingState(false);
     }
-  }, [currentPath]); // Effect when path changes
-
+  }, [currentPath]); 
   const handleSidebarToggle = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
@@ -156,10 +152,11 @@ const Adm: React.FC = () => {
                 aria-label="Confirm Password"
               />
             </div>
+            
             <div className="flex justify-center">
               <button
                 onClick={handleChangePassword}
-                disabled={loading} // Disable the button if loading
+                disabled={loading} 
                 className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
               >
                 {loading ? "Loading..." : "Change Password"}
@@ -176,8 +173,8 @@ const Adm: React.FC = () => {
         </div>
       )}
 
+      {/* Loading Spinner */}
       <div className="flex">
-        {/* Loading Spinner */}
         {loadingState && (
           <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
             <div className="relative flex justify-center items-center">
@@ -192,7 +189,7 @@ const Adm: React.FC = () => {
         )}
 
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
+        <header className="bg-gradient-to-r bg-indigo-800 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
           <div className="flex-grow " />
           <div className="flex items-center">
             <FaLock
@@ -237,8 +234,9 @@ const Adm: React.FC = () => {
           }
         `}
         >
+
+          {/* Sidebar Header */}
           <div className="flex h-full flex-col ">
-            {/* Sidebar Header */}
             <div className="flex items-center border-b px-4 h-14  ">
               <Button
                 variant="outline"

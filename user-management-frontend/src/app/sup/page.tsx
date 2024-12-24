@@ -6,7 +6,6 @@ import {
   LineChart,
   Menu,
   Package,
-  Users,
 } from "lucide-react";
 import { FaLock} from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
@@ -214,7 +213,7 @@ const Sup: React.FC = () => {
 
 
   {/* Header */}
-  <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
+  <header className="bg-gradient-to-r bg-indigo-800 text-white p-4 fixed top-0 left-0 w-full z-10 flex justify-between items-center shadow-md">
           <div className="flex-grow " />
           <div className="flex items-center">
             <FaLock

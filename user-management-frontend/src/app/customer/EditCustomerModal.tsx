@@ -55,7 +55,7 @@ interface EditCustomerModalProps {
           <textarea
             value={updatedCustomer.customerAddress}
             onChange={(e) => handleInputChange('customerAddress', e.target.value)}
-            className="w-full border text-white border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border text-black border-gray-300 rounded-lg px-3 py-2"
           />
         </div>
         <div className="mb-4">
@@ -64,7 +64,7 @@ interface EditCustomerModalProps {
             type="text"
             value={updatedCustomer.gstNumber}
             onChange={(e) => handleInputChange('gstNumber', e.target.value)}
-            className="w-full border text-white border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border text-black border-gray-300 rounded-lg px-3 py-2"
           />
         </div>
         <div className="mb-4">

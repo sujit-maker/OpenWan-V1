@@ -210,7 +210,7 @@ const DeviceTable: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
+            className="bg-gradient-to-r bg-indigo-800 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 w-full sm:w-auto mb-4 sm:mb-0"
           >
             Add Device
           </button>
@@ -231,7 +231,7 @@ const DeviceTable: React.FC = () => {
         {/* Responsive table wrapper */}
         <div className="overflow-x-auto lg:overflow-visible">
         <table className="min-w-full border-collapse bg-white shadow-lg rounded-lg ">
-      <thead className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+      <thead className="bg-gradient-to-r bg-indigo-800 text-white">
         <tr>
           <th className="border p-2 text-center">Identity</th>
           <th className="border p-2 text-center">Device</th>

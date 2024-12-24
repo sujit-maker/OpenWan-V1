@@ -16,7 +16,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   closeModal,
   onUserUpdated,
   user,
-  managers,
   currentUserType,
 }) => {
   const [username, setUsername] = useState(user.username);

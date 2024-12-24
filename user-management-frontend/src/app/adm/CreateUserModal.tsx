@@ -18,7 +18,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [usertype, setUsertype] = useState("MANAGER");  // Default to Manager
+  const [usertype, setUsertype] = useState("MANAGER");  
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +34,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
           );
           const data = await response.json();
           if (response.ok) {
-            setManagers(data); // Assuming the response is an array of managers
+            setManagers(data); 
           } else {
             setError(data.message || "Failed to fetch managers.");
           }
@@ -98,7 +98,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   const resetForm = () => {
     setUsername("");
     setPassword("");
-    setUsertype("MANAGER"); // Default to "MANAGER"
+    setUsertype("MANAGER"); 
   };
 
   return (
@@ -164,7 +164,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               />
             </div>
 
-            {/* No need for usertype selection since it's fixed to "MANAGER" */}
             <input type="hidden" value="MANAGER" />
 
             <div className="flex justify-end mt-6 space-x-4">
